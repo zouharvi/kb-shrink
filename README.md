@@ -1,6 +1,6 @@
 # Knowledge Base Shrink
 
-Goals:
+Notes:
 
 - Observe distribution of keys in KB
 - Reduce embedding vector size
@@ -12,4 +12,19 @@ Goals:
 - - Pre-train vs. post-train reduction effects
 - - MIPS has to be modified to gravitate towards the averages - store cluster size.
 
-Based on KILT research & dataset https://arxiv.org/abs/2009.02252.
+## Usage
+
+```
+pip3 install -r requirementss.txt
+mkdir -p data
+# download ELI5 dataset
+wget -O data/eli5-dev.jsonl http://dl.fbaipublicfiles.com/KILT/eli5-dev-kilt.jsonl
+# compute sentence prompt embeddings
+python3 embedding.py --dataset "data/eli5-dev-kilt.jsonl" --embd-out "data/eli5.dev-kilt.embd"
+```
+
+## Misc.
+
+Based on KILT research & dataset:
+- https://arxiv.org/abs/2009.02252
+- https://github.com/facebookresearch/KILT
