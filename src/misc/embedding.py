@@ -31,5 +31,5 @@ with open(args.dataset, "r") as fread, open(args.embd_out, "wb") as fwrite:
         if i % 10 == 0:
             print(i, line["input"])
         encoded_input = tokenizer(line["input"], return_tensors='pt')
-        output = model(**encoded_input)[1].detach().tolist()
+        output = model(**encoded_input)[1].detach().numpy()
         pickler.dump(output)

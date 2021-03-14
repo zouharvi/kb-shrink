@@ -30,11 +30,25 @@ $ python3 src/misc/analyze_size.py
 Whole dataset size:   11.9MB
 Prompts size:        571.8KB  4.7%
 Values size:          11.7MB 98.2%
-Keys size:             8.8MB  0.8x values size
-Keys size (calc):      8.8MB
-One key size:         24.1KB
-One key size (calc):   6.0KB
+Keys size (comp):      4.4MB  0.4x values size
+Keys size (calc):      4.4MB
+One key size (comp):  24.1KB
+One key size (calc):   3.0KB
+Key shape:            (768,)
+Key element type:    float32
 Number of entries:      1507
+```
+
+```
+$ python3 src/reduce_dim/prec_pca.py 
+Method                           Size                Loss
+Original (float32)              4.4MB (1.0x)    0.0000000
+PCA (512)                       2.9MB (0.7x)    0.0068601
+PCA (256)                       1.5MB (0.3x)    0.1049010
+Precision (float16)             2.2MB (0.5x)    0.0033717
+Precision (float16), PCA (512)  2.9MB (0.7x)    0.0074680
+PCA (512), Precision (float16)  1.5MB (0.3x)    0.0068810
+PCA (256), Precision (float16)  0.7MB (0.2x)    0.1049825
 ```
 
 ## Misc.

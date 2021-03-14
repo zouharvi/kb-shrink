@@ -11,6 +11,7 @@ def read_keys_pickle(path):
                 data.append(reader.load()[0])
             except EOFError:
                 break
+    # print(data[0])
     return np.array(data)
 
 

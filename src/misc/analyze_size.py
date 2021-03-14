@@ -30,13 +30,21 @@ prompts_size = asizeof(dataset_prompts)
 dataset_answers = load_dataset(args.dataset, keep="answers")
 answers_size = asizeof(dataset_answers)
 
+unitType = str(keys[0].dtype)
+if unitType == "float64":
+    unitSize = 8
+elif unitType == "float32":
+    unitSize = 4
+elif unitType == "float16":
+    unitSize = 2
+
 print(f"Whole dataset size:  {dataset_size/1024/1024:>5.1f}MB")
 print(f"Prompts size:        {prompts_size/1024:>5.1f}KB", f"{prompts_size/dataset_size*100:>4.1f}%")
 print(f"Values size:         {answers_size/1024/1024:>5.1f}MB", f"{answers_size/dataset_size*100:>4.1f}%")
-print(f"Keys size:           {keys_size/1024/1024:>5.1f}MB", f"{keys_size/answers_size:>4.1f}x values size")
-print(f"Keys size (calc):    {8*keys[0].shape[0]*len(keys)/1024/1024:>5.1f}MB")
-print(f"One key size:        {asizeof(keys[0].tolist())/1024:>5.1f}KB")
-print(f"One key size (calc): {8*keys[0].shape[0]/1024:>5.1f}KB")
+print(f"Keys size (comp):    {keys_size/1024/1024:>5.1f}MB", f"{keys_size/answers_size:>4.1f}x values size")
+print(f"Keys size (calc):    {unitSize*keys[0].shape[0]*len(keys)/1024/1024:>5.1f}MB")
+print(f"One key size (comp): {asizeof(keys[0].tolist())/1024:>5.1f}KB")
+print(f"One key size (calc): {unitSize*keys[0].shape[0]/1024:>5.1f}KB")
 print(f"Key shape:           {keys[0].shape}")
-print(f"Key element type:    {keys[0].dtype}")
+print(f"Key element type:    {unitType}")
 print(f"Number of entries:   {len(dataset_all):>7}")
