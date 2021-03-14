@@ -4,6 +4,7 @@ import json
 import pickle
 import argparse
 from transformers import BertTokenizer, BertModel
+from utils import parse_dataset_line
 
 parser = argparse.ArgumentParser(
     description='Compute sentence embeddings of KILT prompts.')
@@ -18,12 +19,6 @@ parser.add_argument(
     help='Specific BERT model to use (transformers lib)')
 args = parser.parse_args()
 
-def load_line(line, keep_answers=False):
-    line = json.loads(line)
-    if keep_answers:
-        return {"input": line["input"], "answer": [x["answer"] for x in line["output"] if "answer" in x]}
-    else:
-        return {"input": line["input"]}
 
 tokenizer = BertTokenizer.from_pretrained(args.embd_model)
 model = BertModel.from_pretrained(args.embd_model)
@@ -32,7 +27,7 @@ model.train(False)
 with open(args.dataset, "r") as fread, open(args.embd_out, "wb") as fwrite:
     pickler = pickle.Pickler(fwrite)
     for i, line in enumerate(fread):
-        line = load_line(line)
+        line = parse_dataset_line(line)
         if i % 10 == 0:
             print(i, line["input"])
         encoded_input = tokenizer(line["input"], return_tensors='pt')

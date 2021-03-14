@@ -6,6 +6,9 @@ import random
 from sklearn.neighbors import KDTree, NearestNeighbors
 import numpy as np
 import matplotlib.pyplot as plt
+import sys, os
+sys.path.append("src")
+from misc.utils import read_keys_pickle
 
 parser = argparse.ArgumentParser(description='Reduce KB key count')
 parser.add_argument(
@@ -16,15 +19,7 @@ parser.add_argument(
     help='Parameter p for Minkowski distance metric')
 args = parser.parse_args()
 
-data = []
-with open(args.keys_in, "rb") as fread:
-    reader = pickle.Unpickler(fread)
-    while True:
-        try:
-            data.append(reader.load()[0])
-        except EOFError:
-            break
-data = np.array(data)
+data = read_keys_pickle(args.keys_in)
 
 # original
 model = NearestNeighbors(

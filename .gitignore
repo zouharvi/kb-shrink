@@ -1,3 +1,4 @@
 *.jsonl
 *.embd
 .vscode
+__pycache__
