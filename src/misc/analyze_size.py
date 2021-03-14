@@ -37,4 +37,6 @@ print(f"Keys size:           {keys_size/1024/1024:>5.1f}MB", f"{keys_size/answer
 print(f"Keys size (calc):    {8*keys[0].shape[0]*len(keys)/1024/1024:>5.1f}MB")
 print(f"One key size:        {asizeof(keys[0].tolist())/1024:>5.1f}KB")
 print(f"One key size (calc): {8*keys[0].shape[0]/1024:>5.1f}KB")
+print(f"Key shape:           {keys[0].shape}")
+print(f"Key element type:    {keys[0].dtype}")
 print(f"Number of entries:   {len(dataset_all):>7}")
