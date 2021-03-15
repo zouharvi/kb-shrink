@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 
-import pickle
 import argparse
-import sys
-import torch
-import random
 import numpy as np
-from utils import read_keys_pickle, load_dataset
+from .utils import read_keys_pickle, load_dataset
 from pympler.asizeof import asizeof
 
 parser = argparse.ArgumentParser(description='Explore vector distribution')

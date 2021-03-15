@@ -1,6 +1,9 @@
 import pickle
 import json
 import numpy as np
+import torch
+
+DEVICE = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
 
 def read_keys_pickle(path):
     data = []
@@ -11,7 +14,6 @@ def read_keys_pickle(path):
                 data.append(reader.load()[0])
             except EOFError:
                 break
-    # print(data[0])
     return np.array(data)
 
 

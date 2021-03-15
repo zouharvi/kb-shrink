@@ -20,7 +20,7 @@ mkdir -p data
 # download ELI5 dataset
 wget -O data/eli5-dev.jsonl http://dl.fbaipublicfiles.com/KILT/eli5-dev-kilt.jsonl
 # compute sentence prompt embeddings
-python3 misc/embedding.py --dataset "data/eli5-dev-kilt.jsonl" --embd-out "data/eli5.dev-kilt.embd"
+python3 src/misc/embedding.py --dataset "data/eli5-dev.jsonl" --embd-out "data/eli5-dev.embd"
 ```
 
 Run all scripts from the top directory of the repository.
@@ -49,6 +49,14 @@ Precision (float16)             2.2MB (0.5x)    0.0033717
 Precision (float16), PCA (512)  2.9MB (0.7x)    0.0074680
 PCA (512), Precision (float16)  1.5MB (0.3x)    0.0068810
 PCA (256), Precision (float16)  0.7MB (0.2x)    0.1049825
+```
+
+```
+$ python3 src/reduce_dim/autoencoder.py 
+Method                           Size                Loss
+Autoencoder (256)               1.5MB (0.3x)    0.0001672
+Autoencoder (128)               1.5MB (0.17x)   0.0002453
+Autoencoder (64)                0.8MB (0.08x)   0.0002842
 ```
 
 ## Misc.

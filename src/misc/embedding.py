@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-import json
 import pickle
 import argparse
 from transformers import BertTokenizer, BertModel
-from utils import parse_dataset_line
+from .utils import parse_dataset_line
 
 parser = argparse.ArgumentParser(
     description='Compute sentence embeddings of KILT prompts.')

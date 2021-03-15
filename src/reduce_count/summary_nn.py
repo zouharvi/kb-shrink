@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
-import pickle
 import argparse
-import random
 from sklearn.neighbors import KDTree, NearestNeighbors
 import numpy as np
 import matplotlib.pyplot as plt
-import sys, os
+import sys
 sys.path.append("src")
 from misc.utils import read_keys_pickle
 
