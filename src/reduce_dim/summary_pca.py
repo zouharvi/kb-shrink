@@ -33,6 +33,7 @@ for components in [1, 2, 5, 10, 25, 50, 75, 100, 150, 200, 250, 300, 400, 500, 6
     print(components, np.average(distances))
     reconstructionLosses.append((components, np.average(distances)))
 
+plt.figure(figsize=(6, 3.5))
 plt.plot([x[0] for x in reconstructionLosses], [x[1] for x in reconstructionLosses], marker="o")
 plt.title(f"Average L2 PCA reconstruction loss for {len(data)} keys/embeddings")
 plt.xlabel("PCA components")
@@ -49,6 +50,17 @@ plt.title(f"Dimensions of {len(data)} keys/embeddings")
 plt.tight_layout()
 plt.show()
 
+# PCA dimensions
+model = PCA(n_components=256).fit(data)
+dataReduced = model.transform(data)
+plt.figure(figsize=(6, 3.5))
+plt.scatter(list(range(len(dataReduced[0])))*len(dataReduced), np.array(dataReduced).flatten(), alpha=0.2, marker='.', s=2)
+plt.xlabel("Dimension")
+plt.ylabel("Value")
+plt.title(f"Dimensions of {len(dataReduced)} keys/embeddings PCA (256)")
+plt.tight_layout()
+plt.show()
+
 # PCA reconstructed dimensions
 model = PCA(n_components=256).fit(data)
 dataReduced = model.inverse_transform(model.transform(data))
@@ -56,6 +68,6 @@ plt.figure(figsize=(6, 3.5))
 plt.scatter(list(range(len(dataReduced[0])))*len(dataReduced), np.array(dataReduced).flatten(), alpha=0.2, marker='.', s=2)
 plt.xlabel("Dimension")
 plt.ylabel("Value")
-plt.title(f"Dimensions of {len(dataReduced)} keys/embeddings reduced PCA (256)")
+plt.title(f"Dimensions of reconstructed {len(dataReduced)} keys/embeddings PCA (256)")
 plt.tight_layout()
 plt.show()
