@@ -3,43 +3,41 @@
 import sys
 sys.path.append("src")
 
-from misc.utils import read_keys_pickle, DEVICE
+from misc.utils import read_keys_pickle, save_keys_pickle, DEVICE
 import argparse
-from scipy.spatial.distance import minkowski
 from pympler.asizeof import asizeof
 import torch
 import torch.nn as nn
 
 
 class Autoencoder(nn.Module):
-    def __init__(self, epochs=1000, batchSize=128, learningRate=0.001):
+    def __init__(self, model, batchSize=128, learningRate=0.001):
         super().__init__()
-        # Encoder Network
-        self.encoder = nn.Sequential(
-            nn.Linear(768, 512),
-            nn.ReLU(True),
-            nn.Linear(512, 256),
-            nn.ReLU(True),
-            nn.Linear(256, 64)
-        )
-        # Decoder Network
-        self.decoder = nn.Sequential(
-            nn.Linear(64, 256),
-            nn.ReLU(True),
-            nn.Linear(256, 512),
-            nn.ReLU(True),
-            nn.Linear(512, 768),
-            nn.Tanh(),)
-        # TODO: remove tanh?
 
-        self.epochs = epochs
+        if model == 1:
+            # Encoder Network
+            self.encoder = nn.Sequential(
+                nn.Linear(768, 512),
+                nn.ReLU(True),
+                nn.Linear(512, 256),
+                nn.ReLU(True),
+                nn.Linear(256, 64)
+            )
+            # Decoder Network
+            self.decoder = nn.Sequential(
+                nn.Linear(64, 256),
+                nn.ReLU(True),
+                nn.Linear(256, 512),
+                nn.ReLU(True),
+                nn.Linear(512, 768),
+                nn.Tanh(),
+            )
+            # TODO: remove tanh?
+        else:
+            raise Exception("Unknown model specified")
+
         self.batchSize = batchSize
         self.learningRate = learningRate
-
-        # Data + Data Loaders
-        self.dataLoader = torch.utils.data.DataLoader(
-            dataset=torch.Tensor(data).to(DEVICE), batch_size=self.batchSize, shuffle=True
-        )
 
         self.optimizer = torch.optim.Adam(
             self.parameters(),
@@ -59,8 +57,12 @@ class Autoencoder(nn.Module):
     def decode(self, x):
         return self.decoder(x)
 
-    def trainModel(self):
-        for epoch in range(self.epochs):
+    def trainModel(self, data, epochs):
+        self.dataLoader = torch.utils.data.DataLoader(
+            dataset=data, batch_size=self.batchSize, shuffle=True
+        )
+
+        for epoch in range(epochs):
             for sample in self.dataLoader:
                 # Predictions
                 output = self(sample)
@@ -71,7 +73,7 @@ class Autoencoder(nn.Module):
                 loss.backward()
                 self.optimizer.step()
             if (epoch + 1) % 10 == 0:
-                print(f'epoch [{epoch+1}/{self.epochs}], loss:{loss.data:.7f}')
+                print(f'epoch [{epoch+1}/{epochs}], loss:{loss.data:.7f}')
 
 
 if __name__ == '__main__':
@@ -80,10 +82,22 @@ if __name__ == '__main__':
         '--keys-in', default="data/eli5-dev.embd",
         help='Input keys')
     parser.add_argument(
+        '--keys-out', default="data/eli5-dev-autoencoder.embd",
+        help='Encoded keys')
+    parser.add_argument(
+        '--model', default=1, type=int,
+        help='Which model to use (1 - big)')
+    parser.add_argument(
+        '--epochs', default=1000, type=int)
+    parser.add_argument(
         '--seed', type=int, default=0)
     args = parser.parse_args()
     torch.manual_seed(args.seed)
     data = read_keys_pickle(args.keys_in)
-    origSize = asizeof(data)
-    model = Autoencoder()
-    model.trainModel()
+    data = torch.Tensor(data).to(DEVICE)
+    model = Autoencoder(args.model)
+    model.trainModel(data, args.epochs)
+    model.train(False)
+    with torch.no_grad():
+        encoded = model.encode(data).cpu()
+    save_keys_pickle(encoded, args.keys_out)

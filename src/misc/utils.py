@@ -16,6 +16,11 @@ def read_keys_pickle(path):
                 break
     return np.array(data)
 
+def save_keys_pickle(data, path):
+    with open(path, "wb") as fwrite:
+        pickler = pickle.Pickler(fwrite)
+        for line in data:
+            pickler.dump(line)
 
 def parse_dataset_line(line, keep="inputs"):
     line = json.loads(line)
