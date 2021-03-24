@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-from sklearn.neighbors import KDTree, NearestNeighbors
+from sklearn.neighbors import NearestNeighbors
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
