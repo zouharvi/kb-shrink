@@ -11,7 +11,7 @@ def read_keys_pickle(path):
         reader = pickle.Unpickler(fread)
         while True:
             try:
-                data.append(reader.load()[0])
+                data.append(reader.load())
             except EOFError:
                 break
     return np.array(data)
@@ -20,7 +20,7 @@ def save_keys_pickle(data, path):
     with open(path, "wb") as fwrite:
         pickler = pickle.Pickler(fwrite)
         for line in data:
-            pickler.dump(line)
+            pickler.dump(np.array(line))
 
 def parse_dataset_line(line, keep="inputs"):
     line = json.loads(line)
