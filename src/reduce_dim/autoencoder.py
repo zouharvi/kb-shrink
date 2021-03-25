@@ -21,11 +21,11 @@ class Autoencoder(nn.Module):
                 nn.ReLU(True),
                 nn.Linear(512, 256),
                 nn.ReLU(True),
-                nn.Linear(256, 64)
+                nn.Linear(256, 256)
             )
             # Decoder Network
             self.decoder = nn.Sequential(
-                nn.Linear(64, 256),
+                nn.Linear(256, 256),
                 nn.ReLU(True),
                 nn.Linear(256, 512),
                 nn.ReLU(True),
@@ -81,7 +81,7 @@ class Autoencoder(nn.Module):
                     encoded = model.encode(data).cpu()
                 
                 # V^2 similarity computations is computationally expensive, skip if not necessary
-                if True:
+                if False:
                     order_new = vec_sim_order(encoded)
                     mrr_val = mrr(order_old, order_new, 20, report=False)
                     order_new = vec_sim_order(encoded, lambda x,y: -minkowski(x,y))
