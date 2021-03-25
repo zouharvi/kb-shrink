@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import read_keys_pickle
+from misc.utils import mrr, read_keys_pickle, vec_sim, vec_sim_order
 import argparse
 from scipy.spatial.distance import minkowski
 import numpy as np
@@ -16,47 +16,21 @@ args = parser.parse_args()
 
 data = read_keys_pickle(args.keys_in)
 
-similarities_p = []
-ranks_p = []
-for vec1 in data:
-    local = []
-    for vec2 in data:
-        product = np.inner(vec1, vec2)
-        local.append(product)
-    ranks_p.append(
-        set(sorted(
-            list(range(len(data))),
-            key=lambda x: local[x],
-            reverse=True
-        )[:100])
-    )
-    local.sort(reverse=True)
-    similarities_p.append(local)
+similarities_p = [
+    sorted(sims, reverse=True)
+    for sims in vec_sim(data, np.inner)
+]
 similarities_p = np.average(similarities_p, axis=0)
-
-
-distances_m = []
-ranks_m = []
-for vec1 in data:
-    local = []
-    for vec2 in data:
-        product = minkowski(vec1, vec2)
-        local.append(product)
-    ranks_m.append(
-        set(sorted(
-            list(range(len(data))),
-            key=lambda x: local[x],
-            reverse=False
-        )[:100])
-    )
-    local.sort(reverse=False)
-    distances_m.append(local)
+distances_m = [sorted(sims, reverse=True) for sims in vec_sim(data, minkowski)]
 distances_m = np.average(distances_m, axis=0)
 max_distance_m = max(distances_m)
 similarities_m = [max_distance_m - x for x in distances_m]
 
-avg_overlap = np.average([len(x & y) for x,y in zip(ranks_p, ranks_m)])
-print(f"Average overlap (top 100) is {avg_overlap:.0f} neighbours ({avg_overlap:.2f}%)")
+order_p = vec_sim_order(data, np.inner)
+# adding a constant (max) is irrelevant for ordering
+order_m = vec_sim_order(data, lambda x, y: -minkowski(x, y))
+
+mrr_val = mrr(order_p, order_m, 20, report=True)
 
 # plot
 fig = plt.figure()

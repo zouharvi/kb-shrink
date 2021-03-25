@@ -36,3 +36,30 @@ def parse_dataset_line(line, keep="inputs"):
 def load_dataset(path, keep="inputs"):
     with open(path, "r") as f:
         return [parse_dataset_line(line, keep) for line in f.readlines()]
+
+def vec_sim(data, sim_func=np.inner):
+    return [
+        [sim_func(vec1, vec2) for vec2 in data]
+        for vec1 in data
+    ]
+
+def vec_sim_order(data, sim_func=np.inner):
+    return [
+        sorted(
+            range(len(data)),
+            key=lambda x: sims[x],
+            reverse=True
+        ) for sims in vec_sim(data, sim_func)
+    ]
+
+def mrr(order_old, order_new, n, report=False):
+    order_old = [x[:n] for x in order_old]
+
+    def mrr_local(needles, stack):
+        return 1/min([stack.index(needle)+1 for needle in needles])
+    mrr_val = np.average([mrr_local(x,y) for x,y in zip(order_old, order_new)])
+
+    if report:
+        print(f"MRR (top {n}) is {mrr_val:.3f} (best is 1, worst is 0)")
+
+    return mrr_val

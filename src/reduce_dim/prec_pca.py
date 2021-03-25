@@ -2,10 +2,8 @@
 
 import sys, os
 sys.path.append("src")
-from misc.utils import read_keys_pickle
-import pickle
+from misc.utils import mrr, read_keys_pickle, vec_sim_order
 import argparse
-import random
 from sklearn.decomposition import PCA
 from scipy.spatial.distance import minkowski
 import numpy as np
@@ -20,14 +18,19 @@ args = parser.parse_args()
 data = read_keys_pickle(args.keys_in)
 origSize = asizeof(data)
 
-print(f"{'Method':<30}   {'Size':>4}            {'Loss':>8}")
+order_old = vec_sim_order(data)
+
+
+print(f"{'Method':<30}   {'Size':>4}            {'Loss':>8}   {'MRR 20':>8}")
 
 def summary_performance(name, dataReduced, dataReconstructed):
+    order_new = vec_sim_order(dataReduced)
+    mrr_val = mrr(order_old, order_new, 20, report=False)
     size = asizeof(dataReduced)
     distances = []
     for vec, vecNew in zip(data, dataReconstructed):
         distances.append(minkowski(vec, vecNew, 2))
-    print(f"{name:<30} {size/1024/1024:>4.1f}MB ({size/origSize:.1f}x)   {np.average(distances):>10.7f}")
+    print(f"{name:<30} {size/1024/1024:>4.1f}MB ({size/origSize:.1f}x)   {np.average(distances):>10.7f}    {mrr_val:>5.3f}")
 
 def pca_performance(components):
     model = PCA(n_components=components).fit(data)

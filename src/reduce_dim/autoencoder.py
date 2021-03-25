@@ -3,9 +3,9 @@
 import sys
 sys.path.append("src")
 
-from misc.utils import read_keys_pickle, save_keys_pickle, DEVICE
+from misc.utils import mrr, read_keys_pickle, save_keys_pickle, DEVICE, vec_sim_order
 import argparse
-from pympler.asizeof import asizeof
+from scipy.spatial.distance import minkowski
 import torch
 import torch.nn as nn
 
@@ -32,7 +32,7 @@ class Autoencoder(nn.Module):
                 nn.Linear(512, 768),
                 nn.Tanh(),
             )
-            # TODO: remove tanh?
+            # One may be tempted to remove the Tanh, but it reduces final loss
         else:
             raise Exception("Unknown model specified")
 
@@ -61,8 +61,10 @@ class Autoencoder(nn.Module):
         self.dataLoader = torch.utils.data.DataLoader(
             dataset=data, batch_size=self.batchSize, shuffle=True
         )
+        order_old = vec_sim_order(data.cpu())
 
         for epoch in range(epochs):
+            self.train(True)
             for sample in self.dataLoader:
                 # Predictions
                 output = self(sample)
@@ -72,8 +74,25 @@ class Autoencoder(nn.Module):
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
+
             if (epoch + 1) % 10 == 0:
-                print(f'epoch [{epoch+1}/{epochs}], loss:{loss.data:.7f}')
+                self.train(False)
+                with torch.no_grad():
+                    encoded = model.encode(data).cpu()
+                
+                # V^2 similarity computations is computationally expensive, skip if not necessary
+                if True:
+                    order_new = vec_sim_order(encoded)
+                    mrr_val = mrr(order_old, order_new, 20, report=False)
+                    order_new = vec_sim_order(encoded, lambda x,y: -minkowski(x,y))
+                    mrr_val_l2 = mrr(order_old, order_new, 20, report=False)
+                    print(f'epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f}, mrr_ip: {mrr_val:.3f}, mrr_l2: {mrr_val_l2:.3f}')
+                elif False:
+                    order_new = vec_sim_order(encoded)
+                    mrr_val = mrr(order_old, order_new, 20, report=False)
+                    print(f'epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f}, mrr_ip: {mrr_val:.3f}')
+                else:
+                    print(f'epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f}')
 
 
 if __name__ == '__main__':
