@@ -3,3 +3,4 @@ scikit-learn >= 0.23
 matplotlib >= 3.3
 pympler >= 0.9
 torch >= 1.7
+scann >= 1.2

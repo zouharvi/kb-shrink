@@ -1,6 +1,7 @@
 import pickle
 import json
 import numpy as np
+import scann
 import torch
 
 DEVICE = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
