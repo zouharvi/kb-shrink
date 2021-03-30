@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser(description='Explore vector distribution')
 parser.add_argument('--dataset', default="data/eli5-dev.jsonl")
 parser.add_argument('--keys-in', default="data/eli5-dev.embd")
 parser.add_argument('--embd-model', default="bert-base-cased")
+parser.add_argument('--type-out', default="pooler")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 
@@ -35,6 +36,6 @@ print("Finished")
 
 while True:
     query = input("Ask:   ")
-    query_embd = bert.sentence_embd(query)
+    query_embd = bert.sentence_embd(query, args.type_out)
     neighbours, distances = searcher.search(query_embd)
     print(f"{distances[0]:5.2f}:", dataset[neighbours[0]]["input"])
