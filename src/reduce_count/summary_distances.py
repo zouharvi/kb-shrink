@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import mrr, read_keys_pickle, vec_sim, vec_sim_order
+from misc.utils import l2_sim, mrr, read_keys_pickle, vec_sim, vec_sim_order
 import argparse
 from scipy.spatial.distance import minkowski
 import numpy as np
@@ -16,21 +16,20 @@ args = parser.parse_args()
 
 data = read_keys_pickle(args.keys_in)
 
-similarities_p = [
+similarities_ip = [
     sorted(sims, reverse=True)
-    for sims in vec_sim(data, np.inner)
+    for sims in vec_sim(data, sim_func=np.inner)
 ]
-similarities_p = np.average(similarities_p, axis=0)
-distances_m = [sorted(sims, reverse=True) for sims in vec_sim(data, minkowski)]
-distances_m = np.average(distances_m, axis=0)
-max_distance_m = max(distances_m)
-similarities_m = [max_distance_m - x for x in distances_m]
+similarities_ip = np.average(similarities_ip, axis=0)
+similarities_l2 = [
+    sorted(sims, reverse=True)
+    for sims in vec_sim(data, sim_func=l2_sim)
+]
+similarities_l2 = np.average(similarities_l2, axis=0)
 
-order_p = vec_sim_order(data, np.inner)
-# adding a constant (max) is irrelevant for ordering
-order_m = vec_sim_order(data, lambda x, y: -minkowski(x, y))
-
-mrr_val = mrr(order_p, order_m, 20, report=True)
+# order_ip = vec_sim_order(data, sim_func=np.inner)
+# order_l2 = vec_sim_order(data, sim_func=l2_sim)
+# mrr_val = mrr(order_ip, order_l2, 20, report=True)
 
 # plot
 fig = plt.figure()
@@ -39,29 +38,30 @@ ax2 = ax1.twiny().twinx()
 ax3 = ax1.twinx()
 
 line2, = ax2.plot(
-    similarities_p[:100],
+    similarities_ip[1:100],
     color="tab:orange",
 )
 line1, = ax1.plot(
-    similarities_p,
+    similarities_ip[1:],
     color="tab:blue",
 )
 # mark top 100 on the global line
 line1_mark, = ax1.plot(
-    similarities_p[:100],
+    similarities_ip[1:100],
     color="tab:orange",
     linewidth=3,
     linestyle="dotted"
 )
 
 line3, = ax3.plot(
-    similarities_m,
+    similarities_l2[1:],
     color="tab:green",
 )
+ax1.set_xlabel("Neighbour")
 ax1.set_ylabel("Inner Product All")
 ax2.get_yaxis().set_visible(False)
 ax3.get_xaxis().set_visible(False)
-ax3.set_ylabel("max - L2 All")
+ax3.set_ylabel("- L2 All")
 
 plt.xlabel("Neighbours")
 
@@ -70,6 +70,6 @@ plt.tight_layout()
 plt.legend(
     [line1, line2, line1_mark, line3],
     ["All neighbours (IP)", "Top 100 Neighbours (IP)",
-     "Top 100 Neighbours (IP)", "All neighbours (max - L2)"],
+     "Top 100 Neighbours (IP)", "All neighbours (-L2)"],
     loc="lower left")
 plt.show()
