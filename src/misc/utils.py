@@ -1,7 +1,7 @@
 import pickle
 import json
 import numpy as np
-import scann
+from scipy.spatial.distance import minkowski
 import torch
 
 DEVICE = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
@@ -39,15 +39,18 @@ def load_dataset(path, keep="inputs"):
         return [parse_dataset_line(line, keep) for line in f.readlines()]
 
 def vec_sim(data, sim_func=np.inner):
+    """
+    Compute vector similarity matrix, excluding the diagonal.
+    """
     return [
-        [sim_func(vec1, vec2) for vec2 in data]
-        for vec1 in data
+        [sim_func(vec1, vec2) for i2, vec2 in enumerate(data) if i1 != i2]
+        for i1, vec1 in enumerate(data)
     ]
 
 def vec_sim_order(data, sim_func=np.inner):
     return [
         sorted(
-            range(len(data)),
+            range(len(sims)),
             key=lambda x: sims[x],
             reverse=True
         ) for sims in vec_sim(data, sim_func)
@@ -64,3 +67,6 @@ def mrr(order_old, order_new, n, report=False):
         print(f"MRR (top {n}) is {mrr_val:.3f} (best is 1, worst is 0)")
 
     return mrr_val
+
+def l2_sim(x, y):
+    return -minkowski(x, y)

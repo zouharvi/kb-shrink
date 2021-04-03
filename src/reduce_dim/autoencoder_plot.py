@@ -17,17 +17,17 @@ ax2 = ax1.twinx()
 ax3 = ax2
 
 line1, = ax1.plot(
-    # range(10, 1010, 10),
+    range(10, 1010, 10),
     data_loss,
     color="tab:blue",
 )
 line2, = ax2.plot(
-    # range(10, 1010, 10),
+    range(10, 1010, 10),
     data_mrr_ip,
     color="tab:orange",
 )
 line3, = ax3.plot(
-    # range(10, 1010, 10),
+    range(10, 1010, 10),
     data_mrr_l2,
     color="tab:green",
 )
@@ -42,6 +42,7 @@ plt.title("Autoencoder reconstruction loss vs. neighbour ordering")
 plt.legend(
     [line1, line2, line3],
     ["Train L2 Loss", "Train MRR (inner product)", "Train MRR (L2)"],
-    loc="upper right"
+    loc="best",
+    bbox_to_anchor=(1.0, 0.85)
 )
 plt.show()

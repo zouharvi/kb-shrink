@@ -2,16 +2,17 @@
 
 import sys
 sys.path.append("src")
+from misc.utils import l2_sim
 
 from misc.utils import mrr, read_keys_pickle, save_keys_pickle, DEVICE, vec_sim_order
 import argparse
-from scipy.spatial.distance import minkowski
+import numpy as np
 import torch
 import torch.nn as nn
 
 
 class Autoencoder(nn.Module):
-    def __init__(self, model, batchSize=128, learningRate=0.001):
+    def __init__(self, model, bottleneck, batchSize=128, learningRate=0.001):
         super().__init__()
 
         if model == 1:
@@ -21,11 +22,11 @@ class Autoencoder(nn.Module):
                 nn.ReLU(True),
                 nn.Linear(512, 256),
                 nn.ReLU(True),
-                nn.Linear(256, 256)
+                nn.Linear(256, bottleneck)
             )
             # Decoder Network
             self.decoder = nn.Sequential(
-                nn.Linear(256, 256),
+                nn.Linear(bottleneck, 256),
                 nn.ReLU(True),
                 nn.Linear(256, 512),
                 nn.ReLU(True),
@@ -61,7 +62,8 @@ class Autoencoder(nn.Module):
         self.dataLoader = torch.utils.data.DataLoader(
             dataset=data, batch_size=self.batchSize, shuffle=True
         )
-        order_old = vec_sim_order(data.cpu())
+        order_old_ip = vec_sim_order(data.cpu(), sim_func=np.inner)
+        order_old_l2 = vec_sim_order(data.cpu(), sim_func=l2_sim)
 
         for epoch in range(epochs):
             self.train(True)
@@ -82,10 +84,10 @@ class Autoencoder(nn.Module):
                 
                 # V^2 similarity computations is computationally expensive, skip if not necessary
                 if False:
-                    order_new = vec_sim_order(encoded)
-                    mrr_val = mrr(order_old, order_new, 20, report=False)
-                    order_new = vec_sim_order(encoded, lambda x,y: -minkowski(x,y))
-                    mrr_val_l2 = mrr(order_old, order_new, 20, report=False)
+                    order_new = vec_sim_order(encoded, sim_func=np.inner)
+                    mrr_val = mrr(order_old_ip, order_new, 20, report=False)
+                    order_new = vec_sim_order(encoded, sim_func=l2_sim)
+                    mrr_val_l2 = mrr(order_old_l2, order_new, 20, report=False)
                     print(f'epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f}, mrr_ip: {mrr_val:.3f}, mrr_l2: {mrr_val_l2:.3f}')
                 elif False:
                     order_new = vec_sim_order(encoded)
@@ -107,6 +109,9 @@ if __name__ == '__main__':
         '--model', default=1, type=int,
         help='Which model to use (1 - big)')
     parser.add_argument(
+        '--bottleneck', default=256, type=int,
+        help='Dimension of the bottleneck layer')
+    parser.add_argument(
         '--epochs', default=1000, type=int)
     parser.add_argument(
         '--seed', type=int, default=0)
@@ -114,7 +119,7 @@ if __name__ == '__main__':
     torch.manual_seed(args.seed)
     data = read_keys_pickle(args.keys_in)
     data = torch.Tensor(data).to(DEVICE)
-    model = Autoencoder(args.model)
+    model = Autoencoder(args.model, args.bottleneck)
     model.trainModel(data, args.epochs)
     model.train(False)
     with torch.no_grad():
