@@ -2,9 +2,7 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import l2_sim
-
-from misc.utils import mrr, read_keys_pickle, save_keys_pickle, DEVICE, vec_sim_order
+from misc.utils import l2_sim, mrr, read_keys_pickle, save_keys_pickle, DEVICE, vec_sim_order
 import argparse
 import numpy as np
 import torch
@@ -15,26 +13,28 @@ order_old_l2 = None
 
 
 def report(prefix, encoded, data, level, order_old_ip=None, order_old_l2=None):
-    if level >= 1:
+    if level >= 2:
         if order_old_ip is None:
             order_old_ip = vec_sim_order(data, sim_func=np.inner)
 
-    if level >= 2:
+    if level >= 3:
         if order_old_l2 is None:
             order_old_l2 = vec_sim_order(data, sim_func=l2_sim)
 
     # V^2 similarity computations is computationally expensive, skip if not necessary
-    if level == 2:
+    if level == 3:
         order_new = vec_sim_order(encoded, sim_func=np.inner)
         mrr_val_ip = mrr(order_old_ip, order_new, 20, report=False)
         order_new = vec_sim_order(encoded, sim_func=l2_sim)
         mrr_val_l2 = mrr(order_old_l2, order_new, 20, report=False)
         print(f'{prefix} mrr_ip: {mrr_val_ip:.3f}, mrr_l2: {mrr_val_l2:.3f}')
-    elif level == 1:
+        return mrr_val_ip, mrr_val_l2
+    elif level == 2:
         order_new = vec_sim_order(encoded)
         mrr_val_ip = mrr(order_old_ip, order_new, 20, report=False)
         print(f'{prefix} mrr_ip: {mrr_val_ip:.3f}')
-    elif level == 0:
+        return mrr_val_ip
+    elif level == 1:
         print(f'{prefix}')
 
 
@@ -43,7 +43,6 @@ class Autoencoder(nn.Module):
         super().__init__()
 
         if model == 1:
-            # Encoder Network
             layers = [
                 nn.Linear(768, 512),               # 1
                 nn.Tanh(),                         # 2
@@ -58,11 +57,25 @@ class Autoencoder(nn.Module):
                 nn.Linear(512, 768),               # 11
                 nn.Tanh(),                         # 12
             ]
-            # One may be tempted to remove the Tanh, but it worsens the performance
-            self.encoder = nn.Sequential(*layers[:bottleneck_index])
-            self.decoder = nn.Sequential(*layers[bottleneck_index:])
+        elif model == 2:
+            layers = [
+                nn.Linear(768, 512),               # 1
+                nn.Identity(),                     # 2
+                nn.Linear(512, 256),               # 3
+                nn.Identity(),                     # 4
+                nn.Linear(256, bottleneck_width),  # 5
+                nn.Identity(),                     # 6
+                nn.Linear(bottleneck_width, 256),  # 7
+                nn.Identity(),                     # 8
+                nn.Linear(256, 512),               # 9
+                nn.Identity(),                     # 10
+                nn.Linear(512, 768),               # 11
+                nn.Identity(),                     # 12
+            ]
         else:
             raise Exception("Unknown model specified")
+        self.encoder = nn.Sequential(*layers[:bottleneck_index])
+        self.decoder = nn.Sequential(*layers[bottleneck_index:])
 
         self.batchSize = batchSize
         self.learningRate = learningRate
@@ -85,7 +98,7 @@ class Autoencoder(nn.Module):
     def decode(self, x):
         return self.decoder(x)
 
-    def trainModel(self, data, epochs):
+    def trainModel(self, data, epochs, loglevel):
         self.dataLoader = torch.utils.data.DataLoader(
             dataset=data, batch_size=self.batchSize, shuffle=True
         )
@@ -105,11 +118,11 @@ class Autoencoder(nn.Module):
             if (epoch + 1) % 10 == 0:
                 self.train(False)
                 with torch.no_grad():
-                    encoded = model.encode(data).cpu()
+                    encoded = self.encode(data).cpu()
 
                 report(
                     f"epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f},",
-                    encoded, data.cpu(), level=args.level
+                    encoded, data.cpu(), level=loglevel
                 )
 
 
@@ -133,7 +146,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--epochs', default=1000, type=int)
     parser.add_argument(
-        '--level', default=0, type=int,
+        '--loglevel', default=1, type=int,
         help='Level at which to report')
     parser.add_argument(
         '--seed', type=int, default=0)
@@ -143,9 +156,9 @@ if __name__ == '__main__':
     data = torch.Tensor(data).to(DEVICE)
     model = Autoencoder(args.model, args.bottleneck_width, args.bottleneck_index)
     print(model)
-    model.trainModel(data, args.epochs)
+    model.trainModel(data, args.epochs, args.loglevel)
     model.train(False)
     with torch.no_grad():
         encoded = model.encode(data).cpu()
-    report(f"Final:", encoded, data.cpu(), level=2)
+    report(f"Final:", encoded, data.cpu(), level=3)
     save_keys_pickle(encoded, args.keys_out)

@@ -12,7 +12,7 @@ Notes:
 - - Pre-train vs. post-train reduction effects
 - - MIPS has to be modified to gravitate towards the averages - store cluster size.
 
-## Usage
+## Example Usage
 
 ```
 pip3 install -r requirementss.txt
