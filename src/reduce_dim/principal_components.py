@@ -10,9 +10,8 @@ import numpy as np
 from pympler.asizeof import asizeof
 
 parser = argparse.ArgumentParser(description='Explore vector distribution')
-parser.add_argument(
-    '--keys-in', default="data/eli5-dev.embd",
-    help='Input keys')
+parser.add_argument('--keys-in', default="data/eli5-dev.embd")
+parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 data = read_keys_pickle(args.keys_in)
 origSize = asizeof(data)
@@ -35,7 +34,7 @@ def summary_performance(name, dataReduced, dataReconstructed):
     print(f"{name:<21} {size/origSize:>5.3f}x {np.average(distances):>7.5f} {mrr_val_ip:>5.3f} {mrr_val_l2:>5.3f}")
 
 def pca_performance(components):
-    model = PCA(n_components=components).fit(data)
+    model = PCA(n_components=components, random_state=args.seed).fit(data)
     dataReduced = model.transform(data)
     summary_performance(f"PCA ({components})", dataReduced, model.inverse_transform(dataReduced))
 
@@ -45,17 +44,17 @@ def precision_performance(newType):
 
 def precision_pca_performance(components, newType):
     dataReduced = data.astype(newType)
-    model = PCA(n_components=components).fit(dataReduced)
+    model = PCA(n_components=components, random_state=args.seed).fit(dataReduced)
     dataReduced = model.transform(dataReduced).astype("float32")
     summary_performance(f"Prec ({newType}), PCA ({components})", dataReduced, model.inverse_transform(dataReduced).astype("float32"))
 
 def pca_precision_preformance(components, newType):
-    model = PCA(n_components=components).fit(data)
+    model = PCA(n_components=components, random_state=args.seed).fit(data)
     dataReduced = model.transform(data)
     dataReduced = dataReduced.astype(newType)
     summary_performance(f"PCA ({components}), Prec ({newType})", dataReduced, model.inverse_transform(dataReduced.astype("float32")))
 
-summary_performance(f"Original ({data.dtype})", data, data)
+# summary_performance(f"Original ({data.dtype})", data, data)
 pca_performance(32)
 pca_performance(64)
 pca_performance(128)
