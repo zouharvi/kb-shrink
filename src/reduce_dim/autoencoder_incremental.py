@@ -38,14 +38,15 @@ if __name__ == '__main__':
 
     # for bottleneck_width in [32, 64, 128, 256]:
     for bottleneck_width in [64]:
+        print(f"Running {bottleneck_width}")
+        model = Autoencoder(args.model, bottleneck_width)
+        print(model)
+        model.trainModel(data, args.epochs, bottleneck_index=-1, loglevel=1)
         for bottleneck_index in range(13):
-            print(f"Running {bottleneck_width}, {bottleneck_index}")
-            model = Autoencoder(args.model, bottleneck_width, bottleneck_index)
-            print(model)
-            model.trainModel(data, args.epochs, loglevel=0)
+            print(f"Bottleneck index {bottleneck_index}")
             model.train(False)
             with torch.no_grad():
-                encoded = model.encode(data).cpu()
+                encoded = model.encode(data, bottleneck_index).cpu()
             mrr_ip, mrr_l2 = report(f"Final:", encoded, data.cpu(), level=3)
             with open(args.logfile, "a") as f:
                 if args.model == 2:

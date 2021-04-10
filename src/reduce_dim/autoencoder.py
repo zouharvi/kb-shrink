@@ -39,11 +39,11 @@ def report(prefix, encoded, data, level, order_old_ip=None, order_old_l2=None):
 
 
 class Autoencoder(nn.Module):
-    def __init__(self, model, bottleneck_width, bottleneck_index, batchSize=128, learningRate=0.001):
+    def __init__(self, model, bottleneck_width, batchSize=128, learningRate=0.001):
         super().__init__()
 
         if model == 1:
-            layers = [
+            self.layers = [
                 nn.Linear(768, 512),               # 1
                 nn.Tanh(),                         # 2
                 nn.Linear(512, 256),               # 3
@@ -58,7 +58,7 @@ class Autoencoder(nn.Module):
                 nn.Tanh(),                         # 12
             ]
         elif model == 2:
-            layers = [
+            self.layers = [
                 nn.Linear(768, 512),               # 1
                 nn.Identity(),                     # 2
                 nn.Linear(512, 256),               # 3
@@ -72,10 +72,23 @@ class Autoencoder(nn.Module):
                 nn.Linear(512, 768),               # 11
                 nn.Identity(),                     # 12
             ]
+        elif model == 3:
+            self.layers = [
+                nn.Linear(768, 512),               # 1
+                nn.Tanh(),                         # 2
+                nn.Linear(512, 256),               # 3
+                nn.Tanh(),                         # 4
+                nn.Linear(256, bottleneck_width),  # 5
+                nn.Tanh(),                         # 6
+                nn.Linear(bottleneck_width, 256),  # 7
+                nn.Tanh(),                         # 8
+                nn.Linear(256, 512),               # 9
+                nn.Tanh(),                         # 10
+                nn.Linear(512, 768),               # 11
+            ]
         else:
             raise Exception("Unknown model specified")
-        self.encoder = nn.Sequential(*layers[:bottleneck_index])
-        self.decoder = nn.Sequential(*layers[bottleneck_index:])
+        self.all_layers = nn.Sequential(*self.layers)
 
         self.batchSize = batchSize
         self.learningRate = learningRate
@@ -88,17 +101,17 @@ class Autoencoder(nn.Module):
         self.to(DEVICE)
 
     def forward(self, x):
-        x = self.encoder(x)
-        x = self.decoder(x)
-        return x
+        return self.all_layers(x)
 
-    def encode(self, x):
-        return self.encoder(x)
+    def encode(self, x, bottleneck_index):
+        encoder = nn.Sequential(*self.layers[:bottleneck_index])
+        return encoder(x)
 
-    def decode(self, x):
-        return self.decoder(x)
+    def decode(self, x, bottleneck_index):
+        decoder = nn.Sequential(*self.layers[bottleneck_index:])
+        return decoder(x)
 
-    def trainModel(self, data, epochs, loglevel):
+    def trainModel(self, data, epochs, bottleneck_index, loglevel):
         self.dataLoader = torch.utils.data.DataLoader(
             dataset=data, batch_size=self.batchSize, shuffle=True
         )
@@ -118,7 +131,7 @@ class Autoencoder(nn.Module):
             if (epoch + 1) % 10 == 0:
                 self.train(False)
                 with torch.no_grad():
-                    encoded = self.encode(data).cpu()
+                    encoded = self.encode(data, bottleneck_index).cpu()
 
                 report(
                     f"epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f},",
@@ -154,11 +167,11 @@ if __name__ == '__main__':
     torch.manual_seed(args.seed)
     data = read_keys_pickle(args.keys_in)
     data = torch.Tensor(data).to(DEVICE)
-    model = Autoencoder(args.model, args.bottleneck_width, args.bottleneck_index)
+    model = Autoencoder(args.model, args.bottleneck_width)
     print(model)
-    model.trainModel(data, args.epochs, args.loglevel)
+    model.trainModel(data, args.epochs, bottleneck_index=-1, loglevel=args.loglevel)
     model.train(False)
     with torch.no_grad():
-        encoded = model.encode(data).cpu()
+        encoded = model.encode(data, args.bottleneck_index).cpu()
     report(f"Final:", encoded, data.cpu(), level=3)
     save_keys_pickle(encoded, args.keys_out)
