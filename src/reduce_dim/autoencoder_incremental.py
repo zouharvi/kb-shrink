@@ -17,7 +17,7 @@ if __name__ == '__main__':
         help='Input keys')
     parser.add_argument(
         '--model', default=1, type=int,
-        help='Which model to use (1 - big)')
+        help='Which model to use')
     parser.add_argument(
         '--bottleneck-width', default=256, type=int,
         help='Dimension of the bottleneck layer')
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     data = torch.Tensor(data).to(DEVICE)
     
     with open(args.logfile, "a") as f:
-        f.write(f"width, index, mrr_ip, mrr_l2\n")
+        f.write(f"model, width, index, mrr_ip, mrr_l2\n")
 
     # for bottleneck_width in [32, 64, 128, 256]:
     for bottleneck_width in [64]:
@@ -49,7 +49,4 @@ if __name__ == '__main__':
                 encoded = model.encode(data, bottleneck_index).cpu()
             mrr_ip, mrr_l2 = report(f"Final:", encoded, data.cpu(), level=3)
             with open(args.logfile, "a") as f:
-                if args.model == 2:
-                    f.write(f"{bottleneck_width} no activ., {bottleneck_index}, {mrr_ip}, {mrr_l2}\n")
-                else:
-                    f.write(f"{bottleneck_width}, {bottleneck_index}, {mrr_ip}, {mrr_l2}\n")
+                f.write(f"{args.model}, {bottleneck_width}, {bottleneck_index}, {mrr_ip}, {mrr_l2}\n")

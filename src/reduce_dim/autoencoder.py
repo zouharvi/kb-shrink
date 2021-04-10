@@ -149,7 +149,7 @@ if __name__ == '__main__':
         help='Encoded keys')
     parser.add_argument(
         '--model', default=1, type=int,
-        help='Which model to use (1 - big)')
+        help='Which model to use')
     parser.add_argument(
         '--bottleneck-width', default=256, type=int,
         help='Dimension of the bottleneck layer')

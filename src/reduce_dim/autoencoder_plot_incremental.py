@@ -11,15 +11,22 @@ xtick_labels = [
     "768", "512", "512\ntanh", "256", "256\ntanh", "NECK",
     "NECK\ntanh", "256", "256\ntanh", "512", "512\ntanh", "768", "768\ntanh"
 ]
+model_labels = {
+    '1': '',
+    '1n': ' norm.',
+    '2': ' no activ.',
+    '3': ' no last'
+}
 colors = list(mcolors.TABLEAU_COLORS.values())
 
 data = defaultdict(lambda: defaultdict(list))
 with open(sys.argv[1], 'r') as f:
     data_raw = [line.strip().split(",") for line in f.readlines()[1:]]
     for line in data_raw:
-        data[line[0]]["index"].append(line[1])
-        data[line[0]]["mrr_ip"].append(float(line[2]))
-        data[line[0]]["mrr_l2"].append(float(line[3]))
+        identifier = (line[0], int(line[1]))
+        data[identifier]["index"].append(line[2])
+        data[identifier]["mrr_ip"].append(float(line[3]))
+        data[identifier]["mrr_l2"].append(float(line[4]))
 
 
 fig = plt.figure(figsize=(8, 6))
@@ -34,19 +41,19 @@ for i, xtick_label in enumerate(xtick_labels):
             fill=True,
         ))
 
-for i, (key, arrays) in enumerate(data.items()):
+for i, ((model, bottleneck_width), arrays) in enumerate(data.items()):
     # skip poitns for runs without activation
     data_local = [
         (index, mrr_ip, mrr_l2)
         for xtick_label, index, mrr_ip, mrr_l2
         in zip(xtick_labels, arrays["index"], arrays["mrr_ip"], arrays["mrr_l2"])
-        if not ("tanh" in xtick_label and "no activ." in key)
+        if not ("tanh" in xtick_label and model == '2')
     ]
 
     plt.plot(
         [x[0] for x in data_local],
         [x[1] for x in data_local],
-        label=f"({key}) MRR IP",
+        label=f"({bottleneck_width}{model_labels[model]}) MRR IP",
         marker="^",
         alpha=0.5,
         color=colors[i],
@@ -54,7 +61,7 @@ for i, (key, arrays) in enumerate(data.items()):
     plt.plot(
         [x[0] for x in data_local],
         [x[2] for x in data_local],
-        label=f"({key}) MRR L2",
+        label=f"({bottleneck_width}{model_labels[model]}) MRR L2",
         marker="o",
         alpha=0.5,
         color=colors[i],
