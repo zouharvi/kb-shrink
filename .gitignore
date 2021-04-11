@@ -2,4 +2,3 @@
 *.embd
 .vscode
 __pycache__
-computed

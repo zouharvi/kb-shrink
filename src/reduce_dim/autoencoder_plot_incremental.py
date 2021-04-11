@@ -15,7 +15,8 @@ model_labels = {
     '1': '',
     '1n': ' norm.',
     '2': ' no activ.',
-    '3': ' no last'
+    '3': ' no last',
+    '4': ' no decoder',
 }
 colors = list(mcolors.TABLEAU_COLORS.values())
 

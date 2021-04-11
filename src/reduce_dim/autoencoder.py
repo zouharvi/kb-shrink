@@ -86,10 +86,21 @@ class Autoencoder(nn.Module):
                 nn.Tanh(),                         # 10
                 nn.Linear(512, 768),               # 11
             ]
+        elif model == 4:
+            self.layers = [
+                nn.Linear(768, 512),               # 1
+                nn.Tanh(),                         # 2
+                nn.Linear(512, 256),               # 3
+                nn.Tanh(),                         # 4
+                nn.Linear(256, bottleneck_width),  # 5
+                nn.Tanh(),                         # 6
+                nn.Linear(bottleneck_width, 768),  # 7
+            ]
         else:
             raise Exception("Unknown model specified")
         self.all_layers = nn.Sequential(*self.layers)
 
+        self.model = model
         self.batchSize = batchSize
         self.learningRate = learningRate
 
@@ -125,6 +136,10 @@ class Autoencoder(nn.Module):
                 loss = self.criterion(output, sample)
                 # Backpropagation
                 self.optimizer.zero_grad()
+
+                if self.model == 4:
+                    l1_penalty = 0.0001 * sum([p.abs().sum() for p in self.all_layers[-1].parameters()])
+                    loss += l1_penalty
                 loss.backward()
                 self.optimizer.step()
 
