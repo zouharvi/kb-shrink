@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 from collections import defaultdict
 import sys
 import matplotlib.pyplot as plt
@@ -13,16 +14,26 @@ xtick_labels = [
 ]
 model_labels = {
     '1': '',
-    '1n': ' norm.',
-    '2': ' no activ.',
-    '3': ' no last',
-    '4': ' no decoder',
+    '1n': 'norm.',
+    '2': 'no activ.',
+    '3': 'no last',
+    '4': 'no decoder',
+    '4r1': 'no decoder, L1 reg',
+    '4r2': 'no decoder, L2 reg',
 }
 colors = list(mcolors.TABLEAU_COLORS.values())
 
+
+parser = argparse.ArgumentParser(description='Explore vector distribution')
+parser.add_argument('logfile')
+parser.add_argument(
+    '--hide-dims', type=bool,
+    help='Hide bottleneck dimension')
+args = parser.parse_args()
+
 data = defaultdict(lambda: defaultdict(list))
-with open(sys.argv[1], 'r') as f:
-    data_raw = [line.strip().split(",") for line in f.readlines()[1:]]
+with open(args.logfile, 'r') as f:
+    data_raw = [line.strip().split(",") for line in f.readlines() if line[0] != "#"]
     for line in data_raw:
         identifier = (line[0], int(line[1]))
         data[identifier]["index"].append(line[2])
@@ -51,10 +62,11 @@ for i, ((model, bottleneck_width), arrays) in enumerate(data.items()):
         if not ("tanh" in xtick_label and model == '2')
     ]
 
+    description = f'({model_labels[model]})' if args.hide_dims else f'({bottleneck_width} {model_labels[model]})' 
     plt.plot(
         [x[0] for x in data_local],
         [x[1] for x in data_local],
-        label=f"({bottleneck_width}{model_labels[model]}) MRR IP",
+        label=f"{description} MRR IP",
         marker="^",
         alpha=0.5,
         color=colors[i],
@@ -62,7 +74,7 @@ for i, ((model, bottleneck_width), arrays) in enumerate(data.items()):
     plt.plot(
         [x[0] for x in data_local],
         [x[2] for x in data_local],
-        label=f"({bottleneck_width}{model_labels[model]}) MRR L2",
+        label=f"{description} MRR L2",
         marker="o",
         alpha=0.5,
         color=colors[i],

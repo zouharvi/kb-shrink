@@ -21,14 +21,16 @@ def report(prefix, encoded, data, level, order_old_ip=None, order_old_l2=None):
         if order_old_l2 is None:
             order_old_l2 = vec_sim_order(data, sim_func=l2_sim)
 
+
     # V^2 similarity computations is computationally expensive, skip if not necessary
     if level == 3:
         order_new = vec_sim_order(encoded, sim_func=np.inner)
         mrr_val_ip = mrr(order_old_ip, order_new, 20, report=False)
         order_new = vec_sim_order(encoded, sim_func=l2_sim)
         mrr_val_l2 = mrr(order_old_l2, order_new, 20, report=False)
-        print(f'{prefix} mrr_ip: {mrr_val_ip:.3f}, mrr_l2: {mrr_val_l2:.3f}')
-        return mrr_val_ip, mrr_val_l2
+        avg_norm = np.average([torch.norm(vec, p=2) for vec in encoded])
+        print(f'{prefix} mrr_ip: {mrr_val_ip:.3f}, mrr_l2: {mrr_val_l2:.3f}, norm: {avg_norm:.2f}')
+        return mrr_val_ip, mrr_val_l2, avg_norm
     elif level == 2:
         order_new = vec_sim_order(encoded)
         mrr_val_ip = mrr(order_old_ip, order_new, 20, report=False)
@@ -138,8 +140,12 @@ class Autoencoder(nn.Module):
                 self.optimizer.zero_grad()
 
                 if self.model == 4:
-                    l1_penalty = 0.0001 * sum([p.abs().sum() for p in self.all_layers[-1].parameters()])
-                    loss += l1_penalty
+                    pass
+                    # L1
+                    # regularization_loss = 0.00001 * sum([p.abs().sum() for p in self.all_layers[-1].parameters()])
+                    # L2
+                    # regularization_loss = 0.00001 * sum([p.pow(2).sum() for p in self.all_layers[-1].parameters()])
+                    # loss += regularization_loss
                 loss.backward()
                 self.optimizer.step()
 
