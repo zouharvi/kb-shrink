@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 import sys
-
-import numpy as np
 sys.path.append("src")
 from misc.utils import read_keys_pickle, DEVICE
 from reduce_dim.autoencoder import Autoencoder, report

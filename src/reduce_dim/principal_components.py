@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 import sys, os
+
+import torch
 sys.path.append("src")
 from misc.utils import mrr, read_keys_pickle, vec_sim_order, l2_sim
 import argparse
 from sklearn.decomposition import PCA
-from scipy.spatial.distance import minkowski
 import numpy as np
 from pympler.asizeof import asizeof
 
@@ -27,11 +28,9 @@ def summary_performance(name, dataReduced, dataReconstructed):
     mrr_val_ip = mrr(order_old_ip, order_new_ip, 20, report=False)
     mrr_val_l2 = mrr(order_old_l2, order_new_l2, 20, report=False)
     size = asizeof(dataReduced)
-    distances = []
-    for vec, vecNew in zip(data, dataReconstructed):
-        distances.append(minkowski(vec, vecNew, 2))
+    loss = torch.nn.MSELoss()(torch.Tensor(data), torch.Tensor(dataReconstructed))
     name = name.replace("float", "f")
-    print(f"{name:<21} {size/origSize:>5.3f}x {np.average(distances):>7.5f} {mrr_val_ip:>5.3f} {mrr_val_l2:>5.3f}")
+    print(f"{name:<21} {size/origSize:>5.3f}x {loss:>7.5f} {mrr_val_ip:>5.3f} {mrr_val_l2:>5.3f}")
 
 def pca_performance(components):
     model = PCA(n_components=components, random_state=args.seed).fit(data)
