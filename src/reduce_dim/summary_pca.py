@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import sys
+
+import torch
 sys.path.append("src")
 import argparse
 from sklearn.decomposition import PCA
@@ -25,12 +27,10 @@ for components in [1, 2, 5, 10, 25, 50, 75, 100, 150, 200, 250, 300, 400, 500, 6
     dataReduced = model.transform(data)
     dataDenoised = model.inverse_transform(dataReduced)
 
-    distances = []
-    for vec, vecDenoised in zip(data, dataDenoised):
-        distances.append(minkowski(vec, vecDenoised, 2))
+    loss = torch.nn.MSELoss()(torch.Tensor(data), torch.Tensor(dataDenoised))
     
-    print(components, np.average(distances))
-    reconstructionLosses.append((components, np.average(distances)))
+    print(components, loss)
+    reconstructionLosses.append((components, loss))
 
 plt.figure(figsize=(6, 3.5))
 plt.plot([x[0] for x in reconstructionLosses], [x[1] for x in reconstructionLosses], marker="o")
