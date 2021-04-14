@@ -18,10 +18,12 @@ class BertWrap():
         encoded_input = encoded_input
         output = self.model(**encoded_input)
         if type_out == "pooler":
+            # each dimension is bounded [0, 1] 
             return output["pooler_output"][0].detach().numpy()
         elif type_out == "tokens_avg":
             # select the last layer
-            return output["hidden_states"][-1][0].mean(dim=0).detach().numpy()
+            # dimensions are *not* bounded [0, 1]
+            return output["hidden_states"][-1][0].mean(dim=1).detach().numpy()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
