@@ -10,7 +10,7 @@ from sklearn.decomposition import PCA
 import numpy as np
 from pympler.asizeof import asizeof
 
-parser = argparse.ArgumentParser(description='Explore vector distribution')
+parser = argparse.ArgumentParser(description='PCA performance summary')
 parser.add_argument('--keys-in', default="data/eli5-dev.embd")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()

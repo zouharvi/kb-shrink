@@ -7,7 +7,7 @@ import argparse
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 
-parser = argparse.ArgumentParser(description='Explore vector distribution')
+parser = argparse.ArgumentParser(description='Visualization of embeddings')
 parser.add_argument(
     '--keys-1', default="data/eli5-dev.embd")
 parser.add_argument(

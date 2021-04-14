@@ -8,7 +8,7 @@ import argparse
 import torch
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Explore vector distribution')
+    parser = argparse.ArgumentParser(description='Incremental autoencoder embeddings')
     parser.add_argument(
         'logfile',
         help='File which to log to')

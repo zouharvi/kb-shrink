@@ -161,7 +161,7 @@ class Autoencoder(nn.Module):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Explore vector distribution')
+    parser = argparse.ArgumentParser(description='Autoencoder dimension reduction')
     parser.add_argument(
         '--keys-in', default="data/eli5-dev.embd",
         help='Input keys')
@@ -172,10 +172,10 @@ if __name__ == '__main__':
         '--model', default=1, type=int,
         help='Which model to use')
     parser.add_argument(
-        '--bottleneck-width', default=256, type=int,
+        '--bottleneck-width', default=64, type=int,
         help='Dimension of the bottleneck layer')
     parser.add_argument(
-        '--bottleneck-index', default=5, type=int,
+        '--bottleneck-index', default=6, type=int,
         help='Position of the last encoder layer')
     parser.add_argument(
         '--epochs', default=1000, type=int)

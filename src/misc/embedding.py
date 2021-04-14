@@ -23,7 +23,7 @@ class BertWrap():
         elif type_out == "tokens_avg":
             # select the last layer
             # dimensions are *not* bounded [0, 1]
-            return output["hidden_states"][-1][0].mean(dim=1).detach().numpy()
+            return output["hidden_states"][-1][0].mean(dim=0).detach().numpy()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

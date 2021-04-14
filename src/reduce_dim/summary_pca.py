@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from misc.utils import read_keys_pickle, save_keys_pickle
 
-parser = argparse.ArgumentParser(description='Explore vector distribution')
+parser = argparse.ArgumentParser(description='PCA summary plots')
 parser.add_argument(
     '--keys-in', default="data/eli5-dev.embd")
 parser.add_argument(

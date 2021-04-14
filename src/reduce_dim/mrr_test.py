@@ -8,7 +8,7 @@ import numpy as np
 import argparse
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Explore vector distribution')
+    parser = argparse.ArgumentParser(description='Test embedding MRR')
     parser.add_argument(
         '--keys-in-old', default="data/eli5-dev.embd",
         help='Original embeddings')

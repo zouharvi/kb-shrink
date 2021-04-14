@@ -8,7 +8,7 @@ from misc.utils import load_dataset, read_keys_pickle
 import numpy as np
 import scann
 
-parser = argparse.ArgumentParser(description='Explore vector distribution')
+parser = argparse.ArgumentParser(description='Interactive retrieval prompt')
 parser.add_argument('--dataset', default="data/eli5-dev.jsonl")
 parser.add_argument('--keys-in', default="data/eli5-dev.embd")
 parser.add_argument('--embd-model', default="bert-base-cased")

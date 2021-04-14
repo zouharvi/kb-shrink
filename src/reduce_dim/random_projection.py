@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 
+import numpy as np
+import random
+from sklearn.random_projection import SparseRandomProjection, GaussianRandomProjection
+from pympler.asizeof import asizeof
+from misc.utils import l2_sim, mrr, read_keys_pickle, vec_sim_order
+import argparse
 import sys
 sys.path.append("src")
-import argparse
-from misc.utils import l2_sim, mrr, read_keys_pickle, vec_sim_order
-from pympler.asizeof import asizeof
-from sklearn.random_projection import SparseRandomProjection, GaussianRandomProjection
-import random
-import numpy as np
 
-parser = argparse.ArgumentParser(description='Explore vector distribution')
+parser = argparse.ArgumentParser(
+    description='Random projection performance summary')
 parser.add_argument('--keys-in', default="data/eli5-dev.embd")
 parser.add_argument('--seed', type=int, default=0)
 
@@ -78,6 +79,7 @@ def random_projection_performance(components, model_name, runs=5):
         max(mrr_vals_ip), np.average(mrr_vals_ip),
         max(mrr_vals_l2), np.average(mrr_vals_l2)
     )
+
 
 # summary_performance(f"Original ({data.dtype})", data)
 random_projection_performance(16, "crop")
