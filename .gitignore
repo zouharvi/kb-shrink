@@ -2,3 +2,4 @@
 *.embd
 .vscode
 __pycache__
+data/kilt_knowledgesource.json
