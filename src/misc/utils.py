@@ -101,7 +101,7 @@ def mrr_ip_fast(data, data_new, n=20, report=False):
 
     index1 = faiss.IndexFlatIP(data.shape[1])
     index1.add(data)
-    n_gold = index1.search(data, n+1)[1][:,1:]
+    n_gold = index1.search(data, n+1)[1]
     index2 = faiss.IndexFlatIP(data_new.shape[1])
     index2.add(data_new)
     n_new = index2.search(data_new, len(data_new))[1]
