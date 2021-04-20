@@ -6,6 +6,7 @@ from misc.utils import parse_dataset_line, DEVICE
 import pickle
 import argparse
 from transformers import BertTokenizer, BertModel
+from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer
 import torch
 
 class BertWrap():
@@ -28,20 +29,40 @@ class BertWrap():
             # dimensions are *not* bounded [0, 1]
             return output["hidden_states"][-1][0].mean(dim=0).cpu().numpy()
 
+class DPRWrap():
+    def __init__(self):
+        self.tokenizer = DPRQuestionEncoderTokenizer.from_pretrained('facebook/dpr-question_encoder-single-nq-base')
+        self.model = DPRQuestionEncoder.from_pretrained('facebook/dpr-question_encoder-single-nq-base')
+        self.model.to(DEVICE)
+
+    def sentence_embd(self,  sentence):
+        input_ids = self.tokenizer(sentence, return_tensors='pt')["input_ids"].to(DEVICE)
+        with torch.no_grad():
+            output = self.model(input_ids).pooler_output[0].detach().cpu().numpy()
+        return output
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default="data/eli5-dev.jsonl")
     parser.add_argument('--embd-out', default="data/eli5-dev.embd")
-    parser.add_argument('--embd-model', default="bert-base-cased")
+    parser.add_argument('--model', default="bert")
     parser.add_argument('--type-out', default="pooler")
     args = parser.parse_args()
-    bert = BertWrap(args.embd_model)
+
+    if args.model == "bert":
+        model = BertWrap()
+        encoder = lambda input: model.sentence_embd(input, args.type_out)
+    elif args.model == "dpr":
+        model = DPRWrap()
+        encoder = lambda input: model.sentence_embd(input)
+    else:
+        raise Exception("Unknown model")
 
     with open(args.dataset, "r") as fread, open(args.embd_out, "wb") as fwrite:
         pickler = pickle.Pickler(fwrite)
         for i, line in enumerate(fread):
             line = parse_dataset_line(line, keep="inputs")
-            output = bert.sentence_embd(line["input"], args.type_out)
+            output = encoder(line["input"])
 
             if i % 10 == 0:
                 print(i, line["input"], output.shape)
