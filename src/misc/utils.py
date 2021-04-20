@@ -50,13 +50,13 @@ def vec_sim(data, sim_func=np.inner):
     ]
 
 def vec_sim_order(data, sim_func=np.inner):
-    return [
-        sorted(
+    return np.array([
+        np.array(sorted(
             range(len(sims)),
             key=lambda x: sims[x],
             reverse=True
-        ) for sims in vec_sim(data, sim_func)
-    ]
+        )) for sims in vec_sim(data, sim_func)
+    ])
 
 def mrr_old(order_old, order_new, n, report=False):
     """
@@ -89,7 +89,7 @@ def mrr_l2_fast(data, data_new, n=20, report=False):
     # With L2 we can be sure that `self` is the first element,
     # therefore this is faster that for IP. This is however violated
     # in case of multiple same vectors 
-    n_gold = [x[x!=i] for i,x in enumerate(n_gold)]
+    n_gold = [x[x!=i][:n] for i,x in enumerate(n_gold)]
     n_new = [x[x!=i] for i,x in enumerate(n_new)]
 
     return mrr_from_order(n_gold, n_new, n, report)
@@ -106,15 +106,18 @@ def mrr_ip_fast(data, data_new, n=20, report=False):
     index2.add(data_new)
     n_new = index2.search(data_new, len(data_new))[1]
     # remove self references
-    n_gold = [x[x!=i] for i,x in enumerate(n_gold)]
+    n_gold = [x[x!=i][:n] for i,x in enumerate(n_gold)]
     n_new = [x[x!=i] for i,x in enumerate(n_new)]
 
     return mrr_from_order(n_gold, n_new, n, report)
 
 def mrr_ip_slow(data, data_new, n=20, report=False):
     n_gold = vec_sim_order(data, sim_func=np.inner)
-    n_gold = [x[:n] for x in n_gold]
     n_new = vec_sim_order(data_new, sim_func=np.inner)
+
+    # remove self references
+    n_gold = [x[x!=i][:n] for i,x in enumerate(n_gold)]
+    n_new = [x[x!=i] for i,x in enumerate(n_new)]
 
     return mrr_from_order(n_gold, n_new, n, report)
 
