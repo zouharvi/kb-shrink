@@ -6,14 +6,13 @@ sys.path.append("src")
 from misc.utils import read_keys_pickle, mrr_ip_slow, mrr_l2_fast, mrr_ip_fast
 import argparse
 from sklearn.decomposition import PCA
-import numpy as np
 from pympler.asizeof import asizeof
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
 parser.add_argument('--keys-in', default="data/eli5-dev.embd")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
-data = read_keys_pickle(args.keys_in)
+data = read_keys_pickle(args.keys_in)[:5000]
 origSize = asizeof(data)
 
 print(data.shape)
@@ -81,7 +80,7 @@ def pca_precision_preformance(components, newType):
     )
 
 
-summary_performance(f"Original ({data.dtype})", data, data)
+# summary_performance(f"Original ({data.dtype})", data, data)
 pca_performance(32)
 pca_performance(64)
 pca_performance(128)

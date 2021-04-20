@@ -80,11 +80,15 @@ def mrr_l2_fast(data, data_new, n=20, report=False):
     from sklearn.neighbors import KDTree
     
     tree1 = KDTree(data, metric="l2")
-    n_gold = tree1.query(data, n+1)[1][:,1:]
+    n_gold = tree1.query(data, n+1)[1]
     tree2 = KDTree(data_new, metric="l2")
-    # with L2 we can be sure that `self` is the first element,
-    # therefore this is faster that for IP
-    n_new = tree2.query(data_new, len(data_new))[1][:,1:]
+    n_new = tree2.query(data_new, len(data_new))[1]
+    # remove self references
+    # With L2 we can be sure that `self` is the first element,
+    # therefore this is faster that for IP. This is however violated
+    # in case of multiple same vectors 
+    n_gold = [x[x!=i] for i,x in enumerate(n_gold)]
+    n_new = [x[x!=i] for i,x in enumerate(n_new)]
 
     return mrr_from_order(n_gold, n_new, n, report)
 
@@ -97,7 +101,8 @@ def mrr_ip_fast(data, data_new, n=20, report=False):
     index2 = faiss.IndexFlatIP(data_new.shape[1])
     index2.add(data_new)
     n_new = index2.search(data_new, len(data_new))[1]
-    # remove self
+    # remove self references
+    n_gold = [x[x!=i] for i,x in enumerate(n_gold)]
     n_new = [x[x!=i] for i,x in enumerate(n_new)]
 
     return mrr_from_order(n_gold, n_new, n, report)
