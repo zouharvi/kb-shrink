@@ -27,10 +27,6 @@ similarities_l2 = [
 ]
 similarities_l2 = np.average(similarities_l2, axis=0)
 
-# order_ip = vec_sim_order(data, sim_func=np.inner)
-# order_l2 = vec_sim_order(data, sim_func=l2_sim)
-# mrr_val = mrr(order_ip, order_l2, 20, report=True)
-
 # plot
 fig = plt.figure()
 ax1 = fig.add_subplot(111)

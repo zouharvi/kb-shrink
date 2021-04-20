@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.append("src")
+from misc.utils import mrr_ip_fast, mrr_l2_fast, read_keys_pickle
 import numpy as np
 import random
 from sklearn.random_projection import SparseRandomProjection, GaussianRandomProjection
 from pympler.asizeof import asizeof
-from misc.utils import l2_sim, mrr, read_keys_pickle, vec_sim_order
 import argparse
-import sys
-sys.path.append("src")
 
 parser = argparse.ArgumentParser(
     description='Random projection performance summary')
@@ -18,17 +18,12 @@ args = parser.parse_args()
 data = read_keys_pickle(args.keys_in)
 origSize = asizeof(data)
 
-order_old_l2 = vec_sim_order(data, sim_func=l2_sim)
-order_old_ip = vec_sim_order(data, sim_func=np.inner)
-
 print(f"{'Method':<12} {'Size':<6} {'IPMRR':<0} {'((avg))':<0} {'L2MRR':<0} {'((avg))':<0}")
 
 
 def summary_performance(name, dataReduced):
-    order_new_ip = vec_sim_order(dataReduced, sim_func=np.inner)
-    order_new_l2 = vec_sim_order(dataReduced, sim_func=l2_sim)
-    mrr_val_ip = mrr(order_old_ip, order_new_ip, 20, report=False)
-    mrr_val_l2 = mrr(order_old_l2, order_new_l2, 20, report=False)
+    mrr_val_ip = mrr_ip_fast(data, dataReduced, 20, report=False)
+    mrr_val_l2 = mrr_l2_fast(data, dataReduced, 20, report=False)
     size = asizeof(dataReduced)
     print(f"{name:<12} {size/origSize:>5.3f}x {mrr_val_ip:>5.3f} {mrr_val_l2:>5.3f}")
 
@@ -67,11 +62,10 @@ def random_projection_performance(components, model_name, runs=5):
             n_components=components,
             random_state=random.randint(0, 2**8 - 1)
         ).fit_transform(data).astype("float32")
-        order_new_ip = vec_sim_order(dataReduced, sim_func=np.inner)
-        mrr_val_ip = mrr(order_old_ip, order_new_ip, 20, report=False)
+        # copy to make it C-continuous
+        mrr_val_ip = mrr_ip_fast(data, dataReduced.copy(), 20, report=False)
         mrr_vals_ip.append(mrr_val_ip)
-        order_new_l2 = vec_sim_order(dataReduced, sim_func=l2_sim)
-        mrr_val_l2 = mrr(order_old_l2, order_new_l2, 20, report=False)
+        mrr_val_l2 = mrr_l2_fast(data, dataReduced, 20, report=False)
         mrr_vals_l2.append(mrr_val_l2)
 
     summary_performance_custom(
@@ -81,7 +75,7 @@ def random_projection_performance(components, model_name, runs=5):
     )
 
 
-# summary_performance(f"Original ({data.dtype})", data)
+summary_performance(f"Original ({data.dtype})", data)
 random_projection_performance(16, "crop")
 random_projection_performance(32, "crop")
 random_projection_performance(64, "crop")

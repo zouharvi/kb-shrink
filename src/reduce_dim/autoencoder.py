@@ -2,43 +2,26 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import l2_sim, mrr, read_keys_pickle, save_keys_pickle, DEVICE, vec_sim_order
+from misc.utils import read_keys_pickle, save_keys_pickle, DEVICE, mrr_ip_fast, mrr_l2_fast
 import argparse
 import numpy as np
 import torch
 import torch.nn as nn
 
-order_old_ip = None
-order_old_l2 = None
-
-
-def report(prefix, encoded, data, level, order_old_ip=None, order_old_l2=None):
-    if level >= 2:
-        if order_old_ip is None:
-            order_old_ip = vec_sim_order(data, sim_func=np.inner)
-
-    if level >= 3:
-        if order_old_l2 is None:
-            order_old_l2 = vec_sim_order(data, sim_func=l2_sim)
-
-
+def report(prefix, encoded, data, level):
     # V^2 similarity computations is computationally expensive, skip if not necessary
     if level == 3:
-        order_new = vec_sim_order(encoded, sim_func=np.inner)
-        mrr_val_ip = mrr(order_old_ip, order_new, 20, report=False)
-        order_new = vec_sim_order(encoded, sim_func=l2_sim)
-        mrr_val_l2 = mrr(order_old_l2, order_new, 20, report=False)
+        mrr_val_ip = mrr_ip_fast(data, encoded, 20, report=False)
+        mrr_val_l2 = mrr_l2_fast(data, encoded, 20, report=False)
         avg_norm = np.average(torch.linalg.norm(encoded, axis=1))
         print(f'{prefix} mrr_ip: {mrr_val_ip:.3f}, mrr_l2: {mrr_val_l2:.3f}, norm: {avg_norm:.2f}')
         return mrr_val_ip, mrr_val_l2, avg_norm
     elif level == 2:
-        order_new = vec_sim_order(encoded)
-        mrr_val_ip = mrr(order_old_ip, order_new, 20, report=False)
+        mrr_val_ip = mrr_ip_fast(data, encoded, 20, report=False)
         print(f'{prefix} mrr_ip: {mrr_val_ip:.3f}')
         return mrr_val_ip
     elif level == 1:
         print(f'{prefix}')
-
 
 class Autoencoder(nn.Module):
     def __init__(self, model, bottleneck_width, batchSize=128, learningRate=0.001):
@@ -186,7 +169,7 @@ if __name__ == '__main__':
         '--seed', type=int, default=0)
     args = parser.parse_args()
     torch.manual_seed(args.seed)
-    data = read_keys_pickle(args.keys_in)
+    data = read_keys_pickle(args.keys_in)[:5000]
     data = torch.Tensor(data).to(DEVICE)
     model = Autoencoder(args.model, args.bottleneck_width)
     print(model)

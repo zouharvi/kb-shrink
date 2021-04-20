@@ -78,7 +78,9 @@ def l2_sim(x, y):
 
 def mrr_l2_fast(data, data_new, n=20, report=False):
     from sklearn.neighbors import KDTree
-    
+    data = np.array(data)
+    data_new = np.array(data_new)
+
     tree1 = KDTree(data, metric="l2")
     n_gold = tree1.query(data, n+1)[1]
     tree2 = KDTree(data_new, metric="l2")
@@ -94,6 +96,8 @@ def mrr_l2_fast(data, data_new, n=20, report=False):
 
 def mrr_ip_fast(data, data_new, n=20, report=False):
     import faiss
+    data = np.array(data)
+    data_new = np.array(data_new)
 
     index1 = faiss.IndexFlatIP(data.shape[1])
     index1.add(data)
@@ -117,7 +121,6 @@ def mrr_ip_slow(data, data_new, n=20, report=False):
 def mrr_from_order(n_gold, n_new, n, report=False):
     # compute mrr
     def mrr_local(needles, stack):
-        stack = np.array(stack)
         mrr_candidates = 1/min([min(np.where(stack == needle))+1 for needle in needles])
         if len(mrr_candidates) == 0:
             raise Error("At least one needle is not present in the stack")

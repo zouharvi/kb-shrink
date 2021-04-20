@@ -3,8 +3,7 @@
 import sys
 sys.path.append("src")
 
-from misc.utils import read_keys_pickle, mrr, vec_sim_order, l2_sim
-import numpy as np
+from misc.utils import read_keys_pickle, mrr_l2_fast, mrr_ip_fast
 import argparse
 
 if __name__ == '__main__':
@@ -23,12 +22,8 @@ if __name__ == '__main__':
     data_old = read_keys_pickle(args.keys_in_old)
     data_new = read_keys_pickle(args.keys_in_new)
 
-    order_old_ip = vec_sim_order(data_old, sim_func=np.inner)
-    order_old_l2 = vec_sim_order(data_old, sim_func=l2_sim)
-    order_new_ip = vec_sim_order(data_new, sim_func=np.inner)
-    order_new_l2 = vec_sim_order(data_new, sim_func=l2_sim)
-    mrr_val_ip = mrr(order_old_ip, order_new_ip, 20, report=False)
-    mrr_val_l2 = mrr(order_old_l2, order_new_l2, 20, report=False)
+    mrr_val_ip = mrr_ip_fast(data_old, data_new, 20, report=False)
+    mrr_val_l2 = mrr_l2_fast(data_old, data_new, 20, report=False)
 
     print(mrr_val_ip)
     print(mrr_val_l2)
