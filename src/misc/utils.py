@@ -81,37 +81,58 @@ def mrr_l2_fast(data, data_new, n=20, report=False):
     data = np.array(data)
     data_new = np.array(data_new)
 
-    tree1 = KDTree(data, metric="l2")
-    n_gold = tree1.query(data, n+1)[1]
-    tree2 = KDTree(data_new, metric="l2")
-    n_new = tree2.query(data_new, len(data_new))[1]
-    # remove self references
+    index1 = KDTree(data, metric="l2")
+    index2 = KDTree(data_new, metric="l2")
+
+    # Removing self references:
     # With L2 we can be sure that `self` is the first element,
     # therefore this is faster that for IP. This is however violated
     # in case of multiple same vectors 
-    n_gold = [x[x!=i][:n] for i,x in enumerate(n_gold)]
-    n_new = [x[x!=i] for i,x in enumerate(n_new)]
+    def n_gold_gen():
+        for i,d in enumerate(data):
+            out = index1.query(np.array([d]), n+1)[1][0]
+            # remove self references
+            out = out[i!=out][:n]
+            yield out
+    def n_new_gen():
+        for i,d in enumerate(data_new):
+            out = index2.query(np.array([d]), len(data_new))[1][0]
+            # remove self references
+            out = out[i!=out]
+            yield out
 
-    return mrr_from_order(n_gold, n_new, n, report)
+    return mrr_from_order(n_gold_gen(), n_new_gen(), n, report)
 
 def mrr_ip_fast(data, data_new, n=20, report=False):
     import faiss
-    data = np.array(data)
-    data_new = np.array(data_new)
+    data = np.array(data, dtype="float32")
+    data_new = np.array(data_new, dtype="float32")
 
     index1 = faiss.IndexFlatIP(data.shape[1])
     index1.add(data)
-    n_gold = index1.search(data, n+1)[1]
     index2 = faiss.IndexFlatIP(data_new.shape[1])
     index2.add(data_new)
-    n_new = index2.search(data_new, len(data_new))[1]
-    # remove self references
-    n_gold = [x[x!=i][:n] for i,x in enumerate(n_gold)]
-    n_new = [x[x!=i] for i,x in enumerate(n_new)]
 
-    return mrr_from_order(n_gold, n_new, n, report)
+    def n_gold_gen():
+        for i,d in enumerate(data):
+            out = index1.search(np.array([d]), n+1)[1][0]
+            # remove self references
+            out = out[i!=out][:n]
+            yield out
+    def n_new_gen():
+        for i,d in enumerate(data_new):
+            out = index2.search(np.array([d]), len(data_new))[1][0]
+            # remove self references
+            out = out[i!=out]
+            yield out
+
+    # pass generators so that the resulting vectors don't have to be stored in memory
+    return mrr_from_order(n_gold_gen(), n_new_gen(), n, report)
 
 def mrr_ip_slow(data, data_new, n=20, report=False):
+    """
+    @deprecated for mrr_ip_fast which converts to float32
+    """
     n_gold = vec_sim_order(data, sim_func=np.inner)
     n_new = vec_sim_order(data_new, sim_func=np.inner)
 

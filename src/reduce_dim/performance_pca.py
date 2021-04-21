@@ -3,7 +3,7 @@
 import sys
 import torch
 sys.path.append("src")
-from misc.utils import read_keys_pickle, mrr_ip_slow, mrr_l2_fast, mrr_ip_fast
+from misc.utils import read_keys_pickle, mrr_l2_fast, mrr_ip_fast
 import argparse
 from sklearn.decomposition import PCA
 from pympler.asizeof import asizeof
@@ -28,16 +28,6 @@ def summary_performance(name, dataReduced, dataReconstructed):
     name = name.replace("float", "f")
     print(f"{name:<21} {size/origSize:>5.3f}x {loss:>7.5f} {mrr_val_ip:>5.3f} {mrr_val_l2:>5.3f}")
 
-
-def summary_performance_slow(name, dataReduced, dataReconstructed):
-    mrr_val_l2 = mrr_l2_fast(data, dataReduced, 20, report=False)
-    mrr_val_ip = mrr_ip_slow(data, dataReduced, 20, report=False)
-    size = asizeof(dataReduced)
-    loss = torch.nn.MSELoss()(torch.Tensor(data), torch.Tensor(dataReconstructed))
-    name = name.replace("float", "f")
-    print(f"{name:<21} {size/origSize:>5.3f}x {loss:>7.5f} {mrr_val_ip:>5.3f} {mrr_val_l2:>5.3f}")
-
-
 def pca_performance(components):
     model = PCA(n_components=components, random_state=args.seed).fit(data)
     dataReduced = model.transform(data)
@@ -50,7 +40,7 @@ def pca_performance(components):
 
 def precision_performance(newType):
     dataReduced = data.astype(newType)
-    summary_performance_slow(
+    summary_performance(
         f"Prec ({newType})",
         dataReduced,
         dataReduced.astype("float32")
@@ -73,7 +63,7 @@ def pca_precision_preformance(components, newType):
     model = PCA(n_components=components, random_state=args.seed).fit(data)
     dataReduced = model.transform(data)
     dataReduced = dataReduced.astype(newType)
-    summary_performance_slow(
+    summary_performance(
         f"PCA ({components}), Prec ({newType})",
         dataReduced,
         model.inverse_transform(dataReduced.astype("float32"))
@@ -81,10 +71,10 @@ def pca_precision_preformance(components, newType):
 
 
 # summary_performance(f"Original ({data.dtype})", data, data)
-pca_performance(32)
-pca_performance(64)
-pca_performance(128)
-pca_performance(256)
+# pca_performance(32)
+# pca_performance(64)
+# pca_performance(128)
+# pca_performance(256)
 precision_performance("float16")
 pca_precision_preformance(32, "float16")
 pca_precision_preformance(64, "float16")
