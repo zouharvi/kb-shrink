@@ -28,6 +28,8 @@ class BertWrap():
             # select the last layer
             # dimensions are *not* bounded [0, 1]
             return output["hidden_states"][-1][0].mean(dim=0).cpu().numpy()
+        else:
+            raise Exception("Unknown type out")
 
 class DPRWrap():
     def __init__(self):
@@ -35,11 +37,16 @@ class DPRWrap():
         self.model = DPRQuestionEncoder.from_pretrained('facebook/dpr-question_encoder-single-nq-base')
         self.model.to(DEVICE)
 
-    def sentence_embd(self,  sentence):
+    def sentence_embd(self,  sentence, type_out):
         input_ids = self.tokenizer(sentence, return_tensors='pt')["input_ids"].to(DEVICE)
         with torch.no_grad():
-            output = self.model(input_ids).pooler_output[0].detach().cpu().numpy()
-        return output
+            output = self.model(input_ids, output_hidden_states=type_out=="tokens_avg")
+        if type_out == "pooler":
+            return output.pooler_output[0].detach().cpu().numpy()
+        elif type_out == "tokens_avg":
+            return output.hidden_states[-1][0].mean(dim=0).cpu().numpy()
+        else:
+            raise Exception("Unknown type out")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -51,10 +58,8 @@ if __name__ == "__main__":
 
     if args.model == "bert":
         model = BertWrap()
-        encoder = lambda input: model.sentence_embd(input, args.type_out)
     elif args.model == "dpr":
         model = DPRWrap()
-        encoder = lambda input: model.sentence_embd(input)
     else:
         raise Exception("Unknown model")
 
@@ -62,7 +67,7 @@ if __name__ == "__main__":
         pickler = pickle.Pickler(fwrite)
         for i, line in enumerate(fread):
             line = parse_dataset_line(line, keep="inputs")
-            output = encoder(line["input"])
+            output = model.sentence_embd(line["input"], args.type_out)
 
             if i % 10 == 0:
                 print(i, line["input"], output.shape)
