@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import numpy as np
 import torch
 sys.path.append("src")
 from misc.utils import read_keys_pickle, mrr_l2_fast, mrr_ip_fast
@@ -17,7 +18,7 @@ origSize = asizeof(data)
 
 print(data.shape)
 
-print(f"{'Method':<21} {'Size':<6} {'L2 Loss':<7} {'IPMRR':<0} {'L2MRR':<0}")
+print(f"{'Method':<21} {'Size':<6} {'L2 Loss':<7} {'IPMRR':<0} {'L2MRR':<0} {'norm':<0}")
 
 
 def summary_performance(name, dataReduced, dataReconstructed):
@@ -26,7 +27,9 @@ def summary_performance(name, dataReduced, dataReconstructed):
     size = asizeof(dataReduced)
     loss = torch.nn.MSELoss()(torch.Tensor(data), torch.Tensor(dataReconstructed))
     name = name.replace("float", "f")
-    print(f"{name:<21} {size/origSize:>5.3f}x {loss:>7.5f} {mrr_val_ip:>5.3f} {mrr_val_l2:>5.3f}")
+    avg_norm = np.average(torch.linalg.norm(torch.Tensor(dataReduced), axis=1))
+    print(f"{name:<21} {size/origSize:>5.3f}x {loss:>7.5f} {mrr_val_ip:>5.3f} {mrr_val_l2:>5.3f} {avg_norm:>4.2f}")
+
 
 def pca_performance(components):
     model = PCA(n_components=components, random_state=args.seed).fit(data)
@@ -70,11 +73,11 @@ def pca_precision_preformance(components, newType):
     )
 
 
-# summary_performance(f"Original ({data.dtype})", data, data)
-# pca_performance(32)
-# pca_performance(64)
-# pca_performance(128)
-# pca_performance(256)
+summary_performance(f"Original ({data.dtype})", data, data)
+pca_performance(32)
+pca_performance(64)
+pca_performance(128)
+pca_performance(256)
 precision_performance("float16")
 pca_precision_preformance(32, "float16")
 pca_precision_preformance(64, "float16")
