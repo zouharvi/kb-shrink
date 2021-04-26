@@ -22,9 +22,10 @@ def report(prefix, encoded, data, level):
         return mrr_val_ip
     elif level == 1:
         print(f'{prefix}')
-
+        
+# TODO:  try lower learning rate
 class Autoencoder(nn.Module):
-    def __init__(self, model, dimension=64, batchSize=128, learningRate=0.0001):
+    def __init__(self, model, dimension=64, batchSize=5000, learningRate=0.0001):
         super().__init__()
 
         if model == 1:
@@ -45,14 +46,15 @@ class Autoencoder(nn.Module):
             self.parameters(),
             lr=self.learningRate
         )
-        self.similarity = nn.MSELoss()
+        self.similarity = nn.PairwiseDistance(p=2)
         self.criterion = nn.MSELoss()
         self.to(DEVICE)
 
     def forward(self, x1, x2):
         y1 = self.projection(x1)
         y2 = self.projection(x2)
-        return self.similarity(y1, y2)
+        out = self.similarity(y1, y2)
+        return out
 
     def encode(self, x):
         return self.projection(x)
@@ -70,7 +72,7 @@ class Autoencoder(nn.Module):
             for sample1, sample2 in zip(self.dataLoader1, self.dataLoader2):
                 # Predictions
                 output = self(sample1, sample2)
-                sample_sim = self.criterion(sample1, sample2)
+                sample_sim = self.similarity(sample1, sample2)
                 # Calculate Loss
                 loss = self.criterion(output, sample_sim)
                 # Backpropagation
