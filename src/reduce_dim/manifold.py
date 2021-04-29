@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+
+import sys
+sys.path.append("src")
+from misc.utils import read_keys_pickle, mrr_ip_fast, mrr_l2_fast
+import argparse
+from sklearn.manifold import TSNE, Isomap
+
+parser = argparse.ArgumentParser(description='Visualization of embeddings')
+parser.add_argument(
+    '--keys', default="data/hotpot-dpr.embd")
+args = parser.parse_args()
+
+data = read_keys_pickle(args.keys)[:5000]
+model = TSNE(n_components=3, random_state=0)
+# model = Isomap(n_components=64)
+data_new = model.fit_transform(data)
+
+mrr_l2_fast(data, data_new, report=True)
+mrr_ip_fast(data, data_new, report=True)
