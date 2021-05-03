@@ -37,8 +37,8 @@ with open(args.logfile, 'r') as f:
     for line in data_raw:
         identifier = (line[0], int(line[1]))
         data[identifier]["index"].append(line[2])
-        data[identifier]["mrr_ip"].append(float(line[3]))
-        data[identifier]["mrr_l2"].append(float(line[4]))
+        data[identifier]["acc_ip"].append(float(line[3]))
+        data[identifier]["acc_l2"].append(float(line[4]))
 
 
 fig = plt.figure(figsize=(8, 6))
@@ -56,9 +56,9 @@ for i, xtick_label in enumerate(xtick_labels):
 for i, ((model, bottleneck_width), arrays) in enumerate(data.items()):
     # skip poitns for runs without activation
     data_local = [
-        (index, mrr_ip, mrr_l2)
-        for xtick_label, index, mrr_ip, mrr_l2
-        in zip(xtick_labels, arrays["index"], arrays["mrr_ip"], arrays["mrr_l2"])
+        (index, acc_ip, acc_l2)
+        for xtick_label, index, acc_ip, acc_l2
+        in zip(xtick_labels, arrays["index"], arrays["acc_ip"], arrays["acc_l2"])
         if not ("tanh" in xtick_label and model == '2')
     ]
 
@@ -66,7 +66,7 @@ for i, ((model, bottleneck_width), arrays) in enumerate(data.items()):
     plt.plot(
         [x[0] for x in data_local],
         [x[1] for x in data_local],
-        label=f"{description} MRR IP",
+        label=f"{description} ACC IP",
         marker="^",
         alpha=0.5,
         color=colors[i],
@@ -74,7 +74,7 @@ for i, ((model, bottleneck_width), arrays) in enumerate(data.items()):
     plt.plot(
         [x[0] for x in data_local],
         [x[2] for x in data_local],
-        label=f"{description} MRR L2",
+        label=f"{description} ACC L2",
         marker="o",
         alpha=0.5,
         color=colors[i],
@@ -98,7 +98,7 @@ plt.axvline(x=6.5, color='black', linestyle="dashed", alpha=0.5)
 
 plt.xticks(range(len(xtick_labels)), xtick_labels, rotation=0)
 plt.xlabel("Layer (from which embedding is taken; bottleNECK size in parentheses)")
-plt.ylabel("MRR (from layer embedding)")
+plt.ylabel("ACC (from layer embedding)")
 
 plt.title("Embeddings of different autoencoder layers")
 plt.legend(loc="lower left", ncol=2)

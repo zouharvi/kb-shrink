@@ -4,31 +4,31 @@ import sys
 import numpy as np
 import torch
 sys.path.append("src")
-from misc.utils import read_keys_pickle, mrr_l2_fast, mrr_ip_fast
+from misc.utils import read_keys_pickle, acc_l2_fast, acc_ip_fast
 import argparse
 from sklearn.decomposition import PCA
 from pympler.asizeof import asizeof
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
-parser.add_argument('--keys-in', default="data/eli5-dev.embd")
+parser.add_argument('--keys', default="data/eli5-dev.embd")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
-data = read_keys_pickle(args.keys_in)[:5000]
+data = read_keys_pickle(args.keys)[:5000]
 origSize = asizeof(data)
 
 print(data.shape)
 
-print(f"{'Method':<21} {'Size':<6} {'L2 Loss':<7} {'IPMRR':<0} {'L2MRR':<0} {'norm':<0}")
+print(f"{'Method':<21} {'Size':<6} {'L2 Loss':<7} {'IPACC':<0} {'L2ACC':<0} {'norm':<0}")
 
 
 def summary_performance(name, dataReduced, dataReconstructed):
-    mrr_val_ip = mrr_ip_fast(data, dataReduced, 20, report=False)
-    mrr_val_l2 = mrr_l2_fast(data, dataReduced, 20, report=False)
+    acc_val_ip = acc_ip_fast(data, dataReduced, 20, report=False)
+    acc_val_l2 = acc_l2_fast(data, dataReduced, 20, report=False)
     size = asizeof(dataReduced)
     loss = torch.nn.MSELoss()(torch.Tensor(data), torch.Tensor(dataReconstructed))
     name = name.replace("float", "f")
     avg_norm = np.average(torch.linalg.norm(torch.Tensor(dataReduced), axis=1))
-    print(f"{name:<21} {size/origSize:>5.3f}x {loss:>7.5f} {mrr_val_ip:>5.3f} {mrr_val_l2:>5.3f} {avg_norm:>4.2f}")
+    print(f"{name:<21} {size/origSize:>5.3f}x {loss:>7.5f} {acc_val_ip:>5.3f} {acc_val_l2:>5.3f} {avg_norm:>4.2f}")
 
 
 def pca_performance(components):

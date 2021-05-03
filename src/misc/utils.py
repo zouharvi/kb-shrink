@@ -58,25 +58,25 @@ def vec_sim_order(data, sim_func=np.inner):
         )) for sims in vec_sim(data, sim_func)
     ])
 
-def mrr_old(order_old, order_new, n, report=False):
+def acc_old(order_old, order_new, n, report=False):
     """
-    Deprecated in favor of mrr_l2_fast or mrr_ip_fast but works with other datatypes
+    Deprecated in favor of acc_l2_fast or acc_ip_fast but works with other datatypes
     """
     order_old = [x[:n] for x in order_old]
 
-    def mrr_local(needles, stack):
+    def acc_local(needles, stack):
         return 1/min([stack.index(needle)+1 for needle in needles])
-    mrr_val = np.average([mrr_local(x,y) for x,y in zip(order_old, order_new)])
+    acc_val = np.average([acc_local(x,y) for x,y in zip(order_old, order_new)])
 
     if report:
-        print(f"MRR (top {n}) is {mrr_val:.3f} (best is 1, worst is 0)")
+        print(f"ACC (top {n}) is {acc_val:.3f} (best is 1, worst is 0)")
 
-    return mrr_val
+    return acc_val
 
 def l2_sim(x, y):
     return -minkowski(x, y)
 
-def mrr_l2_fast(data, data_new, n=20, report=False):
+def order_l2_fast(data, data_new, n=20):
     from sklearn.neighbors import KDTree
     data = np.array(data)
     data_new = np.array(data_new)
@@ -101,9 +101,10 @@ def mrr_l2_fast(data, data_new, n=20, report=False):
             out = out[i!=out]
             yield out
 
-    return mrr_from_order(n_gold_gen(), n_new_gen(), n, report)
+    # pass generators so that the resulting vectors don't have to be stored in memory
+    return (n_gold_gen(), n_new_gen())
 
-def mrr_ip_fast(data, data_new, n=20, report=False):
+def order_ip_fast(data, data_new, n=20):
     import faiss
     data = np.array(data, dtype="float32")
     data_new = np.array(data_new, dtype="float32")
@@ -127,11 +128,27 @@ def mrr_ip_fast(data, data_new, n=20, report=False):
             yield out
 
     # pass generators so that the resulting vectors don't have to be stored in memory
-    return mrr_from_order(n_gold_gen(), n_new_gen(), n, report)
+    return (n_gold_gen(), n_new_gen())
 
-def mrr_ip_slow(data, data_new, n=20, report=False):
+def mrr_l2_fast(data, data_new, n=20, report=False):
+    n_gold_gen, n_new_gen = order_l2_fast(data, data_new, n)
+    return mrr_from_order(n_gold_gen, n_new_gen, n, report)
+
+def mrr_ip_fast(data, data_new, n=20, report=False):
+    n_gold_gen, n_new_gen = order_ip_fast(data, data_new, n)
+    return mrr_from_order(n_gold_gen, n_new_gen, n, report)
+
+def acc_l2_fast(data, data_new, n=20, report=False):
+    n_gold_gen, n_new_gen = order_l2_fast(data, data_new, n)
+    return acc_from_order(n_gold_gen, n_new_gen, n, report)
+
+def acc_ip_fast(data, data_new, n=20, report=False):
+    n_gold_gen, n_new_gen = order_ip_fast(data, data_new, n)
+    return acc_from_order(n_gold_gen, n_new_gen, n, report)
+
+def order_ip_slow(data, data_new, n=20):
     """
-    @deprecated for mrr_ip_fast which converts to float32
+    @deprecated for order_ip_fast which converts to float32
     """
     n_gold = vec_sim_order(data, sim_func=np.inner)
     n_new = vec_sim_order(data_new, sim_func=np.inner)
@@ -140,18 +157,33 @@ def mrr_ip_slow(data, data_new, n=20, report=False):
     n_gold = [x[x!=i][:n] for i,x in enumerate(n_gold)]
     n_new = [x[x!=i] for i,x in enumerate(n_new)]
 
-    return mrr_from_order(n_gold, n_new, n, report)
+    return n_gold, n_new
 
 def mrr_from_order(n_gold, n_new, n, report=False):
-    # compute mrr
     def mrr_local(needles, stack):
+        """
+        MRR for one query
+        """
         mrr_candidates = 1/min([min(np.where(stack == needle))+1 for needle in needles])
         if len(mrr_candidates) == 0:
             raise Error("At least one needle is not present in the stack")
         return mrr_candidates[0]
 
-    mrr_val = np.average([mrr_local(x,y) for x,y in zip(n_gold, n_new)])
+    acc_val = np.average([mrr_local(x,y) for x,y in zip(n_gold, n_new)])
     if report:
-        print(f"MRR (top {n}) is {mrr_val:.3f} (best is 1, worst is 0)")
+        print(f"MRR (top {n}) is {acc_val:.3f} (best is 1, worst is 0)")
 
-    return mrr_val
+    return acc_val
+
+def acc_from_order(n_gold,  n_new, n, report=False):
+    def acc_local(doc_true, doc_hyp):
+        """
+        Accuracy for one query
+        """
+        return len(set(doc_true[:n]) & set(doc_hyp[:n]))/n
+
+    acc_val = np.average([acc_local(x,y) for x,y in zip(n_gold, n_new)])
+    if report:
+        print(f"ACC (top {n}) is {acc_val:.3f} (best is 1, worst is 0)")
+
+    return acc_val

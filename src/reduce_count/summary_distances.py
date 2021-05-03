@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import l2_sim, mrr, read_keys_pickle, vec_sim, vec_sim_order
+from misc.utils import l2_sim, read_keys_pickle, vec_sim
 import argparse
 from scipy.spatial.distance import minkowski
 import numpy as np

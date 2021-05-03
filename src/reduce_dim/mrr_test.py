@@ -3,11 +3,11 @@
 import sys
 sys.path.append("src")
 
-from misc.utils import read_keys_pickle, mrr_l2_fast, mrr_ip_fast
+from misc.utils import read_keys_pickle, acc_l2_fast, acc_ip_fast
 import argparse
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Test embedding MRR')
+    parser = argparse.ArgumentParser(description='Test embedding ACC')
     parser.add_argument(
         '--keys-in-old', default="data/eli5-dev.embd",
         help='Original embeddings')
@@ -22,8 +22,8 @@ if __name__ == '__main__':
     data_old = read_keys_pickle(args.keys_in_old)
     data_new = read_keys_pickle(args.keys_in_new)
 
-    mrr_val_ip = mrr_ip_fast(data_old, data_new, 20, report=False)
-    mrr_val_l2 = mrr_l2_fast(data_old, data_new, 20, report=False)
+    acc_val_ip = acc_ip_fast(data_old, data_new, 20, report=False)
+    acc_val_l2 = acc_l2_fast(data_old, data_new, 20, report=False)
 
-    print(mrr_val_ip)
-    print(mrr_val_l2)
+    print(acc_val_ip)
+    print(acc_val_l2)

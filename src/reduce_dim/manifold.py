@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import read_keys_pickle, mrr_ip_fast, mrr_l2_fast
+from misc.utils import read_keys_pickle, acc_ip_fast, acc_l2_fast
 import argparse
 from sklearn.manifold import TSNE, Isomap, MDS, SpectralEmbedding
 
@@ -28,5 +28,5 @@ data_new = model.fit_transform(data)
 # data_new = model.fit_transform(data)
 # data_new = data_new.copy() # is not C-continuous
 
-mrr_l2_fast(data, data_new, report=True)
-mrr_ip_fast(data, data_new, report=True)
+acc_l2_fast(data, data_new, report=True)
+acc_ip_fast(data, data_new, report=True)

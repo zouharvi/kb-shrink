@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import read_keys_pickle, save_keys_pickle, DEVICE, mrr_ip_fast, mrr_l2_fast
+from misc.utils import read_keys_pickle, save_keys_pickle, DEVICE, acc_ip_fast, acc_l2_fast
 import argparse
 import numpy as np
 import torch
@@ -11,15 +11,15 @@ import torch.nn as nn
 def report(prefix, encoded, data, level):
     # V^2 similarity computations is computationally expensive, skip if not necessary
     if level == 3:
-        mrr_val_ip = mrr_ip_fast(data, encoded, 20, report=False)
-        mrr_val_l2 = mrr_l2_fast(data, encoded, 20, report=False)
+        acc_val_ip = acc_ip_fast(data, encoded, 20, report=False)
+        acc_val_l2 = acc_l2_fast(data, encoded, 20, report=False)
         avg_norm = np.average(torch.linalg.norm(encoded, axis=1))
-        print(f'{prefix} mrr_ip: {mrr_val_ip:.3f}, mrr_l2: {mrr_val_l2:.3f}, norm: {avg_norm:.2f}')
-        return mrr_val_ip, mrr_val_l2, avg_norm
+        print(f'{prefix} acc_ip: {acc_val_ip:.3f}, acc_l2: {acc_val_l2:.3f}, norm: {avg_norm:.2f}')
+        return acc_val_ip, acc_val_l2, avg_norm
     elif level == 2:
-        mrr_val_ip = mrr_ip_fast(data, encoded, 20, report=False)
-        print(f'{prefix} mrr_ip: {mrr_val_ip:.3f}')
-        return mrr_val_ip
+        acc_val_ip = acc_ip_fast(data, encoded, 20, report=False)
+        print(f'{prefix} acc_ip: {acc_val_ip:.3f}')
+        return acc_val_ip
     elif level == 1:
         print(f'{prefix}')
 

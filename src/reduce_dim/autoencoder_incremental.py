@@ -34,7 +34,7 @@ if __name__ == '__main__':
     data = torch.Tensor(data).to(DEVICE)[:5000]
     
     with open(args.logfile, "a") as f:
-        f.write(f"# model, width, index, mrr_ip, mrr_l2, avg_norm\n")
+        f.write(f"# model, width, index, acc_ip, acc_l2, avg_norm\n")
 
     for bottleneck_width in [32, 64, 128, 256]:
     # for bottleneck_width in [64]:
@@ -48,6 +48,6 @@ if __name__ == '__main__':
             with torch.no_grad():
                 encoded = model.encode(data, bottleneck_index).cpu()
 
-            mrr_ip, mrr_l2, avg_norm = report(f"Final:", encoded, data.cpu(), level=3)
+            acc_ip, acc_l2, avg_norm = report(f"Final:", encoded, data.cpu(), level=3)
             with open(args.logfile, "a") as f:
-                f.write(f"{args.model}, {bottleneck_width}, {bottleneck_index}, {mrr_ip}, {mrr_l2}, {avg_norm}\n")
+                f.write(f"{args.model}, {bottleneck_width}, {bottleneck_index}, {acc_ip}, {acc_l2}, {avg_norm}\n")
