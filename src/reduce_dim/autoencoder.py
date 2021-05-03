@@ -169,7 +169,7 @@ if __name__ == '__main__':
         '--seed', type=int, default=0)
     args = parser.parse_args()
     torch.manual_seed(args.seed)
-    data = read_keys_pickle(args.keys_in)[:5000]
+    data = read_keys_pickle(args.keys_in)
     data = torch.Tensor(data).to(DEVICE)
     model = Autoencoder(args.model, args.bottleneck_width)
     print(model)

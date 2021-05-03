@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(description='PCA performance summary')
 parser.add_argument('--keys', default="data/eli5-dev.embd")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
-data = read_keys_pickle(args.keys)[:5000]
+data = read_keys_pickle(args.keys)
 origSize = asizeof(data)
 
 print(data.shape)

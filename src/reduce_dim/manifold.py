@@ -11,7 +11,7 @@ parser.add_argument(
     '--keys', default="data/hotpot-dpr.embd")
 args = parser.parse_args()
 
-data = read_keys_pickle(args.keys)[:5000]
+data = read_keys_pickle(args.keys)
 # model = TSNE(n_components=3, random_state=0)
 
 # mds

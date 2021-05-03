@@ -31,7 +31,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     torch.manual_seed(args.seed)
     data = read_keys_pickle(args.keys_in)
-    data = torch.Tensor(data).to(DEVICE)[:5000]
+    data = torch.Tensor(data).to(DEVICE)
     
     with open(args.logfile, "a") as f:
         f.write(f"# model, width, index, acc_ip, acc_l2, avg_norm\n")
