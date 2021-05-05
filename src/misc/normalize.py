@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
+import sys; sys.path.append("src")
 import argparse
 from misc.utils import read_keys_pickle, save_keys_pickle
 import numpy as np

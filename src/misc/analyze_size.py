@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
+import sys; sys.path.append("src")
 from misc.utils import read_keys_pickle, load_dataset
 import argparse
 from pympler.asizeof import asizeof

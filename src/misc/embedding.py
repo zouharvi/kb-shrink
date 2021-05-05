@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
+import sys; sys.path.append("src")
 from misc.utils import parse_dataset_line, DEVICE
 import pickle
 import argparse

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
+import sys; sys.path.append("src")
 from misc.embedding import BertWrap
 import argparse
 from misc.utils import load_dataset, read_keys_pickle
