@@ -1,3 +1,3 @@
-[submodule "src/KILT"]
-	path = src/KILT
-	url = https://github.com/facebookresearch/KILT.git
+[submodule "kilt"]
+	path = kilt
+	url = git@repos.lsv.uni-saarland.de:mmosbach/kilt.git
