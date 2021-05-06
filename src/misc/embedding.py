@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
 import sys; sys.path.append("src")
-from misc.utils import parse_dataset_line, DEVICE
+from misc.utils import DEVICE
 import pickle
 import argparse
 from transformers import BertTokenizer, BertModel
 from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer
 from transformers import AutoTokenizer, AutoModel
 import torch
+import json
 
 # Mean Pooling - Take attention mask into account for correct averaging
 def mean_pooling(model_output, attention_mask):
@@ -81,8 +82,8 @@ class DPRWrap():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', default="data/hotpot.jsonl")
-    parser.add_argument('--embd', default="data/hotpot.embd")
+    parser.add_argument('--data-in', default="data/hotpot.jsonl")
+    parser.add_argument('--data-out', default="data/hotpot.embd")
     parser.add_argument('--model', default="bert")
     parser.add_argument('--type-out', default="cls")
     parser.add_argument('--n', type=int, default=None)
@@ -90,21 +91,43 @@ if __name__ == "__main__":
 
     if args.model == "bert":
         model = BertWrap()
-    elif args.model == "sentencebert":
+    elif args.model in {"sentencebert","sbert"}:
         model = SentenceBertWrap()
     elif args.model == "dpr":
         model = DPRWrap()
     else:
         raise Exception("Unknown model")
 
-    with open(args.dataset, "r") as fread, open(args.embd, "wb") as fwrite:
-        pickler = pickle.Pickler(fwrite)
-        for i, line in enumerate(fread):
-            if i >= args.n:
-                break
-            line = parse_dataset_line(line, keep="inputs")
-            output = model.sentence_embd(line["input"], args.type_out)
+    with open(args.data_in, "r") as fread:
+        data = json.load(fread)
+    
+    data_relevancy = []
+    data_queries = []
+    data_docs = []
+    highest_doc = 0
 
-            if i % 25 == 0:
-                print(i, line["input"], output.shape)
-            pickler.dump(output)
+    # compute query embedding
+    for i, sample in enumerate(data["queries"]):
+        if i == args.n:
+            break
+
+        output = model.sentence_embd(sample["input"], args.type_out)
+        data_queries.append(output)
+        data_relevancy.append(sample["doc_ids"])
+        highest_doc = max(max(sample["doc_ids"]), highest_doc)
+
+        if i % 50 == 0:
+            print(i, sample["input"], output.shape)
+
+    # compute doc embedding
+    for i, doc in enumerate(data["docs"]):
+        if i == highest_doc+1:
+            break
+        output = model.sentence_embd(doc, args.type_out)
+        data_docs.append(output)
+
+    # store data
+    data_out = {"queries": data_queries, "docs": data_docs, "relevancy": data_relevancy}
+    with open(args.data_out, "wb") as fwrite:
+        pickler = pickle.Pickler(fwrite)
+        pickler.dump(data_out)

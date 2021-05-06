@@ -4,3 +4,4 @@ matplotlib >= 3.3
 pympler >= 0.9
 torch >= 1.7
 scann >= 1.2
+faiss-cpu >= 1.7

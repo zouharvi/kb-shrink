@@ -8,6 +8,11 @@ import sys
 
 DEVICE = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
 
+def read_pickle(path):
+    with open(path, "rb") as fread:
+        reader = pickle.Unpickler(fread)
+        return reader.load()
+
 def read_keys_pickle(path):
     data = []
     with open(path, "rb") as fread:
@@ -76,113 +81,56 @@ def acc_old(order_old, order_new, n, report=False):
 def l2_sim(x, y):
     return -minkowski(x, y)
 
-def order_l2_fast(data, data_new, n=20):
+def order_l2_fast(data_queries, data_docs, n=20):
     from sklearn.neighbors import KDTree
-    data = np.array(data)
-    data_new = np.array(data_new)
+    data_queries = np.array(data_queries)
+    data_docs = np.array(data_docs)
 
-    index1 = KDTree(data, metric="l2")
-    index2 = KDTree(data_new, metric="l2")
+    index = KDTree(data_docs, metric="l2")
 
-    # Removing self references:
-    # With L2 we can be sure that `self` is the first element,
-    # therefore this is faster that for IP. This is however violated
-    # in case of multiple same vectors 
-    def n_gold_gen():
-        for i,d in enumerate(data):
-            out = index1.query(np.array([d]), n+1)[1][0]
-            # remove self references
-            out = out[i!=out][:n]
-            yield out
     def n_new_gen():
-        for i,d in enumerate(data_new):
-            out = index2.query(np.array([d]), len(data_new))[1][0]
-            # remove self references
-            out = out[i!=out]
+        for i,d in enumerate(data_queries):
+            out = index.query(np.array([d]), len(data_docs))[1][0]
             yield out
 
     # pass generators so that the resulting vectors don't have to be stored in memory
-    return (n_gold_gen(), n_new_gen())
+    return n_new_gen()
 
-def order_ip_fast(data, data_new, n=20):
+def order_ip_fast(data_queries, data_docs, n=20):
     import faiss
-    data = np.array(data, dtype="float32")
-    data_new = np.array(data_new, dtype="float32")
+    data_queries = np.array(data_queries, dtype="float32")
+    data_docs = np.array(data_docs, dtype="float32")
 
-    index1 = faiss.IndexFlatIP(data.shape[1])
-    index1.add(data)
-    index2 = faiss.IndexFlatIP(data_new.shape[1])
-    index2.add(data_new)
+    index = faiss.IndexFlatIP(data_docs.shape[1])
+    index.add(data_docs)
 
-    def n_gold_gen():
-        for i,d in enumerate(data):
-            out = index1.search(np.array([d]), n+1)[1][0]
-            # remove self references
-            out = out[i!=out][:n]
-            yield out
     def n_new_gen():
-        for i,d in enumerate(data_new):
-            out = index2.search(np.array([d]), len(data_new))[1][0]
-            # remove self references
-            out = out[i!=out]
+        for i,d in enumerate(data_queries):
+            out = index.search(np.array([d]), len(data_docs))[1][0]
             yield out
 
     # pass generators so that the resulting vectors don't have to be stored in memory
-    return (n_gold_gen(), n_new_gen())
+    return n_new_gen()
 
-def mrr_l2_fast(data, data_new, n=20, report=False):
-    n_gold_gen, n_new_gen = order_l2_fast(data, data_new, n)
-    return mrr_from_order(n_gold_gen, n_new_gen, n, report)
+def acc_l2_fast(data_queries, data_docs, data_relevancy, n=20, report=False):
+    n_new_gen = order_l2_fast(data_queries, data_docs, n)
+    return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
 
-def mrr_ip_fast(data, data_new, n=20, report=False):
-    n_gold_gen, n_new_gen = order_ip_fast(data, data_new, n)
-    return mrr_from_order(n_gold_gen, n_new_gen, n, report)
+def acc_ip_fast(data_queries, data_docs, data_relevancy, n=20, report=False):
+    n_new_gen = order_ip_fast(data_queries, data_docs, n)
+    return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
 
-def acc_l2_fast(data, data_new, n=20, report=False):
-    n_gold_gen, n_new_gen = order_l2_fast(data, data_new, n)
-    return acc_from_order(n_gold_gen, n_new_gen, n, report)
-
-def acc_ip_fast(data, data_new, n=20, report=False):
-    n_gold_gen, n_new_gen = order_ip_fast(data, data_new, n)
-    return acc_from_order(n_gold_gen, n_new_gen, n, report)
-
-def order_ip_slow(data, data_new, n=20):
-    """
-    @deprecated for order_ip_fast which converts to float32
-    """
-    n_gold = vec_sim_order(data, sim_func=np.inner)
-    n_new = vec_sim_order(data_new, sim_func=np.inner)
-
-    # remove self references
-    n_gold = [x[x!=i][:n] for i,x in enumerate(n_gold)]
-    n_new = [x[x!=i] for i,x in enumerate(n_new)]
-
-    return n_gold, n_new
-
-def mrr_from_order(n_gold, n_new, n, report=False):
-    def mrr_local(needles, stack):
-        """
-        MRR for one query
-        """
-        mrr_candidates = 1/min([min(np.where(stack == needle))+1 for needle in needles])
-        if len(mrr_candidates) == 0:
-            raise Error("At least one needle is not present in the stack")
-        return mrr_candidates[0]
-
-    acc_val = np.average([mrr_local(x,y) for x,y in zip(n_gold, n_new)])
-    if report:
-        print(f"MRR (top {n}) is {acc_val:.3f} (best is 1, worst is 0)")
-
-    return acc_val
-
-def acc_from_order(n_gold,  n_new, n, report=False):
+def acc_from_relevancy(relevancy,  n_new, n, report=False):
     def acc_local(doc_true, doc_hyp):
         """
         Accuracy for one query
         """
-        return len(set(doc_true[:n]) & set(doc_hyp[:n]))/n
+        if len(set(doc_true) & set(doc_hyp[:n])) != 0:
+            return 1
+        else:
+            return 0
 
-    acc_val = np.average([acc_local(x,y) for x,y in zip(n_gold, n_new)])
+    acc_val = np.average([acc_local(x,y) for x,y in zip(relevancy, n_new)])
     if report:
         print(f"ACC (top {n}) is {acc_val:.3f} (best is 1, worst is 0)")
 
