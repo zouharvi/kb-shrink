@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 import sys; sys.path.append("src")
-from misc.embedding import BertWrap
+from misc.embedding import BertWrap, SentenceBertWrap, DPRWrap
 import argparse
 from misc.utils import load_dataset, read_keys_pickle
 import numpy as np
 import scann
+
+raise Exception("Unimplemented for new structured data")
 
 parser = argparse.ArgumentParser(description='Interactive retrieval prompt')
 parser.add_argument('--dataset', default="data/eli5-dev.jsonl")

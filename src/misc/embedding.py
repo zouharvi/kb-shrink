@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 import sys; sys.path.append("src")
-from misc.utils import DEVICE
-import pickle
+from misc.utils import DEVICE, save_pickle, read_json
 import argparse
 from transformers import BertTokenizer, BertModel
 from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer
@@ -98,8 +97,7 @@ if __name__ == "__main__":
     else:
         raise Exception("Unknown model")
 
-    with open(args.data_in, "r") as fread:
-        data = json.load(fread)
+    data = read_json(args.data_in)
     
     data_relevancy = []
     data_queries = []
@@ -118,7 +116,7 @@ if __name__ == "__main__":
 
         if i % 50 == 0:
             print(i, sample["input"], output.shape)
-
+        
     # compute doc embedding
     for i, doc in enumerate(data["docs"]):
         if i == highest_doc+1:
@@ -126,8 +124,9 @@ if __name__ == "__main__":
         output = model.sentence_embd(doc, args.type_out)
         data_docs.append(output)
 
+        if i % 50 == 0:
+            print(i, doc, output.shape)
+
     # store data
     data_out = {"queries": data_queries, "docs": data_docs, "relevancy": data_relevancy}
-    with open(args.data_out, "wb") as fwrite:
-        pickler = pickle.Pickler(fwrite)
-        pickler.dump(data_out)
+    save_pickle(args.data_out, data_out)

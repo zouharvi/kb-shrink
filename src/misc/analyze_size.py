@@ -1,42 +1,30 @@
 #!/usr/bin/env python3
 
 import sys; sys.path.append("src")
-from misc.utils import read_keys_pickle, load_dataset
+from misc.utils import read_pickle, load_dataset, read_json
 import argparse
 from pympler.asizeof import asizeof
 
 parser = argparse.ArgumentParser(description='Explore vector distribution')
 parser.add_argument(
-    '--keys-in', default="data/eli5-dev.embd",
+    '--embd', default="data/eli5-dev.embd",
     help='Input keys')
 parser.add_argument(
     '--dataset', default="data/eli5-dev.jsonl",
     help='KILT (sub)dataset with JSON lines')
-parser.add_argument(
-    '--dataset-type', default="eli5",
-    help='eli5 or hotpot')
 args = parser.parse_args()
 
-keys = read_keys_pickle(args.keys_in)
-keys_size = asizeof(keys)
+data = read_pickle(args.embd)
+sizee_all = asizeof(data)
+sizee_queries = asizeof(data["queries"])
+sizee_docs = asizeof(data["docs"])
 
-dataset_all = load_dataset(args.dataset, keep="all")
-dataset_size = asizeof(dataset_all)
+data_raw = read_json(args.dataset)
+sizer_all = asizeof(data_raw)
+sizer_queries = asizeof(data_raw["queries"])
+sizer_docs = asizeof(data_raw["docs"])
 
-dataset_prompts = load_dataset(args.dataset, keep="inputs")
-prompts_size = asizeof(dataset_prompts)
-
-if args.dataset_type == "eli5":
-    dataset_answers = load_dataset(args.dataset, keep="answers")
-    answers_size = asizeof(dataset_answers)
-elif args.dataset_type == "hotpot":
-    # drop provenance
-    dataset_answers = load_dataset(args.dataset, keep="answers")
-    answers_size = asizeof(dataset_answers)
-else:
-    raise Exception("Unknown dataset type")
-
-unitType = str(keys[0].dtype)
+unitType = str(data["queries"][0].dtype)
 if unitType == "float64":
     unitSize = 8
 elif unitType == "float32":
@@ -44,13 +32,16 @@ elif unitType == "float32":
 elif unitType == "float16":
     unitSize = 2
 
-print(f"Whole dataset size:  {dataset_size/1024/1024:>5.1f}MB")
-print(f"Prompts size:        {prompts_size/1024/1024:>5.1f}MB", f"{prompts_size/dataset_size*100:>4.1f}%")
-print(f"Values size:         {answers_size/1024/1024:>5.1f}MB", f"{answers_size/dataset_size*100:>4.1f}%")
-print(f"Keys size (comp):    {keys_size/1024/1024:>5.1f}MB", f"{keys_size/answers_size:>4.1f}x values size")
-print(f"Keys size (calc):    {unitSize*keys[0].shape[0]*len(keys)/1024/1024:>5.1f}MB")
-print(f"One key size (comp): {asizeof(keys[0].tolist())/1024:>5.1f}KB")
-print(f"One key size (calc): {unitSize*keys[0].shape[0]/1024:>5.1f}KB")
-print(f"Key shape:           {keys[0].shape}")
-print(f"Key element type:    {unitType}")
-print(f"Number of entries:   {len(dataset_all):>7}")
+print(f"Whole raw size:      {sizer_all/1024/1024:>5.1f}MB")
+print(f"Prompts size (raw):  {sizer_queries/1024/1024:>5.1f}MB", f"{sizer_queries/sizer_all*100:>4.1f}%")
+print(f"Docs size (raw):     {sizer_docs/1024/1024:>5.1f}MB", f"{sizer_docs/sizer_all*100:>4.1f}%")
+print()
+print(f"Whole embd size:     {sizee_all/1024/1024:>5.1f}MB")
+print(f"Prompts size (embd): {sizee_queries/1024/1024:>5.1f}MB", f"{sizee_queries/sizee_all*100:>4.1f}%")
+print(f"Docs size (embd):    {sizee_docs/1024/1024:>5.1f}MB", f"{sizee_docs/sizee_all*100:>4.1f}%")
+print()
+print(f"Query shape:         {data['queries'][0].shape}")
+print(f"Query element type:  {unitType}")
+print()
+print(f"Number of queries:   {len(data['queries']):>7}")
+print(f"Number of docs:      {len(data['docs']):>7}")
