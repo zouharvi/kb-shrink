@@ -4,7 +4,7 @@ import sys
 import numpy as np
 import torch
 sys.path.append("src")
-from misc.utils import read_pickle, acc_l2_fast, acc_ip_fast
+from misc.utils import read_pickle, acc_l2, acc_ip
 import argparse
 from sklearn.decomposition import PCA
 
@@ -18,10 +18,10 @@ print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPACC':<0} {'L2ACC':<0}")
 
 
 def summary_performance(name, dataReduced, dataReconstructed):
-    acc_val_ip = acc_ip_fast(
+    acc_val_ip = acc_ip(
         dataReduced["queries"], dataReduced["docs"], data["relevancy"], 20
     )
-    acc_val_l2 = acc_l2_fast(
+    acc_val_l2 = acc_l2(
         dataReduced["queries"], dataReduced["docs"], data["relevancy"], 20
     )
     loss_q = torch.nn.MSELoss()(

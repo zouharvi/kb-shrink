@@ -3,7 +3,7 @@
 import sys
 sys.path.append("src")
 
-from misc.utils import read_keys_pickle, acc_l2_fast, acc_ip_fast
+from misc.utils import read_keys_pickle, acc_l2, acc_ip
 import argparse
 
 if __name__ == '__main__':
@@ -22,8 +22,8 @@ if __name__ == '__main__':
     data_old = read_keys_pickle(args.keys_in_old)
     data_new = read_keys_pickle(args.keys_in_new)
 
-    acc_val_ip = acc_ip_fast(data_old, data_new, 20, report=False)
-    acc_val_l2 = acc_l2_fast(data_old, data_new, 20, report=False)
+    acc_val_ip = acc_ip(data_old, data_new, 20, report=False)
+    acc_val_l2 = acc_l2(data_old, data_new, 20, report=False)
 
     print(acc_val_ip)
     print(acc_val_l2)

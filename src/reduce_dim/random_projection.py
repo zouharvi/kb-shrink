@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import acc_ip_fast, acc_l2_fast, read_keys_pickle
+from misc.utils import acc_ip, acc_l2, read_keys_pickle
 import numpy as np
 import random
 from sklearn.random_projection import SparseRandomProjection, GaussianRandomProjection
@@ -23,8 +23,8 @@ print(f"{'Method':<12} {'Size':<6} {'(max)|(avg)':<0} {'(max)|(avg)':<0}")
 
 
 def summary_performance(name, dataReduced):
-    acc_val_ip = acc_ip_fast(data, dataReduced, 20, report=False)
-    acc_val_l2 = acc_l2_fast(data, dataReduced, 20, report=False)
+    acc_val_ip = acc_ip(data, dataReduced, 20, report=False)
+    acc_val_l2 = acc_l2(data, dataReduced, 20, report=False)
     size = asizeof(dataReduced)
     print(f"{name:<12} {size/origSize:>5.3f}x {acc_val_ip:>5.3f}|{acc_val_ip:>5.3f} {acc_val_l2:>5.3f}|{acc_val_l2:>5.3f}")
 
@@ -64,9 +64,9 @@ def random_projection_performance(components, model_name, runs=5):
             random_state=random.randint(0, 2**8 - 1)
         ).fit_transform(data).astype("float32")
         # copy to make it C-continuous
-        acc_val_ip = acc_ip_fast(data, dataReduced.copy(), 20, report=False)
+        acc_val_ip = acc_ip(data, dataReduced.copy(), 20, report=False)
         acc_vals_ip.append(acc_val_ip)
-        acc_val_l2 = acc_l2_fast(data, dataReduced, 20, report=False)
+        acc_val_l2 = acc_l2(data, dataReduced, 20, report=False)
         acc_vals_l2.append(acc_val_l2)
 
     summary_performance_custom(

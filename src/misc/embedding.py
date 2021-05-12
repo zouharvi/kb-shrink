@@ -4,7 +4,7 @@ import sys; sys.path.append("src")
 from misc.utils import DEVICE, save_pickle, read_json
 import argparse
 from transformers import BertTokenizer, BertModel
-from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer
+from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer, DPRContextEncoder, DPRContextEncoderTokenizer
 from transformers import AutoTokenizer, AutoModel
 import torch
 import json
@@ -25,7 +25,7 @@ class BertWrap():
         self.model.train(False)
         self.model.to(DEVICE)
 
-    def sentence_embd(self, sentence, type_out):
+    def query_embd(self, sentence, type_out):
         encoded_input = self.tokenizer(sentence, padding=True, truncation=True, max_length=128, return_tensors='pt')
         encoded_input = encoded_input.to(DEVICE)
         with torch.no_grad():
@@ -38,6 +38,10 @@ class BertWrap():
             return sentence_embedding.cpu().numpy()
         else:
             raise Exception("Unknown type out")
+
+    def doc_embd(self, *args):
+        # Use the same encoding for document and queries
+        return self.query_embd(*args)
 
 class SentenceBertWrap():
     def __init__(self):
@@ -46,7 +50,7 @@ class SentenceBertWrap():
         self.model.train(False)
         self.model.to(DEVICE)
 
-    def sentence_embd(self, sentence, type_out):
+    def query_embd(self, sentence, type_out):
         encoded_input = self.tokenizer(sentence, padding=True, truncation=True, max_length=128, return_tensors='pt')
         encoded_input = encoded_input.to(DEVICE)
         with torch.no_grad():
@@ -60,17 +64,39 @@ class SentenceBertWrap():
         else:
             raise Exception("Unknown type out")
 
+    def doc_embd(self, *args):
+        # Use the same encoding for document and queries
+        return self.query_embd(*args)
+
 class DPRWrap():
     def __init__(self):
-        self.tokenizer = DPRQuestionEncoderTokenizer.from_pretrained('facebook/dpr-question_encoder-single-nq-base')
-        self.model = DPRQuestionEncoder.from_pretrained('facebook/dpr-question_encoder-single-nq-base')
-        self.model.to(DEVICE)
+        self.tokenizer_q = DPRQuestionEncoderTokenizer.from_pretrained('facebook/dpr-question_encoder-single-nq-base')
+        self.model_q = DPRQuestionEncoder.from_pretrained('facebook/dpr-question_encoder-single-nq-base')
+        self.model_q.to(DEVICE)
+        # These models are probably incorrect!
+        self.tokenizer_d = DPRContextEncoderTokenizer.from_pretrained('facebook/dpr-reader-single-nq-base')
+        self.model_d = DPRContextEncoder.from_pretrained('facebook/dpr-reader-single-nq-base')
+        self.model_d.to(DEVICE)
 
-    def sentence_embd(self,  sentence, type_out):
-        encoded_input = self.tokenizer(sentence, padding=True, truncation=True, max_length=128, return_tensors='pt')
+    def query_embd(self,  sentence, type_out):
+        encoded_input = self.tokenizer_q(sentence, padding=True, truncation=True, max_length=128, return_tensors='pt')
         encoded_input = encoded_input.to(DEVICE)
         with torch.no_grad():
-            output = self.model(**encoded_input, output_hidden_states=type_out=="tokens")
+            output = self.model_q(**encoded_input, output_hidden_states=type_out=="tokens")
+        if type_out == "cls":
+            return output.pooler_output[0].detach().cpu().numpy()
+        elif type_out == "tokens":
+            sentence_embedding = mean_pooling(output["hidden_states"], encoded_input['attention_mask'])
+            return sentence_embedding.cpu().numpy()
+        else:
+            raise Exception("Unknown type out")
+
+    def doc_embd(self,  sentence, type_out):
+        # These models are probably incorrect!
+        encoded_input = self.tokenizer_d(sentence, padding=True, truncation=True, max_length=128, return_tensors='pt')
+        encoded_input = encoded_input.to(DEVICE)
+        with torch.no_grad():
+            output = self.model_d(**encoded_input, output_hidden_states=type_out=="tokens")
         if type_out == "cls":
             return output.pooler_output[0].detach().cpu().numpy()
         elif type_out == "tokens":
@@ -109,7 +135,7 @@ if __name__ == "__main__":
         if i == args.n:
             break
 
-        output = model.sentence_embd(sample["input"], args.type_out)
+        output = model.query_embd(sample["input"], args.type_out)
         data_queries.append(output)
         data_relevancy.append(sample["doc_ids"])
         highest_doc = max(max(sample["doc_ids"]), highest_doc)
@@ -121,7 +147,7 @@ if __name__ == "__main__":
     for i, doc in enumerate(data["docs"]):
         if i == highest_doc+1:
             break
-        output = model.sentence_embd(doc, args.type_out)
+        output = model.doc_embd(doc, args.type_out)
         data_docs.append(output)
 
         if i % 50 == 0:
