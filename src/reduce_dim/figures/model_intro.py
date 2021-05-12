@@ -64,13 +64,13 @@ ax.bar(
     color="lightskyblue", hatch="...",
 )
 ax.bar(
-    POS + 0.2 * 2 + 0.05,
+    POS + 0.2 * 2,
     [x["l2"] for x in DATA.values()],
     width=BARHEIGHT, label="L2", yerr=YERRMOCK,
     color="tab:red", hatch="",
 )
 ax.bar(
-    POS + 0.2 * 3 + 0.05,
+    POS + 0.2 * 3,
     [x["l2_fast"] for x in DATA.values()],
     width=BARHEIGHT, label="L2 fast", yerr=YERRMOCK,
     color="lightcoral", hatch="...",
