@@ -7,41 +7,41 @@ import matplotlib.pyplot as plt
 
 
 DATA = {
-    "Sentence\nBert\n(tok)": {
-        "ip": 0.7324,
-        "ip_fast": 0.5930,
-        "l2": 0.7310,
-        "l2_fast": 0.5676,
+    "DPR\n(avg)": {
+        "ip_fast": 0.532,
+        "ip": 0.8176,
+        "l2_fast": 0.5508,
+        "l2": 0.7154,
     },
-    "Bert\n(tok)": {
-        "ip": 0.5420,
-        "l2": 0.6142,
+    "Sentence\nBert\n(avg)": {
+        "ip_fast": 0.6268,
+        "ip": 0.7284,
+        "l2_fast": 0.5976,
+        "l2": 0.7304,
+    },
+    "Bert\n(avg)": {
         "ip_fast": 0.5270,
+        "ip": 0.5420,
         "l2_fast": 0.5256,
+        "l2": 0.6142,
     },
-    "DPR\n(tok)": {
-        "ip": 0.0044,
-        "ip_fast": 0.0024,
-        "l2": 0.004,
-        "l2_fast": 0.004,
+    "DPR\n(cls)": {
+        "ip_fast": 0.461,
+        "ip": 0.8862,
+        "l2_fast": 0.4682,
+        "l2": 0.6036,
     },
-    "Sentence\nBert\n(pooln)": {
-        "ip": 0.2438,
-        "ip_fast": 0.2112,
-        "l2": 0.2404,
-        "l2_fast": 0.2052,
+    "Sentence\nBert\n(cls)": {
+        "ip_fast": 0.5738,
+        "ip": 0.7178,
+        "l2_fast": 0.555,
+        "l2": 0.7036,
     },
-    "Bert\n(pooln)": {
-        "ip": 0.0246,
-        "ip_fast": 0.0248,
-        "l2": 0.0246,
-        "l2_fast": 0.0240,
-    },
-    "DPR\n(pooln)": {
-        "ip": 0.0036,
-        "ip_fast": 0.0034,
-        "l2": 0.0036,
-        "l2_fast": 0.0048,
+    "Bert\n(cls)": {
+        "ip_fast": 0.1834,
+        "ip": 0.0322,
+        "l2_fast": 0.1428,
+        "l2": 0.1894,
     },
 }
 
@@ -75,10 +75,9 @@ ax.bar(
     width=BARHEIGHT, label="L2 fast", yerr=YERRMOCK,
     color="lightcoral", hatch="...",
 )
-# ax.invert_yaxis()
 ax.set_xticks(POS + 0.15 * 2)
 ax.set_xticklabels(DATA.keys())
 ax.set_ylabel("Accuracy (n=20)")
+plt.legend(bbox_to_anchor=(0, 1, 1, 0), loc="lower left", mode="expand", ncol=4)
 plt.tight_layout()
-plt.legend()
 plt.show()
