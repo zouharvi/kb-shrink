@@ -25,23 +25,23 @@ DATA = {
         "l2": 0.004,
         "l2_fast": 0.004,
     },
-    "Sentence\nBert\n(pool)": {
-        "ip": 0.035,
-        "ip_fast": 0.2178,
+    "Sentence\nBert\n(pooln)": {
+        "ip": 0.2438,
+        "ip_fast": 0.2112,
         "l2": 0.2404,
         "l2_fast": 0.2052,
     },
-    "Bert\n(pool)": {
-        "ip": 0.0046,
-        "ip_fast": 0.022,
-        "l2": 0.0244,
-        "l2_fast": 0.0232,
+    "Bert\n(pooln)": {
+        "ip": 0.0246,
+        "ip_fast": 0.0248,
+        "l2": 0.0246,
+        "l2_fast": 0.0240,
     },
-    "DPR\n(pool)": {
+    "DPR\n(pooln)": {
         "ip": 0.0036,
         "ip_fast": 0.0034,
         "l2": 0.0036,
-        "l2_fast": 0.0042,
+        "l2_fast": 0.0048,
     },
 }
 
