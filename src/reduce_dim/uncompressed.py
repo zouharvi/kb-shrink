@@ -12,15 +12,15 @@ parser.add_argument('--data', default="data/hotpot.embd")
 args = parser.parse_args()
 data = read_pickle(args.data)
 
-print("acc_ip", acc_ip(
-    data["queries"], data["docs"], data["relevancy"], 20
-))
 print("acc_ip_fast", acc_ip(
     data["queries"], data["docs"], data["relevancy"], 20, fast=True
 ))
-print("acc_l2", acc_l2(
+print("acc_ip", acc_ip(
     data["queries"], data["docs"], data["relevancy"], 20
 ))
 print("acc_l2_fast", acc_l2(
     data["queries"], data["docs"], data["relevancy"], 20, fast=True
+))
+print("acc_l2", acc_l2(
+    data["queries"], data["docs"], data["relevancy"], 20
 ))

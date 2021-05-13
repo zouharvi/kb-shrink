@@ -10,18 +10,18 @@ import torch
 import json
 
 # Mean Pooling - Take attention mask into account for correct averaging
-def mean_pooling(model_output, attention_mask):
+def mean_pooling(model_output, attention_mask, layer_i=0):
     # first element of model_output contains all token embeddings
-    token_embeddings = model_output[0]
+    token_embeddings = model_output[layer_i]
     input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
     sum_embeddings = torch.sum(token_embeddings * input_mask_expanded, 1)
     sum_mask = torch.clamp(input_mask_expanded.sum(1), min=1e-9)
     return (sum_embeddings / sum_mask).reshape(-1)
 
 class BertWrap():
-    def __init__(self, embd_model="bert-base-cased"):
-        self.tokenizer = BertTokenizer.from_pretrained(embd_model)
-        self.model = BertModel.from_pretrained(embd_model, return_dict=True, output_hidden_states=True)
+    def __init__(self):
+        self.tokenizer = BertTokenizer.from_pretrained("bert-base-cased")
+        self.model = BertModel.from_pretrained("bert-base-cased", return_dict=True, output_hidden_states=True)
         self.model.train(False)
         self.model.to(DEVICE)
 
@@ -31,7 +31,8 @@ class BertWrap():
         with torch.no_grad():
             output = self.model(**encoded_input)
         if type_out == "cls":
-            # each dimension is bounded [0, 1] 
+            return output[0][0,0].cpu().numpy()
+        elif type_out == "pooler":
             return output["pooler_output"][0].cpu().numpy()
         elif type_out == "tokens":
             sentence_embedding = mean_pooling(output, encoded_input['attention_mask'])
@@ -45,8 +46,8 @@ class BertWrap():
 
 class SentenceBertWrap():
     def __init__(self):
-        self.tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/bert-base-nli-mean-tokens")
-        self.model = AutoModel.from_pretrained("sentence-transformers/bert-base-nli-mean-tokens")
+        self.tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
+        self.model = AutoModel.from_pretrained("sentence-transformers/bert-base-nli-cls-token")
         self.model.train(False)
         self.model.to(DEVICE)
 
@@ -56,7 +57,8 @@ class SentenceBertWrap():
         with torch.no_grad():
             output = self.model(**encoded_input)
         if type_out == "cls":
-            # each dimension is bounded [0, 1] 
+            return output[0][0,0].cpu().numpy()
+        elif type_out == "pooler":
             return output["pooler_output"][0].cpu().numpy()
         elif type_out == "tokens":
             sentence_embedding = mean_pooling(output, encoded_input['attention_mask'])
@@ -73,34 +75,36 @@ class DPRWrap():
         self.tokenizer_q = DPRQuestionEncoderTokenizer.from_pretrained('facebook/dpr-question_encoder-single-nq-base')
         self.model_q = DPRQuestionEncoder.from_pretrained('facebook/dpr-question_encoder-single-nq-base')
         self.model_q.to(DEVICE)
-        # These models are probably incorrect!
-        self.tokenizer_d = DPRContextEncoderTokenizer.from_pretrained('facebook/dpr-reader-single-nq-base')
-        self.model_d = DPRContextEncoder.from_pretrained('facebook/dpr-reader-single-nq-base')
+        self.tokenizer_d = DPRContextEncoderTokenizer.from_pretrained('facebook/dpr-ctx_encoder-single-nq-base')
+        self.model_d = DPRContextEncoder.from_pretrained('facebook/dpr-ctx_encoder-single-nq-base')
         self.model_d.to(DEVICE)
 
     def query_embd(self,  sentence, type_out):
         encoded_input = self.tokenizer_q(sentence, padding=True, truncation=True, max_length=128, return_tensors='pt')
         encoded_input = encoded_input.to(DEVICE)
         with torch.no_grad():
-            output = self.model_q(**encoded_input, output_hidden_states=type_out=="tokens")
+            output = self.model_q(**encoded_input, output_hidden_states=type_out in {"tokens", "cls"})
         if type_out == "cls":
+            return output["hidden_states"][-1][0,0].cpu().numpy()
+        elif type_out == "pooler":
             return output.pooler_output[0].detach().cpu().numpy()
         elif type_out == "tokens":
-            sentence_embedding = mean_pooling(output["hidden_states"], encoded_input['attention_mask'])
+            sentence_embedding = mean_pooling(output["hidden_states"], encoded_input['attention_mask'], layer_i=-1)
             return sentence_embedding.cpu().numpy()
         else:
             raise Exception("Unknown type out")
 
     def doc_embd(self,  sentence, type_out):
-        # These models are probably incorrect!
         encoded_input = self.tokenizer_d(sentence, padding=True, truncation=True, max_length=128, return_tensors='pt')
         encoded_input = encoded_input.to(DEVICE)
         with torch.no_grad():
-            output = self.model_d(**encoded_input, output_hidden_states=type_out=="tokens")
+            output = self.model_d(**encoded_input, output_hidden_states=type_out in {"tokens", "cls"})
         if type_out == "cls":
+            return output["hidden_states"][-1][0,0].cpu().numpy()
+        elif type_out == "pooler":
             return output.pooler_output[0].detach().cpu().numpy()
         elif type_out == "tokens":
-            sentence_embedding = mean_pooling(output["hidden_states"], encoded_input['attention_mask'])
+            sentence_embedding = mean_pooling(output["hidden_states"], encoded_input['attention_mask'], layer_i=-1)
             return sentence_embedding.cpu().numpy()
         else:
             raise Exception("Unknown type out")
