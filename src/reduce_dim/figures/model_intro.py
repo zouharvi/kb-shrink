@@ -5,8 +5,8 @@ sys.path.append("src")
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-DATA = {
+# data outdated
+DATA_ACC = {
     "DPR\n(avg)": {
         "ip_fast": 0.532,
         "ip": 0.8176,
@@ -45,6 +45,48 @@ DATA = {
     },
 }
 
+DATA_RPREC = {
+    "DPR\n(avg)": {
+        "ip_fast": 0.3159,
+        "ip": 0.3259,
+        "l2_fast": 0.2420,
+        "l2": 0.2469,
+    },
+    "Sentence\nBert\n(avg)": {
+        "ip_fast": 0.2586,
+        "ip": 0.2650,
+        "l2_fast": 0.2893,
+        "l2": 0.2958,
+    },
+    "Bert\n(avg)": {
+        "ip_fast": 0.1451,
+        "ip": 0.1460,
+        "l2_fast": 0.1970,
+        "l2": 0.2084,
+    },
+    "DPR\n(cls)": {
+        "ip_fast": 0.4029,
+        "ip": 0.4391,
+        "l2_fast": 0.1745,
+        "l2": 0.1845,
+    },
+    "Sentence\nBert\n(cls)": {
+        "ip_fast": 0.2599,
+        "ip": 0.2687,
+        "l2_fast": 0.2610,
+        "l2": 0.2691,
+    },
+    "Bert\n(cls)": {
+        "ip_fast": 0.0042,
+        "ip": 0.0025,
+        "l2_fast": 0.0291,
+        "l2": 0.0313,
+    },
+}
+
+# DATA = DATA_ACC
+DATA = DATA_RPREC
+
 POS = np.arange(len(DATA))
 BARHEIGHT = 0.2
 YERRMOCK = np.random.rand(len(DATA))/10000
@@ -77,7 +119,8 @@ ax.bar(
 )
 ax.set_xticks(POS + 0.15 * 2)
 ax.set_xticklabels(DATA.keys())
-ax.set_ylabel("Accuracy (n=20)")
+# ax.set_ylabel("Accuracy (n=20)")
+ax.set_ylabel("R-Precision")
 plt.legend(bbox_to_anchor=(0, 1, 1, 0), loc="lower left", mode="expand", ncol=4)
 plt.tight_layout()
 plt.show()
