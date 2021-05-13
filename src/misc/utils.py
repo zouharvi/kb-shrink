@@ -88,7 +88,7 @@ def order_l2_kdtree(data_queries, data_docs, fast):
     # pass generators so that the resulting vectors don't have to be stored in memory
     return n_new_gen()
 
-def order_l2(data_queries, data_docs, fast):
+def order_l2(data_queries, data_docs, n, fast):
     """
     Generator which computes ordering of neighbours. If speed=False, the results are
     guaranteed to be accurate and correct.
@@ -99,21 +99,22 @@ def order_l2(data_queries, data_docs, fast):
 
     index = faiss.IndexFlatL2(data_docs.shape[1])
     if fast:
-        nlist = 4
-        index = faiss.IndexIVFFlat(index, data_docs.shape[1], nlist)
+        nlist = 200
+        index = faiss.IndexIVFFlat(index, data_docs.shape[1], nlist, faiss.METRIC_L2)
+        index.nprobe = 25
         index.train(data_docs)
     index.add(data_docs)
 
     def n_new_gen():
         for i, d in enumerate(data_queries):
-            out = index.search(np.array([d]), len(data_docs))[1][0]
+            out = index.search(np.array([d]), n)[1][0]
             yield out
 
     # pass generators so that the resulting vectors don't have to be stored in memory
     return n_new_gen()
 
 
-def order_ip(data_queries, data_docs, fast):
+def order_ip(data_queries, data_docs, n, fast):
     """
     Generator which computes ordering of neighbours. If speed=False, the results are
     guaranteed to be accurate and correct.
@@ -124,14 +125,15 @@ def order_ip(data_queries, data_docs, fast):
 
     index = faiss.IndexFlatIP(data_docs.shape[1])
     if fast:
-        nlist = 4
-        index = faiss.IndexIVFFlat(index, data_docs.shape[1], nlist)
+        nlist = 200
+        index = faiss.IndexIVFFlat(index, data_docs.shape[1], nlist, faiss.METRIC_INNER_PRODUCT)
+        index.nprobe = 25
         index.train(data_docs)
     index.add(data_docs)
 
     def n_new_gen():
         for i, d in enumerate(data_queries):
-            out = index.search(np.array([d]), len(data_docs))[1][0]
+            out = index.search(np.array([d]), n)[1][0]
             yield out
 
     # pass generators so that the resulting vectors don't have to be stored in memory
@@ -139,14 +141,21 @@ def order_ip(data_queries, data_docs, fast):
 
 
 def acc_l2(data_queries, data_docs, data_relevancy, n=20, fast=False, report=False):
-    n_new_gen = order_l2(data_queries, data_docs, fast)
+    n_new_gen = order_l2(data_queries, data_docs, n, fast)
     return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
 
 
 def acc_ip(data_queries, data_docs, data_relevancy, n=20, fast=False, report=False):
-    n_new_gen = order_ip(data_queries, data_docs, fast)
+    n_new_gen = order_ip(data_queries, data_docs, n, fast)
     return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
 
+def rprec_l2(data_queries, data_docs, data_relevancy, fast=False, report=False):
+    n_new_gen = order_l2(data_queries, data_docs, 20, fast)
+    return rprec_from_relevancy(data_relevancy, n_new_gen, report)
+
+def rprec_ip(data_queries, data_docs, data_relevancy, fast=False, report=False):
+    n_new_gen = order_ip(data_queries, data_docs, 20, fast)
+    return rprec_from_relevancy(data_relevancy, n_new_gen, report)
 
 def acc_from_relevancy(relevancy, n_new, n, report=False):
     def acc_local(doc_true, doc_hyp):
@@ -163,3 +172,16 @@ def acc_from_relevancy(relevancy, n_new, n, report=False):
         print(f"ACC (top {n}) is {acc_val:.3f} (best is 1, worst is 0)")
 
     return acc_val
+
+def rprec_from_relevancy(relevancy, n_new, report=False):
+    def rprec_local(doc_true, doc_hyp):
+        """
+        R-Precision for one query
+        """
+        return len(set(doc_hyp[:len(doc_true)]) & set(doc_true))/len(doc_true)
+
+    rprec_val = np.average([rprec_local(x, y) for x, y in zip(relevancy, n_new)])
+    if report:
+        print(f"RPrec is {rprec_val:.3f} (best is 1, worst is 0)")
+
+    return rprec_val
