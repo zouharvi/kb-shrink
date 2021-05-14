@@ -46,37 +46,37 @@ DATA_ACC = {
 }
 
 DATA_RPREC = {
-    "DPR\n(avg)": {
+    "DPR\n(Avg)": {
         "ip_fast": 0.3159,
         "ip": 0.3259,
         "l2_fast": 0.2420,
         "l2": 0.2469,
     },
-    "Sentence\nBert\n(avg)": {
+    "Sentence\nBERT\n(Avg)": {
         "ip_fast": 0.2586,
         "ip": 0.2650,
         "l2_fast": 0.2893,
         "l2": 0.2958,
     },
-    "Bert\n(avg)": {
+    "BERT\n(Avg)": {
         "ip_fast": 0.1451,
         "ip": 0.1460,
         "l2_fast": 0.1970,
         "l2": 0.2084,
     },
-    "DPR\n(cls)": {
+    "DPR\n[CLS]": {
         "ip_fast": 0.4029,
         "ip": 0.4391,
         "l2_fast": 0.1745,
         "l2": 0.1845,
     },
-    "Sentence\nBert\n(cls)": {
+    "Sentence\nBERT\n[CLS]": {
         "ip_fast": 0.2599,
         "ip": 0.2687,
         "l2_fast": 0.2610,
         "l2": 0.2691,
     },
-    "Bert\n(cls)": {
+    "BERT\n[CLS]": {
         "ip_fast": 0.0042,
         "ip": 0.0025,
         "l2_fast": 0.0291,
