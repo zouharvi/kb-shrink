@@ -2,36 +2,26 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import acc_ip, acc_l2, read_keys_pickle
+from misc.utils import rprec_ip, rprec_l2, read_pickle
 import numpy as np
 import random
 from sklearn.random_projection import SparseRandomProjection, GaussianRandomProjection
-from pympler.asizeof import asizeof
 import argparse
 
 parser = argparse.ArgumentParser(
     description='Random projection performance summary')
-parser.add_argument('--keys-in', default="data/eli5-dev.embd")
+parser.add_argument('--data')
+parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--seed', type=int, default=0)
 
 args = parser.parse_args()
-data = read_keys_pickle(args.keys_in)
-origSize = asizeof(data)
+data = read_pickle(args.data)
 
 print(f"{'':<19} {'IPACC':<11} {'L2ACC':<0}")
-print(f"{'Method':<12} {'Size':<6} {'(max)|(avg)':<0} {'(max)|(avg)':<0}")
+print(f"{'Method':<12} {'(max)|(avg)':<0} {'(max)|(avg)':<0}")
 
-
-def summary_performance(name, dataReduced):
-    acc_val_ip = acc_ip(data, dataReduced, 20, report=False)
-    acc_val_l2 = acc_l2(data, dataReduced, 20, report=False)
-    size = asizeof(dataReduced)
-    print(f"{name:<12} {size/origSize:>5.3f}x {acc_val_ip:>5.3f}|{acc_val_ip:>5.3f} {acc_val_l2:>5.3f}|{acc_val_l2:>5.3f}")
-
-
-def summary_performance_custom(name, dataReduced, acc_val_ip, acc_avg_ip, acc_val_l2, acc_avg_l2):
-    size = asizeof(dataReduced)
-    print(f"{name:<12} {size/origSize:>5.3f}x {acc_val_ip:>5.3f}|{acc_avg_ip:>5.3f} {acc_val_l2:>5.3f}|{acc_avg_l2:>5.3f}")
+def summary_performance_custom(name, acc_val_ip, acc_avg_ip, acc_val_l2, acc_avg_l2):
+    print(f"{name:<12} {acc_val_ip:>5.3f}|{acc_avg_ip:>5.3f} {acc_val_l2:>5.3f}|{acc_avg_l2:>5.3f}")
 
 
 class CropRandomProjection():
@@ -39,11 +29,16 @@ class CropRandomProjection():
         self.n_components = n_components
         self.random = random.Random(random_state)
 
-    def fit_transform(self, data):
-        indicies = self.random.sample(
-            range(data[0].shape[0]), k=self.n_components)
-        return data.take(indicies, axis=1)
+    def transform(self, data):
+        return data.take(self.indicies, axis=1)
 
+    def fit(self, _data):
+        self.indicies = self.random.sample(
+            range(data[0].shape[0]),
+            k=self.n_components
+        )
+
+data_log = []
 
 def random_projection_performance(components, model_name, runs=5):
     if model_name == "gauss":
@@ -56,27 +51,36 @@ def random_projection_performance(components, model_name, runs=5):
         raise Exception("Unknown model")
 
     random.seed(args.seed)
-    acc_vals_ip = []
-    acc_vals_l2 = []
+    vals_ip = []
+    vals_l2 = []
     for i in range(runs):
-        dataReduced = Model(
+        model = Model(
             n_components=components,
             random_state=random.randint(0, 2**8 - 1)
-        ).fit_transform(data).astype("float32")
+        ).fit(data["queries"]+data["docs"])
+
+        dataReduced = {
+            "queries": model.transform(data["queries"]),
+            "docs": model.transform(data["docs"])
+        }
         # copy to make it C-continuous
-        acc_val_ip = acc_ip(data, dataReduced.copy(), 20, report=False)
-        acc_vals_ip.append(acc_val_ip)
-        acc_val_l2 = acc_l2(data, dataReduced, 20, report=False)
-        acc_vals_l2.append(acc_val_l2)
+        val_ip = rprec_ip(data, dataReduced.copy(), 20, report=False)
+        vals_ip.append(val_ip)
+        val_l2 = rprec_l2(data, dataReduced, 20, report=False)
+        vals_l2.append(val_l2)
+
+    data_log.append({"dim": components, "vals_ip": vals_ip, "vals_l2": vals_l2, "model": model_name})
+    # continuously override the file
+    with open(args.logfile, "w") as f:
+        f.write(str(data_log))
 
     summary_performance_custom(
-        f"{model_name.capitalize()} ({components})", dataReduced,
-        max(acc_vals_ip), np.average(acc_vals_ip),
-        max(acc_vals_l2), np.average(acc_vals_l2)
+        f"{model_name.capitalize()} ({components})",
+        max(vals_ip), np.average(vals_ip),
+        max(vals_l2), np.average(vals_l2)
     )
 
 
-summary_performance(f"Original", data)
 random_projection_performance(16, "crop")
 random_projection_performance(32, "crop")
 random_projection_performance(64, "crop")
