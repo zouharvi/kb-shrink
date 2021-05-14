@@ -4,25 +4,26 @@ import sys
 import numpy as np
 import torch
 sys.path.append("src")
-from misc.utils import read_pickle, acc_l2, acc_ip
+from misc.utils import read_pickle, rprec_l2, rprec_ip
 import argparse
 from sklearn.decomposition import PCA
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
-parser.add_argument('--keys', default="data/hotpot.embd")
+parser.add_argument('--data')
+parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
-data = read_pickle(args.keys)
+data = read_pickle(args.data)
 
-print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPACC':<0} {'L2ACC':<0}")
+print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
 
 
 def summary_performance(name, dataReduced, dataReconstructed):
-    acc_val_ip = acc_ip(
-        dataReduced["queries"], dataReduced["docs"], data["relevancy"], 20
+    val_ip = rprec_ip(
+        dataReduced["queries"], dataReduced["docs"], data["relevancy"], fast=True
     )
-    acc_val_l2 = acc_l2(
-        dataReduced["queries"], dataReduced["docs"], data["relevancy"], 20
+    val_l2 = rprec_l2(
+        dataReduced["queries"], dataReduced["docs"], data["relevancy"], fast=True
     )
     loss_q = torch.nn.MSELoss()(
         torch.Tensor(data["queries"]),
@@ -36,7 +37,8 @@ def summary_performance(name, dataReduced, dataReconstructed):
     avg_norm_q = np.average(
         torch.linalg.norm(torch.Tensor(dataReduced["queries"]), axis=1)
     )
-    print(f"{name:<21} {loss_d:>7.5f} {loss_q:>7.5f} {acc_val_ip:>5.3f} {acc_val_l2:>5.3f}")
+    print(f"{name:<21} {loss_d:>7.5f} {loss_q:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
+    return val_ip, val_l2, loss_q.item(), loss_d.item()
 
 
 def pca_performance_d(components):
@@ -52,7 +54,7 @@ def pca_performance_d(components):
         "queries": model.inverse_transform(dataReduced["queries"]),
         "docs": model.inverse_transform(dataReduced["docs"])
     }
-    summary_performance(
+    return summary_performance(
         f"PCA-D ({components})",
         dataReduced,
         dataReconstructed
@@ -72,17 +74,18 @@ def pca_performance_q(components):
         "queries": model.inverse_transform(dataReduced["queries"]),
         "docs": model.inverse_transform(dataReduced["docs"])
     }
-    summary_performance(
+    return summary_performance(
         f"PCA-Q ({components})",
         dataReduced,
         dataReconstructed
     )
 
+
 def pca_performance_dq(components):
     model = PCA(
         n_components=components,
         random_state=args.seed
-    ).fit(data["queries"]+data["docs"])
+    ).fit(data["queries"] + data["docs"])
     dataReduced = {
         "queries": model.transform(data["queries"]),
         "docs": model.transform(data["docs"])
@@ -91,7 +94,7 @@ def pca_performance_dq(components):
         "queries": model.inverse_transform(dataReduced["queries"]),
         "docs": model.inverse_transform(dataReduced["docs"])
     }
-    summary_performance(
+    return summary_performance(
         f"PCA-DQ ({components})",
         dataReduced,
         dataReconstructed
@@ -107,7 +110,7 @@ def precision_performance(newType):
         "queries": dataReduced["queries"].astype("float32"),
         "docs": dataReduced["docs"].astype("float32")
     }
-    summary_performance(
+    return summary_performance(
         f"Prec ({newType})",
         dataReduced,
         dataReconstructed
@@ -116,12 +119,21 @@ def precision_performance(newType):
 
 # precision_performance("float32")
 # precision_performance("float16")
-# pca_performance_d(64)
-# pca_performance_q(64)
-# pca_performance_dq(64)
-# pca_performance_d(128)
-# pca_performance_q(128)
-pca_performance_dq(128)
+
+data_log = []
+for dim in np.linspace(32, 768, num=768//32, endpoint=True):
+    dim = int(dim)
+    val_ip, val_l2, loss_q, loss_d = pca_performance_d(dim)
+    data_log.append({"type": "train_doc", "dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
+    val_ip, val_l2, loss_q, loss_d = pca_performance_q(dim)
+    data_log.append({"type": "train_query", "dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
+    val_ip, val_l2, loss_q, loss_d = pca_performance_dq(dim)
+    data_log.append({"type": "train_both", "dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
+
+    # continuously override the file
+    with open(args.logfile, "w") as f:
+        f.write(str(data_log))
+
 # pca_precision_preformance(32, "float16")
 # pca_precision_preformance(64, "float16")
 # pca_precision_preformance(128, "float16")
