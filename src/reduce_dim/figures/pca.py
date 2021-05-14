@@ -16,13 +16,18 @@ DISPLAY_DIMS = [32, 256, 512, 768]
 
 plt.figure(figsize=(4.8, 3.7))
 ax = plt.gca() 
-ax.plot(DIMS, [x["val_ip"] for x in DATA if x["type"] == "train_doc"], label="IP, Docs", color="tab:blue")
-ax.plot(DIMS, [x["val_ip"] for x in DATA if x["type"] == "train_query"], label="IP, Queries", color="tab:red")
-ax.plot(DIMS, [x["val_ip"] for x in DATA if x["type"] == "train_both"], label="IP, Both", color="tab:purple")
+ax.plot(DIMS, [x["val_ip"] for x in DATA if x["type"] == "train_doc"], label="IP, Docs", color="tab:blue", linestyle="-")
+ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "train_doc"], label="L2, Docs", color="tab:red", linestyle="-")
 
-ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "train_doc"], label="L2, Docs", color="tab:blue", linestyle=":")
+ax.plot(DIMS, [x["val_ip"] for x in DATA if x["type"] == "train_query"], label="IP, Queries", color="tab:blue", linestyle=":")
 ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "train_query"], label="L2, Queries", color="tab:red", linestyle=":")
-ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "train_both"], label="L2, Both", color="tab:purple", linestyle=":")
+
+ax.plot(DIMS, [x["val_ip"] for x in DATA if x["type"] == "train_both"], label="IP, Both", color="tab:blue", linestyle="-.")
+ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "train_both"], label="L2, Both", color="tab:red", linestyle="-.")
+
+# uncompressed
+ax.axhline(y=0.2599, alpha=0.5, linestyle="--", color="tab:blue")
+ax.axhline(y=0.2610, alpha=0.5, linestyle="--", color="tab:red")
 
 plt.legend(bbox_to_anchor=(-0.1, 1, 1.2, 0), loc="lower left", mode="expand", ncol=3)
 
