@@ -4,19 +4,24 @@ import sys
 import numpy as np
 import torch
 sys.path.append("src")
-from misc.utils import read_pickle, rprec_l2, rprec_ip
+from misc.utils import read_pickle, rprec_l2, rprec_ip, center_data, norm_data
 import argparse
 from sklearn.decomposition import PCA
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
 parser.add_argument('--data')
 parser.add_argument('--logfile', default="computed/tmp.log")
+parser.add_argument('--center', action="store_true")
+parser.add_argument('--norm', action="store_true")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 data = read_pickle(args.data)
+if args.center:
+    data = center_data(data)
+if args.norm:
+    data = norm_data(data)
 
 print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
-
 
 def summary_performance(name, dataReduced, dataReconstructed):
     val_ip = rprec_ip(
@@ -85,7 +90,7 @@ def pca_performance_dq(components):
     model = PCA(
         n_components=components,
         random_state=args.seed
-    ).fit(data["queries"] + data["docs"])
+    ).fit(np.concatenate((data["queries"], data["docs"])))
     dataReduced = {
         "queries": model.transform(data["queries"]),
         "docs": model.transform(data["docs"])

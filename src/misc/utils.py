@@ -46,28 +46,19 @@ def save_keys_pickle(path, data):
             pickler.dump(np.array(line))
 
 
-def parse_dataset_line(line, keep="inputs"):
-    """
-    @deprecated
-    """
-    line = json.loads(line)
-    if keep == "inputs":
-        return {"input": line["input"]}
-    elif keep == "answers":
-        return {"answer": [x["answer"] for x in line["output"] if "answer" in x]}
-    elif keep == "all":
-        return {"input": line["input"], "answer": [x["answer"] for x in line["output"] if "answer" in x]}
-    else:
-        raise Exception("Wrong `keep` argument")
+def center_data(data):
+    data["docs"] = np.array(data["docs"])
+    data["queries"] = np.array(data["queries"])
+    data["docs"] = data["docs"] - data["docs"].mean(axis=0)
+    data["queries"] = data["queries"] - data["queries"].mean(axis=0)
+    return data
 
-
-def load_dataset(path, keep="inputs"):
-    """
-    @deprecated
-    """
-    with open(path, "r") as f:
-        return [parse_dataset_line(line, keep) for line in f.readlines()]
-
+def norm_data(data):
+    data["docs"] = np.array(data["docs"])
+    data["queries"] = np.array(data["queries"])
+    data["docs"] = data["docs"] / np.linalg.norm(data["docs"])
+    data["queries"] = data["queries"] / np.linalg.norm(data["queries"])
+    return data
 
 def l2_sim(x, y):
     return -minkowski(x, y)

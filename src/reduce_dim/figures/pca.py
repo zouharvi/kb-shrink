@@ -44,6 +44,3 @@ ax2.set_ylabel("Reconstruction loss")
 
 plt.tight_layout()
 plt.show()
-
-
-# TODO: compute correlation of loss or plot it
