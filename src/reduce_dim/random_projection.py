@@ -15,6 +15,8 @@ parser.add_argument('--seed', type=int, default=0)
 
 args = parser.parse_args()
 data = read_pickle(args.data)
+data["queries"] = np.array(data["queries"])
+data["DOCS"] = np.array(data["docs"])
 
 print(f"{'':<12} {'IP':<12} {'L2':<12}")
 print(f"{'Method':<12} {'(max)|(avg)':<12} {'(max)|(avg)':<12}")
@@ -58,7 +60,7 @@ def random_projection_performance(components, model_name, runs=5):
             n_components=components,
             random_state=random.randint(0, 2**8 - 1)
         )
-        model.fit(data["queries"]+data["docs"])
+        model.fit(np.concatenate((data["queries"],data["docs"])))
 
         dataReduced = {
             "queries": model.transform(data["queries"]),
