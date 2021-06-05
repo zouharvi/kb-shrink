@@ -17,29 +17,26 @@ DISPLAY_DIMS = [32, 256, 512, 768]
 plt.figure(figsize=(4.8, 3.2))
 ax = plt.gca() 
 
-# CROP
 ax.plot(
     DIMS, [max(x["vals_ip"]) for x in DATA if x["model"] == "crop"],
     label="IP, Crop", color="tab:blue", linestyle="-"
 )
 ax.plot(
+    DIMS, [max(x["vals_ip"]) for x in DATA if x["model"] == "sparse"],
+    label="IP, Sparse", color="tab:blue", linestyle="-."
+)
+ax.plot(
+    DIMS, [max(x["vals_ip"]) for x in DATA if x["model"] == "gauss"],
+    label="IP, Gaussian", color="tab:blue", linestyle=":"
+)
+ax.plot(
     DIMS, [max(x["vals_l2"]) for x in DATA if x["model"] == "crop"],
     label="L2, Crop", color="tab:red", linestyle="-"
 )
-
-# SPARSE
-# ax.plot(
-#     DIMS, [max(x["vals_ip"]) for x in DATA if x["model"] == "sparse"],
-#     label="IP, Sparse", color="tab:blue", linestyle=":")
-# ax.plot(
-#     DIMS, [max(x["vals_l2"]) for x in DATA if x["model"] == "sparse"],
-#     label="L2, Sparse", color="tab:red", linestyle=":"
-# )
-
-# GAUSS
 ax.plot(
-    DIMS, [max(x["vals_ip"]) for x in DATA if x["model"] == "gauss"],
-    label="IP, Gaussian", color="tab:blue", linestyle=":")
+    DIMS, [max(x["vals_l2"]) for x in DATA if x["model"] == "sparse"],
+    label="L2, Sparse", color="tab:red", linestyle="-."
+)
 ax.plot(
     DIMS, [max(x["vals_l2"]) for x in DATA if x["model"] == "gauss"],
     label="L2, Gaussian", color="tab:red", linestyle=":"
@@ -62,8 +59,8 @@ ax.plot(
 # ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "train_both"], label="L2, Both", color="tab:red", linestyle="-.")
 
 # uncompressed
-ax.axhline(y=0.2599, alpha=0.5, linestyle="--", color="tab:blue")
-ax.axhline(y=0.2610, alpha=0.5, linestyle="--", color="tab:red")
+ax.axhline(y=0.3229, alpha=0.5, linestyle="--", color="black")
+# ax.axhline(y=0.2610, alpha=0.5, linestyle="--", color="tab:red")
 
 # plt.legend(bbox_to_anchor=(-0.1, 1, 1.2, 0), loc="center", ncol=2)
 plt.legend(ncol=2)
