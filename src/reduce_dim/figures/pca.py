@@ -14,7 +14,7 @@ with open(args.logfile, "r") as f:
 DIMS = sorted(list(set([x["dim"] for x in DATA])), key=lambda x: int(x))
 DISPLAY_DIMS = [32, 256, 512, 768]
 
-plt.figure(figsize=(4.8, 3.7))
+plt.figure(figsize=(4.8, 4.0))
 ax = plt.gca() 
 ax.plot(DIMS, [x["val_ip"] for x in DATA if x["type"] == "train_doc"], label="IP, Docs", color="tab:blue", linestyle="-")
 ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "train_doc"], label="L2, Docs", color="tab:red", linestyle="-")
@@ -26,8 +26,7 @@ ax.plot(DIMS, [x["val_ip"] for x in DATA if x["type"] == "train_both"], label="I
 ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "train_both"], label="L2, Both", color="tab:red", linestyle="-.")
 
 # uncompressed
-ax.axhline(y=0.2599, alpha=0.5, linestyle="--", color="tab:blue")
-ax.axhline(y=0.2610, alpha=0.5, linestyle="--", color="tab:red")
+ax.axhline(y=0.3229, alpha=0.5, linestyle="--", color="black")
 
 plt.legend(bbox_to_anchor=(-0.1, 1, 1.2, 0), loc="lower left", mode="expand", ncol=3)
 
