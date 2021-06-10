@@ -16,7 +16,7 @@ parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 data = read_pickle(args.data)
 data["queries"] = np.array(data["queries"])
-data["DOCS"] = np.array(data["docs"])
+data["docs"] = np.array(data["docs"])
 
 print(f"{'':<12} {'IP':<12} {'L2':<12}")
 print(f"{'Method':<12} {'(max)|(avg)':<12} {'(max)|(avg)':<12}")
