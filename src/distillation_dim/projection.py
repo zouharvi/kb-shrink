@@ -94,11 +94,10 @@ class Autoencoder(nn.Module):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Autoencoder dimension reduction')
     parser.add_argument(
-        '--keys-in', default="data/eli5-dev.embd",
+        '--keys-in', default="/data/kilt/hotpot-dpr-c-5000.embd_norm",
         help='Input keys')
     parser.add_argument(
-        '--keys-out', default="data/eli5-dev-distiller.embd",
-        help='Encoded keys')
+        '--keys-out', help='Encoded keys')
     parser.add_argument(
         '--dimension', default=64, type=int)
     parser.add_argument(

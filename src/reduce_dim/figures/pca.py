@@ -34,6 +34,7 @@ ax.set_xticks(DISPLAY_DIMS)
 ax.set_xticklabels(DISPLAY_DIMS)
 ax.set_ylabel("R-Precision")
 ax.set_xlabel("Dimension")
+ax.set_ylim(0.05,0.46)
 
 ax2 = ax.twinx()
 ax2.plot(DIMS, [(x["loss_d"]+x["loss_q"])/2 for x in DATA if x["type"] == "train_doc"], color="tab:blue", alpha=0.2)
