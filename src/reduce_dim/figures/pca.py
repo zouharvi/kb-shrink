@@ -6,6 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 parser = argparse.ArgumentParser()
+parser.add_argument('--uncompressed-ip', type=float, default=0.3229)
+parser.add_argument('--uncompressed-l2', type=float, default=None)
 parser.add_argument('--logfile', default="computed/tmp.log")
 args = parser.parse_args()
 
@@ -26,7 +28,11 @@ ax.plot(DIMS, [x["val_ip"] for x in DATA if x["type"] == "train_both"], label="I
 ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "train_both"], label="L2, Both", color="tab:red", linestyle="-.")
 
 # uncompressed
-ax.axhline(y=0.3229, alpha=0.5, linestyle="--", color="black")
+if args.uncompressed_l2 is not None:
+    ax.axhline(y=args.uncompressed_ip, alpha=0.5, linestyle="--", color="tab:blue")
+    ax.axhline(y=args.uncompressed_l2, alpha=0.5, linestyle="--", color="tab:red")
+else:
+    ax.axhline(y=args.uncompressed_ip, alpha=0.5, linestyle="--", color="black")
 
 plt.legend(bbox_to_anchor=(-0.1, 1, 1.2, 0), loc="lower left", mode="expand", ncol=3)
 
