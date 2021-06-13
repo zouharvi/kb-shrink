@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 import sys; sys.path.append("src")
-from misc.utils import read_pickle, load_dataset, read_json
+from misc.utils import read_pickle, read_json
 import argparse
 from pympler.asizeof import asizeof
+import numpy as np
 
 parser = argparse.ArgumentParser(description='Explore vector distribution')
 parser.add_argument(
@@ -45,3 +46,5 @@ print(f"Query element type:  {unitType}")
 print()
 print(f"Number of queries:   {len(data['queries']):>7}")
 print(f"Number of docs:      {len(data['docs']):>7}")
+print()
+print(f'Average number of documents per question: {np.average([len(x) for x in data["relevancy"]]):.2f}')

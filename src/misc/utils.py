@@ -122,10 +122,16 @@ def order_ip(data_queries, data_docs, n, fast):
         index.train(data_docs)
     index.add(data_docs)
 
+    BATCH_LIMIT = 16
     def n_new_gen():
+        batch = []
         for i, d in enumerate(data_queries):
-            out = index.search(np.array([d]), n)[1][0]
-            yield out
+            batch.append(d)
+            if len(batch) >= BATCH_LIMIT or i == len(data_queries)-1:
+                out = index.search(np.array(batch), n)[1]
+                for el in out:
+                    yield el
+                batch = []
 
     # pass generators so that the resulting vectors don't have to be stored in memory
     return n_new_gen()

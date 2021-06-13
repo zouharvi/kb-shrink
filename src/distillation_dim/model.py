@@ -36,7 +36,7 @@ def create_generator(data, batchSize, dataOrganization):
             relevant = torch.zeros(query.shape[0])
             for i, (i_iquery, i_idoc) in enumerate(zip(iquery, idoc)):
                 if i_idoc in data["relevancy"][i_iquery]:
-                    relevant[i] = 1000.0
+                    relevant[i] = 1.0
             yield query,doc,relevant.to(DEVICE)
     else:
         raise Exception("Generator not defined")

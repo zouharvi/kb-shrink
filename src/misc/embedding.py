@@ -111,8 +111,8 @@ class DPRWrap():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data-in', default="data/hotpot.jsonl")
-    parser.add_argument('--data-out', default="data/hotpot.embd")
+    parser.add_argument('--data-in', default="/data/kilt-triv/full.json")
+    parser.add_argument('--data-out', default="/data/kilt-triv/full.embd")
     parser.add_argument('--model', default="bert")
     parser.add_argument('--type-out', default="cls")
     parser.add_argument('--n', type=int, default=None)
@@ -141,6 +141,7 @@ if __name__ == "__main__":
 
         output = model.query_embd(sample["input"], args.type_out)
         data_queries.append(output)
+        assert len(sample["doc_ids"]) != 0 
         data_relevancy.append(sample["doc_ids"])
         highest_doc = max(max(sample["doc_ids"]), highest_doc)
 
