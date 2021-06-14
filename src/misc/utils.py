@@ -79,7 +79,7 @@ def order_l2_kdtree(data_queries, data_docs, fast):
     # pass generators so that the resulting vectors don't have to be stored in memory
     return n_new_gen()
 
-def order_l2(data_queries, data_docs, n, fast):
+def order_l2(data_queries, data_docs, retrieve_counts, fast):
     """
     Generator which computes ordering of neighbours. If speed=False, the results are
     guaranteed to be accurate and correct.
@@ -96,22 +96,26 @@ def order_l2(data_queries, data_docs, n, fast):
         index.train(data_docs)
     index.add(data_docs)
 
+
     BATCH_LIMIT = 256
     def n_new_gen():
         batch = []
-        for i, d in enumerate(data_queries):
+        batch_n = []
+        for i, (d,n) in enumerate(zip(data_queries, retrieve_counts)):
             batch.append(d)
+            batch_n.append(n)
             if len(batch) >= BATCH_LIMIT or i == len(data_queries)-1:
-                out = index.search(np.array(batch), n)[1]
+                out = index.search(np.array(batch), max(batch_n))[1]
                 for el in out:
                     yield el
                 batch = []
+                batch_n = []
 
     # pass generators so that the resulting vectors don't have to be stored in memory
     return n_new_gen()
 
 
-def order_ip(data_queries, data_docs, n, fast):
+def order_ip(data_queries, data_docs, retrieve_counts, fast):
     """
     Generator which computes ordering of neighbours. If speed=False, the results are
     guaranteed to be accurate and correct.
@@ -131,33 +135,36 @@ def order_ip(data_queries, data_docs, n, fast):
     BATCH_LIMIT = 256
     def n_new_gen():
         batch = []
-        for i, d in enumerate(data_queries):
+        batch_n = []
+        for i, (d,n) in enumerate(zip(data_queries, retrieve_counts)):
             batch.append(d)
+            batch_n.append(n)
             if len(batch) >= BATCH_LIMIT or i == len(data_queries)-1:
-                out = index.search(np.array(batch), n)[1]
+                out = index.search(np.array(batch), max(batch_n))[1]
                 for el in out:
                     yield el
                 batch = []
+                batch_n = []
 
     # pass generators so that the resulting vectors don't have to be stored in memory
     return n_new_gen()
 
 
 def acc_l2(data_queries, data_docs, data_relevancy, n=20, fast=False, report=False):
-    n_new_gen = order_l2(data_queries, data_docs, n, fast)
+    n_new_gen = order_l2(data_queries, data_docs, [n]*len(data_queries), fast)
     return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
 
 
 def acc_ip(data_queries, data_docs, data_relevancy, n=20, fast=False, report=False):
-    n_new_gen = order_ip(data_queries, data_docs, n, fast)
+    n_new_gen = order_ip(data_queries, data_docs, [n]*len(data_queries), fast)
     return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
 
 def rprec_l2(data_queries, data_docs, data_relevancy, fast=False, report=False):
-    n_new_gen = order_l2(data_queries, data_docs, 20, fast)
+    n_new_gen = order_l2(data_queries, data_docs, [len(x) for x in data_relevancy], fast)
     return rprec_from_relevancy(data_relevancy, n_new_gen, report)
 
 def rprec_ip(data_queries, data_docs, data_relevancy, fast=False, report=False):
-    n_new_gen = order_ip(data_queries, data_docs, 20, fast)
+    n_new_gen = order_ip(data_queries, data_docs, [len(x) for x in data_relevancy], fast)
     return rprec_from_relevancy(data_relevancy, n_new_gen, report)
 
 def acc_from_relevancy(relevancy, n_new, n, report=False):
