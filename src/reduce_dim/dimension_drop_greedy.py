@@ -19,8 +19,12 @@ data["docs"] = np.array(data["docs"])
 
 with open(args.logfile_single, "r") as f:
     DATA_SINGLE = eval(f.read())
+DATA_BASE = [x for x in DATA_SINGLE if x["dim"] == False][0]
 IMPR_IP = [x["dim"] for x in sorted(DATA_SINGLE, key=lambda x: x["val_ip"], reverse=True)]
 IMPR_L2 = [x["dim"] for x in sorted(DATA_SINGLE, key=lambda x: x["val_l2"], reverse=True)]
+
+print("ip_impr count", len([x for x in DATA_SINGLE if x["val_ip"] >= DATA_BASE["val_ip"]]))
+print("l2_impr count", len([x for x in DATA_SINGLE if x["val_ip"] >= DATA_BASE["val_ip"]]))
 
 print(f"{'Method':<12} {'(IP)':<8} {'(L2)':<8}")
 

@@ -6,8 +6,8 @@ from misc.utils import read_pickle, save_pickle, norm_data, center_data
 import numpy as np
 
 parser = argparse.ArgumentParser(description='Normalize embeddings')
-parser.add_argument('--data-in', default="data/eli5-dev.embd")
-parser.add_argument('--data-out', default="data/eli5-dev-norm.embd")
+parser.add_argument('--data-in', default="/data/kilt-hp/dpr-c-5000.embd")
+parser.add_argument('--data-out')
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
 args = parser.parse_args()

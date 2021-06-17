@@ -49,11 +49,28 @@ print(f"Number of docs:      {len(data['docs']):>7}")
 print()
 print(f'Average number of documents per question: {np.average([len(x) for x in data["relevancy"]]):.2f}')
 print()
+
 data["queries"] = np.array(data["queries"])
 data["docs"] = np.array(data["docs"])
-print(f"Average of query embedding 1-norm:", np.average(np.linalg.norm(data["queries"], axis=1, ord=1)))
-print(f"Average of doc embedding 1-norm:  ", np.average(np.linalg.norm(data["docs"], axis=1, ord=1)))
+
+print(f"Average of query embedding 1-norm:",
+    "{:.3f}".format(np.average(np.linalg.norm(data["queries"], axis=1, ord=1))),
+    "std:",
+    "{:.3f}".format(np.std(np.linalg.norm(data["queries"], axis=1, ord=1)))
+)
+print(f"Average of doc embedding 1-norm:  ",
+    "{:.3f}".format(np.average(np.linalg.norm(data["docs"], axis=1, ord=1))),
+    "std:",
+    "{:.3f}".format(np.std(np.linalg.norm(data["docs"], axis=1, ord=1)))
+)
 print()
-print(f"Average of query embedding 2-norm:", np.linalg.norm(data["queries"], axis=1, ord=2).shape)
-print(f"Average of query embedding 2-norm:", np.average(np.linalg.norm(data["queries"], axis=1, ord=2)))
-print(f"Average of doc embedding 2-norm:  ", np.average(np.linalg.norm(data["docs"], axis=1, ord=2)))
+print(f"Average of query embedding 2-norm:",
+    "{:.3f}".format(np.average(np.linalg.norm(data["queries"], axis=1, ord=2))),
+    "std:",
+    "{:.3f}".format(np.std(np.linalg.norm(data["queries"], axis=1, ord=2)))
+)
+print(f"Average of doc embedding 2-norm:  ",
+    "{:.3f}".format(np.average(np.linalg.norm(data["docs"], axis=1, ord=2))),
+    "std:",
+    "{:.3f}".format(np.std(np.linalg.norm(data["docs"], axis=1, ord=2)))
+)
