@@ -59,7 +59,7 @@ ax.plot(
 # ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "train_both"], label="L2, Both", color="tab:red", linestyle="-.")
 
 # uncompressed
-ax.axhline(y=0.3229, alpha=0.5, linestyle="--", color="black")
+ax.axhline(y=0.4533, alpha=0.5, linestyle="--", color="black")
 # ax.axhline(y=0.2610, alpha=0.5, linestyle="--", color="tab:red")
 
 # plt.legend(bbox_to_anchor=(-0.1, 1, 1.2, 0), loc="center", ncol=2)
