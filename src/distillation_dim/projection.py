@@ -19,8 +19,6 @@ if __name__ == '__main__':
     parser.add_argument(
         '--epochs', default=10000, type=int)
     parser.add_argument(
-        '--log-level', default=1, type=int)
-    parser.add_argument(
         '--seed', type=int, default=0)
     args = parser.parse_args()
 
@@ -33,7 +31,7 @@ if __name__ == '__main__':
         } 
     model = ProjectionModel(args.model, args.dimension)
     print(model)
-    model.trainModel(data, args.epochs, loglevel=args.log_level)
+    model.trainModel(data, args.epochs)
     model.train(False)
 
     # encode data
@@ -43,5 +41,5 @@ if __name__ == '__main__':
             "docs": model.encode2(data["queries"]).cpu().numpy(), 
             "relevancy": data["relevancy"], 
         } 
-    report(f"Final:", encoded, data.cpu(), level=2)
+    report(f"Final:", encoded, data.cpu())
     save_pickle(encoded, args.data_out)
