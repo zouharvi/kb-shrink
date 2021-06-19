@@ -40,7 +40,7 @@ def create_generator(data, batchSize, dataOrganization):
 
 # TODO:  try lower learning rate
 class ProjectionModel(nn.Module):
-    def __init__(self, model, dimension, batchSize=2500, dataOrganization="dd", similarityModel="ip", similarityGold="ip", merge=True, learningRate=0.0001):
+    def __init__(self, model, dimension, batchSize=2500, dataOrganization="dd", similarityModel="l2", similarityGold="l2", merge=True, learningRate=0.0001):
         super().__init__()
 
         if model == 1:
@@ -100,7 +100,7 @@ class ProjectionModel(nn.Module):
 
     def forward(self, x1, x2):
         y1 = self.projection1(x1)
-        y2 = self.projection1(x2)
+        y2 = self.projection2(x2)
         out = self.similarityModel(y1, y2)
         return out
 
