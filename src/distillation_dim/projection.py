@@ -19,6 +19,10 @@ if __name__ == '__main__':
     parser.add_argument(
         '--epochs', default=10000, type=int)
     parser.add_argument(
+        '--batch-size', default=2500, type=int)
+    parser.add_argument(
+        '--learning-rate', default=0.0001, type=float)
+    parser.add_argument(
         '--seed', type=int, default=0)
     args = parser.parse_args()
 
@@ -29,7 +33,7 @@ if __name__ == '__main__':
             "docs": torch.Tensor(data["docs"]).to(DEVICE),
             "relevancy": data["relevancy"], 
         } 
-    model = ProjectionModel(args.model, args.dimension)
+    model = ProjectionModel(args.model, args.dimension, batchSize=args.batch_size, learningRate=args.learning_rate)
     print(model)
     model.trainModel(data, args.epochs)
     model.train(False)
