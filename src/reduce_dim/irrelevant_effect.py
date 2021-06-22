@@ -39,6 +39,11 @@ for threshold in range(max_base_doc, len(data['docs'])+args.step-1, args.step):
         n_components=64,
         random_state=args.seed
     ).fit(np.concatenate((data["queries"], docsCropped)))
+
+    # print(f"PCA avg norm before: {np.average(np.linalg.norm(model.components_, axis=1)):.50f}")
+    # model.components_ /= np.linalg.norm(model.components_.T, axis=1)[:, np.newaxis].T
+    # print(f"PCA avg norm after:  {np.average(np.linalg.norm(model.components_, axis=1)):.50f}")
+
     dataReduced = {
         "queries": model.transform(data["queries"]),
         "docs": model.transform(docsCropped)

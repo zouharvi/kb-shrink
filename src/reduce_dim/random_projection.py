@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
+import argparse
+from sklearn.random_projection import SparseRandomProjection, GaussianRandomProjection
+import random
+import numpy as np
+from misc.utils import rprec_ip, rprec_l2, read_pickle
 import sys
 sys.path.append("src")
-from misc.utils import rprec_ip, rprec_l2, read_pickle
-import numpy as np
-import random
-from sklearn.random_projection import SparseRandomProjection, GaussianRandomProjection
-import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data')
@@ -20,6 +20,7 @@ data["docs"] = np.array(data["docs"])
 
 print(f"{'':<12} {'IP':<12} {'L2':<12}")
 print(f"{'Method':<12} {'(max)|(avg)':<12} {'(max)|(avg)':<12}")
+
 
 def summary_performance_custom(name, acc_val_ip, acc_avg_ip, acc_val_l2, acc_avg_l2):
     print(f"{name:<12} {acc_val_ip:>5.3f}|{acc_avg_ip:>5.3f} {acc_val_l2:>5.3f}|{acc_avg_l2:>5.3f}")
@@ -40,7 +41,9 @@ class CropRandomProjection():
             k=self.n_components
         )
 
+
 data_log = []
+
 
 def random_projection_performance(components, model_name, runs=5):
     if model_name == "gauss":
@@ -60,7 +63,7 @@ def random_projection_performance(components, model_name, runs=5):
             n_components=components,
             random_state=random.randint(0, 2**8 - 1)
         )
-        model.fit(np.concatenate((data["queries"],data["docs"])))
+        model.fit(np.concatenate((data["queries"], data["docs"])))
 
         dataReduced = {
             "queries": model.transform(data["queries"]),
@@ -77,8 +80,9 @@ def random_projection_performance(components, model_name, runs=5):
         )
         vals_l2.append(val_l2)
 
-    data_log.append({"dim": components, "vals_ip": vals_ip, "vals_l2": vals_l2, "model": model_name})
-    
+    data_log.append({"dim": components, "vals_ip": vals_ip,
+                    "vals_l2": vals_l2, "model": model_name})
+
     # continuously override the file
     with open(args.logfile, "w") as f:
         f.write(str(data_log))
@@ -88,6 +92,7 @@ def random_projection_performance(components, model_name, runs=5):
         max(vals_ip), np.average(vals_ip),
         max(vals_l2), np.average(vals_l2)
     )
+
 
 for model in ["crop", "sparse", "gauss"]:
     for dim in np.linspace(32, 768, num=768//32, endpoint=True):
