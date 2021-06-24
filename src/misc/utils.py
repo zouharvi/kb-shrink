@@ -9,7 +9,6 @@ if torch.cuda.is_available():
 else:
     DEVICE = torch.device("cpu")
 
-
 def read_json(path):
     with open(path, "r") as fread:
         return json.load(fread)
@@ -45,6 +44,12 @@ def save_keys_pickle(path, data):
         for line in data:
             pickler.dump(np.array(line))
 
+def small_data(data, n_queries):
+    return {
+        "queries": data["queries"][:n_queries],
+        "docs": data["docs"][:max([max(l) for l in data["relevancy"][:n_queries]])],
+        "relevancy": data["relevancy"][:n_queries]
+    }
 
 def center_data(data):
     data["docs"] = np.array(data["docs"])
