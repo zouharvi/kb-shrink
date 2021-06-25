@@ -19,13 +19,20 @@ model = PCA(
 ).fit(np.concatenate((data["queries"], data["docs"])))
 
 print("Q * Q^T")
-print(np.matmul(model.components_, model.components_.T) >= 0.01)
+print((np.matmul(model.components_, model.components_.T) >= 0.001)*1)
+
+print("Q^T * Q")
+print((np.matmul(model.components_.T, model.components_) >= 0.001)*1)
 
 dataReduced = {
     "queries": model.transform(data["queries"]),
     "docs": model.transform(data["docs"])
 }
 
+
+print("\nReduced norms")
+print(f"Queries: {np.average(np.linalg.norm(dataReduced['queries'], axis=1)[:, np.newaxis]):.8f}")
+print(f"Docs:    {np.average(np.linalg.norm(dataReduced['docs'], axis=1)[:, np.newaxis]):.8f}")
 
 print("\nPerformance")
 val_ip_pca = rprec_ip(
@@ -34,6 +41,20 @@ val_ip_pca = rprec_ip(
 val_l2_pca = rprec_l2(
     dataReduced["queries"], dataReduced["docs"], data["relevancy"], fast=True
 )
+print(f"IP: {val_ip_pca}")
+print(f"L2: {val_l2_pca}")
+
+print("\nRenormalized performance")
+dataReduced = center_data(dataReduced)
+dataReduced = norm_data(dataReduced)
+val_ip_pca = rprec_ip(
+    dataReduced["queries"], dataReduced["docs"], data["relevancy"], fast=True
+)
+val_l2_pca = rprec_l2(
+    dataReduced["queries"], dataReduced["docs"], data["relevancy"], fast=True
+)
+print(f"IP: {val_ip_pca}")
+print(f"L2: {val_l2_pca}")
 
 print("\nOverlap of retrievals")
 val_order_l2 = list(order_l2(
