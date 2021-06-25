@@ -2,7 +2,7 @@
 
 import sys; sys.path.append("src")
 import argparse
-from misc.utils import read_pickle, save_pickle, norm_data, center_data
+from misc.utils import read_pickle, save_pickle, norm_data, center_data, small_data
 import numpy as np
 
 parser = argparse.ArgumentParser(description='Normalize embeddings')
@@ -10,13 +10,18 @@ parser.add_argument('--data-in', default="/data/kilt-hp/dpr-c-5000.embd")
 parser.add_argument('--data-out')
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
+parser.add_argument('--small', type=int)
 args = parser.parse_args()
 
-assert args.center or args.norm
+assert args.center or args.norm or args.small
 
 print("Loading")
 data = read_pickle(args.data_in)
 print("First query element[:4]", data["queries"][0][:4], "Norm:", np.linalg.norm(data["queries"][0]))
+
+if args.small:
+    print(f"Downsizing to {args.small}")
+    data = small_data(data, 1000)
 
 if args.center:
     print("Centering")
