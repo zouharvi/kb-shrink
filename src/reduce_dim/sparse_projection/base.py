@@ -98,6 +98,7 @@ def random_projection_performance(components, model_name, runs=5):
     )
 
 for model in ["crop", "sparse", "gauss"]:
-    for dim in np.linspace(32, 768, num=768//32, endpoint=True):
-        dim = int(dim)
+    # for dim in np.linspace(32, 768, num=768//32, endpoint=True):
+    #     dim = int(dim)
+    dim = 128
     random_projection_performance(dim, model)

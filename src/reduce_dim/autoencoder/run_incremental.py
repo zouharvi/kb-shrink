@@ -21,7 +21,7 @@ parser.add_argument(
     '--model', default=1, type=int,
     help='Which model to use')
 parser.add_argument(
-    '--bottleneck-width', default=256, type=int,
+    '--bottleneck-width', default=128, type=int,
     help='Dimension of the bottleneck layer')
 parser.add_argument(
     '--bottleneck-index', default=5, type=int,
@@ -39,7 +39,6 @@ with open(args.logfile, "a") as f:
     f.write(f"# model, width, index, acc_ip, acc_l2, avg_norm\n")
 
 for bottleneck_width in [32, 64, 128, 256]:
-# for bottleneck_width in [64]:
     print(f"Running {bottleneck_width}")
     model = Autoencoder(args.model, bottleneck_width)
     print(model)

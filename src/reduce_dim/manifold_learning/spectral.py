@@ -6,7 +6,7 @@ sys.path.append("src")
 from misc.utils import read_pickle, rprec_l2, rprec_ip
 from sklearn.metrics import euclidean_distances
 import argparse
-from sklearn.manifold import MDS
+from sklearn.manifold import SpectralEmbedding
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data', default="/data/kilt-hp/dpr-c-1000.embd_cn")
@@ -17,14 +17,9 @@ dataNew = np.array(np.concatenate((data["docs"], data["queries"])))
 dataNew -= dataNew.mean()
 
 print("Computing similarities")
-# similarities = euclidean_distances(dataNew)
 
 print("Preparing model")
-model = MDS(
-    n_components=128, max_iter=10, eps=1e-9, random_state=args.seed,
-    # dissimilarity="precomputed",
-    n_jobs=6
-)
+model = SpectralEmbedding(n_components=128)
 
 print("Fitting model")
 # dataNew = model.fit_transform(similarities)
@@ -52,4 +47,4 @@ val_ip_pca = rprec_ip(
 val_l2_pca = rprec_l2(
     dataNew["queries"], dataNew["docs"], data["relevancy"], fast=False
 )
-print(f"ip: {val_ip_pca:.4f}, l2: {val_l2_pca:.4f} (MDS)")
+print(f"ip: {val_ip_pca:.4f}, l2: {val_l2_pca:.4f} (Spectral)")

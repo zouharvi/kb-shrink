@@ -14,18 +14,16 @@ parser.add_argument(
     '--data', default="/data/kilt-hp/dpr-c-5000.embd_cn")
 parser.add_argument(
     '--data-out', default="/data/kilt-hp/tmp.embd")
+parser.add_argument('--model', default=1, type=int)
 parser.add_argument(
-    '--model', default=1, type=int)
-parser.add_argument(
-    '--bottleneck-width', default=64, type=int,
+    '--bottleneck-width', default=128, type=int,
     help='Dimension of the bottleneck layer')
 parser.add_argument(
     '--bottleneck-index', default=6, type=int,
     help='Position of the last encoder layer')
-parser.add_argument(
-    '--epochs', default=1000, type=int)
-parser.add_argument(
-    '--seed', type=int, default=0)
+parser.add_argument('--post-cn', action="store_true")
+parser.add_argument('--epochs', default=1000, type=int)
+parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 
 torch.manual_seed(args.seed)
@@ -38,7 +36,7 @@ data = {
 model = AutoencoderModel(args.model, args.bottleneck_width)
 print(model)
 
-model.trainModel(data, args.epochs, bottleneck_index=-1)
+model.trainModel(data, args.epochs, bottleneck_index=-1, post_cn=args.post_cn)
 model.train(False)
 
 # encode data

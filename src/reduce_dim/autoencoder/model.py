@@ -8,7 +8,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-def report(prefix, encoded, data):
+def report(prefix, encoded, data, post_cn):
+    if post_cn:
+        encoded = center_data(encoded)
+        encoded = norm_data(encoded)
     val_ip = rprec_ip(
         encoded["queries"], encoded["docs"],
         data["relevancy"], fast=True, report=False)
@@ -76,6 +79,21 @@ class AutoencoderModel(nn.Module):
                 nn.Tanh(),                         # 6
                 nn.Linear(bottleneck_width, 768),  # 7
             ]
+        elif model == 5:
+            self.layers = [
+                nn.Linear(768, 1024),              # 1
+                nn.Tanh(),                         # 2
+                nn.Linear(1024, 1024),             # 3
+                nn.Tanh(),                         # 4
+                nn.Linear(1024, bottleneck_width), # 5
+                nn.Tanh(),                         # 6
+                nn.Linear(bottleneck_width, 768),  # 7
+            ]
+        elif model == 6:
+            self.layers = [
+                nn.Linear(768, bottleneck_width),  # 1
+                nn.Linear(bottleneck_width, 768),  # 2
+            ]
         else:
             raise Exception("Unknown model specified")
         self.all_layers = nn.Sequential(*self.layers)
@@ -102,7 +120,7 @@ class AutoencoderModel(nn.Module):
         decoder = nn.Sequential(*self.layers[bottleneck_index:])
         return decoder(x)
 
-    def trainModel(self, data, epochs, bottleneck_index):
+    def trainModel(self, data, epochs, bottleneck_index, post_cn):
         self.dataLoader = torch.utils.data.DataLoader(
             dataset=data["docs"], batch_size=self.batchSize, shuffle=True
         )
@@ -127,7 +145,7 @@ class AutoencoderModel(nn.Module):
                 loss.backward()
                 self.optimizer.step()
 
-            if (epoch + 1) % 100 == 0:
+            if (epoch + 1) % 10 == 0:
                 self.train(False)
                 with torch.no_grad():
                     encoded = {
@@ -135,9 +153,7 @@ class AutoencoderModel(nn.Module):
                         "docs": self.encode(data["docs"], bottleneck_index).cpu().numpy(),
                     }
 
-                encoded = center_data(encoded)
-                encoded = norm_data(encoded)
                 report(
                     f"epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f},",
-                    encoded, data
+                    encoded, data, post_cn
                 )
