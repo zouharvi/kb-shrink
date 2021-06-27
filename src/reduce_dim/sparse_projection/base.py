@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.append("src")
+from misc.utils import rprec_ip, rprec_l2, read_pickle, center_data, norm_data
 import argparse
 from sklearn.random_projection import SparseRandomProjection, GaussianRandomProjection
 import random
 import numpy as np
-from misc.utils import rprec_ip, rprec_l2, read_pickle
-import sys
-sys.path.append("src")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data')
 parser.add_argument('--logfile', default="computed/tmp.log")
+parser.add_argument('--post-cn', action="store_true")
 parser.add_argument('--seed', type=int, default=0)
 
 args = parser.parse_args()
@@ -69,6 +70,9 @@ def random_projection_performance(components, model_name, runs=5):
             "queries": model.transform(data["queries"]),
             "docs": model.transform(data["docs"])
         }
+        if args.post_cn:
+            dataReduced = center_data(dataReduced)
+            dataReduced = norm_data(dataReduced)
 
         # copy to make it C-continuous
         val_ip = rprec_ip(
@@ -93,8 +97,7 @@ def random_projection_performance(components, model_name, runs=5):
         max(vals_l2), np.average(vals_l2)
     )
 
-
 for model in ["crop", "sparse", "gauss"]:
     for dim in np.linspace(32, 768, num=768//32, endpoint=True):
         dim = int(dim)
-        random_projection_performance(dim, model)
+    random_projection_performance(dim, model)

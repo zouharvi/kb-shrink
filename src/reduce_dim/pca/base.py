@@ -13,6 +13,7 @@ parser.add_argument('--data')
 parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
+parser.add_argument('--post-cn', action="store_true")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 data = read_pickle(args.data)
@@ -24,6 +25,10 @@ if args.norm:
 print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
 
 def summary_performance(name, dataReduced, dataReconstructed):
+    if args.post_cn:
+        dataReduced = center_data(dataReduced)
+        dataReduced = norm_data(dataReduced)
+
     val_ip = rprec_ip(
         dataReduced["queries"], dataReduced["docs"], data["relevancy"], fast=True
     )
@@ -134,7 +139,6 @@ for dim in np.linspace(32, 768, num=768//32, endpoint=True):
     data_log.append({"type": "train_query", "dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
     val_ip, val_l2, loss_q, loss_d = pca_performance_dq(dim)
     data_log.append({"type": "train_both", "dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
-
     # continuously override the file
     with open(args.logfile, "w") as f:
         f.write(str(data_log))
