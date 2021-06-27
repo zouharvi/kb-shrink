@@ -2,28 +2,23 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import read_keys_pickle, save_keys_pickle, DEVICE, acc_ip, acc_l2
+from misc.utils import read_keys_pickle, save_keys_pickle, DEVICE, rprec_ip, rprec_l2, center_data, norm_data
 import argparse
 import numpy as np
 import torch
 import torch.nn as nn
 
-def report(prefix, encoded, data, level):
-    # V^2 similarity computations is computationally expensive, skip if not necessary
-    if level == 3:
-        acc_val_ip = acc_ip(data, encoded, 20, report=False)
-        acc_val_l2 = acc_l2(data, encoded, 20, report=False)
-        avg_norm = np.average(torch.linalg.norm(encoded, axis=1))
-        print(f'{prefix} acc_ip: {acc_val_ip:.3f}, acc_l2: {acc_val_l2:.3f}, norm: {avg_norm:.2f}')
-        return acc_val_ip, acc_val_l2, avg_norm
-    elif level == 2:
-        acc_val_ip = acc_ip(data, encoded, 20, report=False)
-        print(f'{prefix} acc_ip: {acc_val_ip:.3f}')
-        return acc_val_ip
-    elif level == 1:
-        print(f'{prefix}')
+def report(prefix, encoded, data):
+    val_ip = rprec_ip(
+        encoded["queries"], encoded["docs"],
+        data["relevancy"], fast=True, report=False)
+    val_l2 = rprec_l2(
+        encoded["queries"], encoded["docs"],
+        data["relevancy"], fast=True, report=False)
+    print(f'{prefix} rprec_ip: {val_ip:.3f}, rprec_l2: {val_l2:.3f}')
+    return val_ip, val_l2
 
-class Autoencoder(nn.Module):
+class AutoencoderModel(nn.Module):
     def __init__(self, model, bottleneck_width, batchSize=128, learningRate=0.001):
         super().__init__()
 
@@ -107,9 +102,9 @@ class Autoencoder(nn.Module):
         decoder = nn.Sequential(*self.layers[bottleneck_index:])
         return decoder(x)
 
-    def trainModel(self, data, epochs, bottleneck_index, loglevel):
+    def trainModel(self, data, epochs, bottleneck_index):
         self.dataLoader = torch.utils.data.DataLoader(
-            dataset=data, batch_size=self.batchSize, shuffle=True
+            dataset=data["docs"], batch_size=self.batchSize, shuffle=True
         )
 
         for epoch in range(epochs):
@@ -132,50 +127,17 @@ class Autoencoder(nn.Module):
                 loss.backward()
                 self.optimizer.step()
 
-            if (epoch + 1) % 10 == 0:
+            if (epoch + 1) % 100 == 0:
                 self.train(False)
                 with torch.no_grad():
-                    encoded = self.encode(data, bottleneck_index).cpu()
+                    encoded = {
+                        "queries": self.encode(data["queries"], bottleneck_index).cpu().numpy(),
+                        "docs": self.encode(data["docs"], bottleneck_index).cpu().numpy(),
+                    }
 
+                encoded = center_data(encoded)
+                encoded = norm_data(encoded)
                 report(
                     f"epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f},",
-                    encoded, data.cpu(), level=loglevel
+                    encoded, data
                 )
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Autoencoder dimension reduction')
-    parser.add_argument(
-        '--keys-in', default="data/eli5-dev.embd",
-        help='Input keys')
-    parser.add_argument(
-        '--keys-out', default="data/eli5-dev-autoencoder.embd",
-        help='Encoded keys')
-    parser.add_argument(
-        '--model', default=1, type=int,
-        help='Which model to use')
-    parser.add_argument(
-        '--bottleneck-width', default=64, type=int,
-        help='Dimension of the bottleneck layer')
-    parser.add_argument(
-        '--bottleneck-index', default=6, type=int,
-        help='Position of the last encoder layer')
-    parser.add_argument(
-        '--epochs', default=1000, type=int)
-    parser.add_argument(
-        '--loglevel', default=1, type=int,
-        help='Level at which to report')
-    parser.add_argument(
-        '--seed', type=int, default=0)
-    args = parser.parse_args()
-    torch.manual_seed(args.seed)
-    data = read_keys_pickle(args.keys_in)
-    data = torch.Tensor(data).to(DEVICE)
-    model = Autoencoder(args.model, args.bottleneck_width)
-    print(model)
-    model.trainModel(data, args.epochs, bottleneck_index=-1, loglevel=args.loglevel)
-    model.train(False)
-    with torch.no_grad():
-        encoded = model.encode(data, args.bottleneck_index).cpu()
-    report(f"Final:", encoded, data.cpu(), level=3)
-    save_keys_pickle(encoded, args.keys_out)

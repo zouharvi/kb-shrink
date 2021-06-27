@@ -5,7 +5,6 @@ import numpy as np
 import torch.nn as nn
 import torch
 
-
 def report(prefix, encoded, data):
     val_ip = rprec_ip(
         encoded["queries"], encoded["docs"],
@@ -15,7 +14,6 @@ def report(prefix, encoded, data):
         data["relevancy"], fast=True, report=False)
     print(f'{prefix} rprec_ip: {val_ip:.3f}, rprec_l2: {val_l2:.3f}')
     return val_ip, val_l2
-
 
 def create_generator(data, batchSize, dataOrganization):
     # TODO: this will result in 5000, 5000, 1369 which is incorrect
@@ -48,7 +46,7 @@ def create_generator(data, batchSize, dataOrganization):
 # TODO:  try lower learning rate
 
 
-class ProjectionModel(nn.Module):
+class SimDistilModel(nn.Module):
     # similarityGold relevancy
     # learningRate=0.00001
     # batchSize=5000
