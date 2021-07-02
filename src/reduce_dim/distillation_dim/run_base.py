@@ -5,7 +5,7 @@ sys.path.append("src")
 from misc.utils import read_pickle, save_pickle, DEVICE
 import argparse
 import torch
-from reduce_dim.distillation_dim.model import SimDistilModle, report
+from reduce_dim.distillation_dim.model import SimDistilModel, report
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -13,7 +13,7 @@ if __name__ == '__main__':
         '--data', default="/data/kilt/hotpot-dpr-c-5000.embd_norm")
     parser.add_argument('--data-out')
     parser.add_argument(
-        '--dimension', default=64, type=int)
+        '--dimension', default=256, type=int)
     parser.add_argument(
         '--model', default=2, type=int)
     parser.add_argument(
@@ -22,6 +22,7 @@ if __name__ == '__main__':
         '--batch-size', default=2500, type=int)
     parser.add_argument(
         '--learning-rate', default=0.0001, type=float)
+    parser.add_argument('--post-cn', action="store_true")
     parser.add_argument(
         '--seed', type=int, default=0)
     args = parser.parse_args()
@@ -33,9 +34,9 @@ if __name__ == '__main__':
             "docs": torch.Tensor(data["docs"]).to(DEVICE),
             "relevancy": data["relevancy"], 
         } 
-    model = SimDistilModle(args.model, args.dimension, batchSize=args.batch_size, learningRate=args.learning_rate)
+    model = SimDistilModel(args.model, args.dimension, batchSize=args.batch_size, learningRate=args.learning_rate)
     print(model)
-    model.trainModel(data, args.epochs)
+    model.trainModel(data, args.epochs, args.post_cn)
     model.train(False)
 
     # encode data

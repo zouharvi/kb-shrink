@@ -1,17 +1,23 @@
 import sys
 sys.path.append("src")
-from misc.utils import DEVICE, rprec_ip, rprec_l2
+from misc.utils import DEVICE, rprec_ip, rprec_l2, center_data, norm_data
 import numpy as np
 import torch.nn as nn
 import torch
 
-def report(prefix, encoded, data):
-    val_ip = rprec_ip(
-        encoded["queries"], encoded["docs"],
-        data["relevancy"], fast=True, report=False)
+def report(prefix, encoded, data, post_cn):
+    if post_cn:
+        encoded = center_data(encoded)
+        encoded = norm_data(encoded)
     val_l2 = rprec_l2(
         encoded["queries"], encoded["docs"],
         data["relevancy"], fast=True, report=False)
+    if post_cn:
+        val_ip = val_l2
+    else:
+        val_ip = rprec_ip(
+            encoded["queries"], encoded["docs"],
+            data["relevancy"], fast=True, report=False)
     print(f'{prefix} rprec_ip: {val_ip:.3f}, rprec_l2: {val_l2:.3f}')
     return val_ip, val_l2
 
@@ -54,9 +60,8 @@ class SimDistilModel(nn.Module):
     # similarityGold ip, l2
     # learningRate=0.0001
     # batchSize=2500
-    def __init__(self, model, dimension, batchSize=2500, dataOrganization="dd", similarityModel="l2", similarityGold="l2", merge=True, learningRate=0.0001):
+    def __init__(self, model, dimension, batchSize=2500, dataOrganization="dd", similarityModel="ip", similarityGold="ip", merge=True, learningRate=0.0005):
         super().__init__()
-
         if model == 1:
             self.projection1 = nn.Linear(768, dimension)
             self.projection2 = nn.Linear(768, dimension)
@@ -76,6 +81,30 @@ class SimDistilModel(nn.Module):
                 nn.Linear(1024, 768),
                 nn.Tanh(),
                 nn.Linear(768, dimension),
+                # This is optional. The final results are the same though the convergence is faster with this.
+                nn.Tanh(),
+            )
+        elif model == 3:
+            self.projection1 = nn.Sequential(
+                nn.Linear(768, 1024),
+                nn.Tanh(),
+                nn.Linear(1024, 2048),
+                nn.Tanh(),
+                nn.Linear(2048, 2048),
+                nn.Tanh(),
+                nn.Linear(2048, 1024),
+                nn.Tanh(),
+                nn.Linear(1024, dimension),
+                # This is optional. The final results are the same though the convergence is faster with this.
+                nn.Tanh(),
+            )
+        elif model == 4:
+            self.projection1 = nn.Sequential(
+                nn.Linear(768, 4096),
+                nn.Tanh(),
+                nn.Linear(4096, 4096),
+                nn.Tanh(),
+                nn.Linear(4096, dimension),
                 # This is optional. The final results are the same though the convergence is faster with this.
                 nn.Tanh(),
             )
@@ -99,7 +128,6 @@ class SimDistilModel(nn.Module):
             if dataOrganization != "qd":
                 raise Exception("Incompatible criterion and data organization")
             self.similarityGold = lambda d1, d2, relevancy: relevancy
-            # TODO
         elif similarityGold == "l2":
             self.similarityGold = lambda d1, d2, relevancy: nn.PairwiseDistance(
                 p=2)(d1, d2)
@@ -131,7 +159,7 @@ class SimDistilModel(nn.Module):
     def encode2(self, x):
         return self.projection2(x)
 
-    def trainModel(self, data, epochs):
+    def trainModel(self, data, epochs, post_cn):
         for epoch in range(epochs):
             self.train(True)
             self.dataGenerator = create_generator(
@@ -160,5 +188,5 @@ class SimDistilModel(nn.Module):
 
                 report(
                     f"epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.9f},",
-                    encoded, data
+                    encoded, data, post_cn
                 )

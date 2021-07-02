@@ -12,12 +12,15 @@ def report(prefix, encoded, data, post_cn):
     if post_cn:
         encoded = center_data(encoded)
         encoded = norm_data(encoded)
-    val_ip = rprec_ip(
-        encoded["queries"], encoded["docs"],
-        data["relevancy"], fast=True, report=False)
     val_l2 = rprec_l2(
         encoded["queries"], encoded["docs"],
         data["relevancy"], fast=True, report=False)
+    if post_cn:
+        val_ip = val_l2
+    else:
+        val_ip = rprec_ip(
+            encoded["queries"], encoded["docs"],
+            data["relevancy"], fast=True, report=False)
     print(f'{prefix} rprec_ip: {val_ip:.3f}, rprec_l2: {val_l2:.3f}')
     return val_ip, val_l2
 
