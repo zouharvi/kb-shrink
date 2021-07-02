@@ -32,6 +32,15 @@ def create_generator(data, batchSize, dataOrganization):
         )
         for x, y in zip(dataLoader1, dataLoader2):
             yield x, y, None
+    elif dataOrganization == "ddqq":
+        dataLoader1 = torch.utils.data.DataLoader(
+            dataset=torch.cat((data["docs"],data["queries"])), batch_size=batchSize, shuffle=True
+        )
+        dataLoader2 = torch.utils.data.DataLoader(
+            dataset=torch.cat((data["docs"],data["queries"])), batch_size=batchSize, shuffle=True
+        )
+        for x, y in zip(dataLoader1, dataLoader2):
+            yield x, y, None
     elif dataOrganization == "qd":
         dataLoader1 = torch.utils.data.DataLoader(
             dataset=list(enumerate(data["queries"])), batch_size=batchSize, shuffle=True
@@ -60,8 +69,10 @@ class SimDistilModel(nn.Module):
     # similarityGold ip, l2
     # learningRate=0.0001
     # batchSize=2500
-    def __init__(self, model, dimension, batchSize=2500, dataOrganization="dd", similarityModel="ip", similarityGold="ip", merge=True, learningRate=0.0005):
+    def __init__(self, model, dimension, batchSize, learningRate, dataOrganization="ddqq", similarityModel="l2", similarityGold="l2", merge=True):
         super().__init__()
+        print(similarityModel, similarityGold)
+        
         if model == 1:
             self.projection1 = nn.Linear(768, dimension)
             self.projection2 = nn.Linear(768, dimension)
@@ -86,15 +97,15 @@ class SimDistilModel(nn.Module):
             )
         elif model == 3:
             self.projection1 = nn.Sequential(
-                nn.Linear(768, 1024),
+                nn.Linear(768, 4096),
                 nn.Tanh(),
-                nn.Linear(1024, 2048),
+                nn.Linear(4096, 4096),
                 nn.Tanh(),
-                nn.Linear(2048, 2048),
+                nn.Linear(4096, 4096),
                 nn.Tanh(),
-                nn.Linear(2048, 1024),
+                nn.Linear(4096, 4096),
                 nn.Tanh(),
-                nn.Linear(1024, dimension),
+                nn.Linear(4096, dimension),
                 # This is optional. The final results are the same though the convergence is faster with this.
                 nn.Tanh(),
             )

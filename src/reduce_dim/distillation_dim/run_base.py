@@ -13,7 +13,7 @@ if __name__ == '__main__':
         '--data', default="/data/kilt/hotpot-dpr-c-5000.embd_norm")
     parser.add_argument('--data-out')
     parser.add_argument(
-        '--dimension', default=256, type=int)
+        '--dimension', default=128, type=int)
     parser.add_argument(
         '--model', default=2, type=int)
     parser.add_argument(

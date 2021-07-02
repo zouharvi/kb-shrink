@@ -84,11 +84,11 @@ class AutoencoderModel(nn.Module):
             ]
         elif model == 5:
             self.layers = [
-                nn.Linear(768, 1024),              # 1
+                nn.Linear(768, 2048),              # 1
                 nn.Tanh(),                         # 2
-                nn.Linear(1024, 1024),             # 3
+                nn.Linear(2048, 2048),             # 3
                 nn.Tanh(),                         # 4
-                nn.Linear(1024, bottleneck_width), # 5
+                nn.Linear(2048, bottleneck_width), # 5
                 nn.Tanh(),                         # 6
                 nn.Linear(bottleneck_width, 768),  # 7
             ]
@@ -125,7 +125,7 @@ class AutoencoderModel(nn.Module):
 
     def trainModel(self, data, epochs, bottleneck_index, post_cn):
         self.dataLoader = torch.utils.data.DataLoader(
-            dataset=data["docs"], batch_size=self.batchSize, shuffle=True
+            dataset=torch.cat((data["docs"],data["queries"])), batch_size=self.batchSize, shuffle=True
         )
 
         for epoch in range(epochs):
