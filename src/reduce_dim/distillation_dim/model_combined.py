@@ -50,24 +50,10 @@ def create_generator(data, batchSize, dataOrganization):
         )
         for x, y in zip(dataLoader1, dataLoader2):
             yield x, y, None
-    elif dataOrganization == "rel":
-        dataLoader1 = torch.utils.data.DataLoader(
-            dataset=list(enumerate(data["queries"])), batch_size=batchSize, shuffle=True
-        )
-        dataLoader2 = torch.utils.data.DataLoader(
-            dataset=list(enumerate(data["docs"])), batch_size=batchSize, shuffle=True
-        )
-        for (iquery, query), (idoc, doc) in zip(dataLoader1, dataLoader2):
-            # TODO: this needs to be switched between IP and L2
-            relevant = torch.ones(query.shape[0])
-            for i, (i_iquery, i_idoc) in enumerate(zip(iquery, idoc)):
-                if i_idoc in data["relevancy"][i_iquery]:
-                    relevant[i] = 0.0
-            yield query, doc, relevant.to(DEVICE)
     else:
         raise Exception("Generator not defined")
 
-class SimDistilModel(nn.Module):
+class SimDistilModelCombined(nn.Module):
     # similarityGold relevancy
     # learningRate=0.00001
     # batchSize=5000
@@ -80,51 +66,10 @@ class SimDistilModel(nn.Module):
         
         if model == 1:
             projection_builder = lambda: nn.Linear(768, dimension)
+            self.decoder = nn.Linear(dimension, 768)
         elif model == 2:
             projection_builder = lambda: nn.Sequential(
                 nn.Linear(768, 1024),
-                nn.Tanh(),
-                nn.Linear(1024, 768),
-                nn.Tanh(),
-                nn.Linear(768, dimension),
-                # This is optional. The final results are the same though the convergence is faster with this.
-                nn.Tanh(),
-            )
-        elif model == 3:
-            projection_builder = lambda: nn.Sequential(
-                nn.Linear(768, 4096),
-                nn.Tanh(),
-                nn.Linear(4096, 4096),
-                nn.Tanh(),
-                nn.Linear(4096, 4096),
-                nn.Tanh(),
-                nn.Linear(4096, 4096),
-                nn.Tanh(),
-                nn.Linear(4096, dimension),
-                # This is optional. The final results are the same though the convergence is faster with this.
-                nn.Tanh(),
-            )
-        elif model == 4:
-            projection_builder = lambda: nn.Sequential(
-                nn.Linear(768, 1024*8),
-                nn.Tanh(),
-                nn.Linear(1024*8, 1024*4),
-                nn.Tanh(),
-                nn.Linear(1024*4, dimension),
-                # This is optional. The final results are the same though the convergence is faster with this.
-                # nn.Tanh(),
-            )
-        elif model == 5:
-            projection_builder = lambda: nn.Sequential(
-                nn.Linear(768, 1024),
-                nn.Tanh(),
-                nn.Linear(1024, 1024),
-                nn.Tanh(),
-                nn.Linear(1024, 1024),
-                nn.Tanh(),
-                nn.Linear(1024, 1024),
-                nn.Tanh(),
-                nn.Linear(1024, 1024),
                 nn.Tanh(),
                 nn.Linear(1024, 768),
                 nn.Tanh(),
@@ -153,11 +98,7 @@ class SimDistilModel(nn.Module):
             lr=self.learningRate
         )
 
-        if similarityGold == "relevancy":
-            if dataOrganization != "rel":
-                raise Exception("Incompatible criterion and data organization")
-            self.similarityGold = lambda d1, d2, relevancy: relevancy
-        elif similarityGold == "l2":
+        if similarityGold == "l2":
             self.similarityGold = lambda d1, d2, relevancy: nn.PairwiseDistance(
                 p=2)(d1, d2)
         elif similarityGold == "ip":
@@ -173,14 +114,16 @@ class SimDistilModel(nn.Module):
         else:
             raise Exception("Unknown similarity model")
 
-        self.criterion = nn.MSELoss()
+        self.loss = nn.MSELoss()
         self.to(DEVICE)
 
     def forward(self, x1, x2):
         y1 = self.projection1(x1)
         y2 = self.projection2(x2)
-        out = self.similarityModel(y1, y2)
-        return out
+        out_sim = self.similarityModel(y1, y2)
+        out_recons1 = self.decoder(self.projection1(x1))
+        out_recons2 = self.decoder(self.projection2(x2))
+        return out_sim, (out_recons1, out_recons2)
 
     def encode1(self, x):
         return self.projection1(x)
@@ -199,12 +142,12 @@ class SimDistilModel(nn.Module):
                     continue
 
                 # Predictions
-                output = self(sample1, sample2)
+                output, (recons1, recons2) = self(sample1, sample2)
                 sample_sim = self.similarityGold(
                     sample1, sample2, sampleRelevancy
                 )
                 # Calculate Loss
-                loss = self.criterion(output, sample_sim)
+                loss = self.loss(output, sample_sim) + 25*(self.loss(recons1, sample1) + self.loss(recons2, sample2))
                 # Backpropagation
                 self.optimizer.zero_grad()
                 loss.backward()

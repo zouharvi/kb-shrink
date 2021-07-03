@@ -5,7 +5,7 @@ sys.path.append("src")
 from misc.utils import read_pickle, save_pickle, DEVICE
 import argparse
 import torch
-from reduce_dim.distillation_dim.model import SimDistilModel, report
+from reduce_dim.distillation_dim.model_combined import SimDistilModelCombined, report
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -32,7 +32,7 @@ if __name__ == '__main__':
         "docs": torch.Tensor(data["docs"]).to(DEVICE),
         "relevancy": data["relevancy"], 
     }
-    model = SimDistilModel(
+    model = SimDistilModelCombined(
         args.model, args.dimension,
         batchSize=args.batch_size,
         learningRate=args.learning_rate,
