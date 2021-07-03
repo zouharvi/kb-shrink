@@ -5,7 +5,7 @@ from scipy.spatial.distance import minkowski
 import torch
 
 if torch.cuda.is_available():
-    DEVICE = torch.device("cuda:3")
+    DEVICE = torch.device("cuda:1")
 else:
     DEVICE = torch.device("cpu")
 

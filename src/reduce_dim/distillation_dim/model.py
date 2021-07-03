@@ -32,7 +32,7 @@ def create_generator(data, batchSize, dataOrganization):
         )
         for x, y in zip(dataLoader1, dataLoader2):
             yield x, y, None
-    elif dataOrganization == "ddqq":
+    elif dataOrganization == "d+q":
         dataLoader1 = torch.utils.data.DataLoader(
             dataset=torch.cat((data["docs"],data["queries"])), batch_size=batchSize, shuffle=True
         )
@@ -42,6 +42,15 @@ def create_generator(data, batchSize, dataOrganization):
         for x, y in zip(dataLoader1, dataLoader2):
             yield x, y, None
     elif dataOrganization == "qd":
+        dataLoader1 = torch.utils.data.DataLoader(
+            dataset=data["queries"], batch_size=batchSize, shuffle=True
+        )
+        dataLoader2 = torch.utils.data.DataLoader(
+            dataset=data["docs"], batch_size=batchSize, shuffle=True
+        )
+        for x, y in zip(dataLoader1, dataLoader2):
+            yield x, y, None
+    elif dataOrganization == "rel":
         dataLoader1 = torch.utils.data.DataLoader(
             dataset=list(enumerate(data["queries"])), batch_size=batchSize, shuffle=True
         )
@@ -69,24 +78,14 @@ class SimDistilModel(nn.Module):
     # similarityGold ip, l2
     # learningRate=0.0001
     # batchSize=2500
-    def __init__(self, model, dimension, batchSize, learningRate, dataOrganization="ddqq", similarityModel="l2", similarityGold="l2", merge=True):
+    def __init__(self, model, dimension, batchSize, learningRate, dataOrganization, merge, similarityModel, similarityGold):
         super().__init__()
         print(similarityModel, similarityGold)
         
         if model == 1:
-            self.projection1 = nn.Linear(768, dimension)
-            self.projection2 = nn.Linear(768, dimension)
+            projection_builder = lambda: nn.Linear(768, dimension)
         elif model == 2:
-            self.projection1 = nn.Sequential(
-                nn.Linear(768, 1024),
-                nn.Tanh(),
-                nn.Linear(1024, 768),
-                nn.Tanh(),
-                nn.Linear(768, dimension),
-                # This is optional. The final results are the same though the convergence is faster with this.
-                nn.Tanh(),
-            )
-            self.projection2 = nn.Sequential(
+            projection_builder = lambda: nn.Sequential(
                 nn.Linear(768, 1024),
                 nn.Tanh(),
                 nn.Linear(1024, 768),
@@ -96,7 +95,7 @@ class SimDistilModel(nn.Module):
                 nn.Tanh(),
             )
         elif model == 3:
-            self.projection1 = nn.Sequential(
+            projection_builder = lambda: nn.Sequential(
                 nn.Linear(768, 4096),
                 nn.Tanh(),
                 nn.Linear(4096, 4096),
@@ -110,12 +109,30 @@ class SimDistilModel(nn.Module):
                 nn.Tanh(),
             )
         elif model == 4:
-            self.projection1 = nn.Sequential(
-                nn.Linear(768, 4096),
+            projection_builder = lambda: nn.Sequential(
+                nn.Linear(768, 1024*8),
                 nn.Tanh(),
-                nn.Linear(4096, 4096),
+                nn.Linear(1024*8, 1024*4),
                 nn.Tanh(),
-                nn.Linear(4096, dimension),
+                nn.Linear(1024*4, dimension),
+                # This is optional. The final results are the same though the convergence is faster with this.
+                # nn.Tanh(),
+            )
+        elif model == 5:
+            projection_builder = lambda: nn.Sequential(
+                nn.Linear(768, 1024),
+                nn.Tanh(),
+                nn.Linear(1024, 1024),
+                nn.Tanh(),
+                nn.Linear(1024, 1024),
+                nn.Tanh(),
+                nn.Linear(1024, 1024),
+                nn.Tanh(),
+                nn.Linear(1024, 1024),
+                nn.Tanh(),
+                nn.Linear(1024, 768),
+                nn.Tanh(),
+                nn.Linear(768, dimension),
                 # This is optional. The final results are the same though the convergence is faster with this.
                 nn.Tanh(),
             )
@@ -123,7 +140,12 @@ class SimDistilModel(nn.Module):
             raise Exception("Unknown model specified")
 
         if merge:
+            self.projection1 = projection_builder()
             self.projection2 = self.projection1
+        else:
+            self.projection1 = projection_builder()
+            self.projection2 = projection_builder()
+
 
         self.batchSize = batchSize
         self.dataOrganization = dataOrganization
@@ -136,7 +158,7 @@ class SimDistilModel(nn.Module):
         )
 
         if similarityGold == "relevancy":
-            if dataOrganization != "qd":
+            if dataOrganization != "rel":
                 raise Exception("Incompatible criterion and data organization")
             self.similarityGold = lambda d1, d2, relevancy: relevancy
         elif similarityGold == "l2":
@@ -176,6 +198,10 @@ class SimDistilModel(nn.Module):
             self.dataGenerator = create_generator(
                 data, self.batchSize, self.dataOrganization)
             for sample1, sample2, sampleRelevancy in self.dataGenerator:
+                if sample1.shape[0] != sample2.shape[0]:
+                    # hotfix for qd not matching dimensions when at the end of the epoch
+                    continue
+
                 # Predictions
                 output = self(sample1, sample2)
                 sample_sim = self.similarityGold(
@@ -188,7 +214,7 @@ class SimDistilModel(nn.Module):
                 loss.backward()
                 self.optimizer.step()
 
-            if (epoch + 1) % 100 == 0:
+            if (epoch + 1) % 50 == 0:
                 self.train(False)
                 with torch.no_grad():
                     encoded = {
