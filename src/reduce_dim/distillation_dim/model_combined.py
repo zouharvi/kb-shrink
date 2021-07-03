@@ -147,7 +147,7 @@ class SimDistilModelCombined(nn.Module):
                     sample1, sample2, sampleRelevancy
                 )
                 # Calculate Loss
-                loss = self.loss(output, sample_sim) + 25*(self.loss(recons1, sample1) + self.loss(recons2, sample2))
+                loss = 1*self.loss(output, sample_sim) + 50*(self.loss(recons1, sample1) + self.loss(recons2, sample2))
                 # Backpropagation
                 self.optimizer.zero_grad()
                 loss.backward()

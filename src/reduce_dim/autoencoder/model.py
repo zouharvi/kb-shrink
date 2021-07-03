@@ -138,12 +138,12 @@ class AutoencoderModel(nn.Module):
                 # Backpropagation
                 self.optimizer.zero_grad()
 
-                if self.model == 4:
+                if self.model == 6:
                     pass
                     # L1
                     # regularization_loss = 0.00001 * sum([p.abs().sum() for p in self.all_layers[-1].parameters()])
                     # L2
-                    # regularization_loss = 0.00001 * sum([p.pow(2).sum() for p in self.all_layers[-1].parameters()])
+                    # regularization_loss = 0.0001 * sum([p.pow(2).sum() for p in self.all_layers[-1].parameters()])
                     # loss += regularization_loss
                 loss.backward()
                 self.optimizer.step()
