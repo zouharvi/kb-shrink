@@ -27,9 +27,9 @@ if __name__ == '__main__':
     torch.manual_seed(args.seed)
     data = read_pickle(args.data)
     data = {
-        "queries": torch.Tensor(data["queries"]).to(DEVICE)[:1500],
+        "queries": torch.Tensor(data["queries"]).to(DEVICE),
         "docs": torch.Tensor(data["docs"]).to(DEVICE),
-        "relevancy": data["relevancy"][:1500], 
+        "relevancy": data["relevancy"], 
     }
     model = ContrastiveLearningModel(
         args.model, args.dimension,

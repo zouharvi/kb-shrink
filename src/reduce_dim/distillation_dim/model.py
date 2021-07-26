@@ -4,7 +4,6 @@ from misc.utils import DEVICE, order_l2, rprec_ip, rprec_l2, center_data, norm_d
 import numpy as np
 import torch.nn as nn
 import torch
-import random
 
 def report(prefix, encoded, data, post_cn):
     if post_cn:
@@ -52,7 +51,11 @@ def create_generator(data, batchSize, dataOrganization):
         for x, y in zip(dataLoader1, dataLoader2):
             yield x, y, None
     elif dataOrganization == "qd2":
-        query_order_all = order_l2(data["queries"].cpu(), data["docs"].cpu(), [5] * len(data["queries"]), fast=True)
+        RANDOM_N = 40
+        CLOSE_N = 5
+        QUERY_N = RANDOM_N + CLOSE_N
+
+        query_order_all = order_l2(data["queries"].cpu(), data["docs"].cpu(), [CLOSE_N] * len(data["queries"]), fast=True)
         dataLoader1 = torch.utils.data.DataLoader(
             dataset=list(zip(data["queries"], query_order_all)), batch_size=1, shuffle=True
         )
@@ -60,17 +63,23 @@ def create_generator(data, batchSize, dataOrganization):
         batch_queries = []
         batch_docs = []
         for query, query_order in dataLoader1:
-            random_docs = data["docs"].cpu()[np.random.choice(np.arange(len(data["docs"])), 5)]
+            random_docs = data["docs"].cpu()[np.random.choice(np.arange(len(data["docs"])), RANDOM_N)]
             close_docs = data["docs"][query_order[0]]
-            batch_queries.append(np.repeat(query.cpu(), 10, axis=0))
+            batch_queries.append(np.repeat(query.cpu(), QUERY_N, axis=0))
             batch_docs.append(np.concatenate((random_docs, close_docs.cpu()), axis=0))
-            yield torch.tensor(batch_queries[-1], device=DEVICE), torch.tensor(batch_docs[-1], device=DEVICE), None
-
-        batch_queries = np.concatenate(batch_queries, axis=0)
-        batch_docs = np.concatenate(batch_docs, axis=0)
-        print(batch_queries.shape)
-        print(batch_docs.shape)
-        # yield torch.tensor(batch_queries, device=DEVICE), torch.tensor(batch_docs, device=DEVICE), None
+            
+            if len(batch_queries)*QUERY_N >= batchSize:
+                batch_queries = np.concatenate(batch_queries, axis=0)
+                batch_docs = np.concatenate(batch_docs, axis=0)
+                yield torch.tensor(batch_queries, device=DEVICE), torch.tensor(batch_docs, device=DEVICE), None
+                batch_queries = []
+                batch_docs = []
+        
+        if len(batch_queries) > 0:
+            print("Last batch:", len(batch_queries)*QUERY_N)
+            batch_queries = np.concatenate(batch_queries, axis=0)
+            batch_docs = np.concatenate(batch_docs, axis=0)
+            yield torch.tensor(batch_queries, device=DEVICE), torch.tensor(batch_docs, device=DEVICE), None
 
     elif dataOrganization == "rel":
         dataLoader1 = torch.utils.data.DataLoader(
@@ -114,20 +123,6 @@ class SimDistilModel(nn.Module):
             )
         elif model == 3:
             projection_builder = lambda: nn.Sequential(
-                nn.Linear(768, 4096),
-                nn.Tanh(),
-                nn.Linear(4096, 4096),
-                nn.Tanh(),
-                nn.Linear(4096, 4096),
-                nn.Tanh(),
-                nn.Linear(4096, 4096),
-                nn.Tanh(),
-                nn.Linear(4096, dimension),
-                # This is optional. The final results are the same though the convergence is faster with this.
-                nn.Tanh(),
-            )
-        elif model == 4:
-            projection_builder = lambda: nn.Sequential(
                 nn.Linear(768, 1024*8),
                 nn.Tanh(),
                 nn.Linear(1024*8, 1024*4),
@@ -135,24 +130,6 @@ class SimDistilModel(nn.Module):
                 nn.Linear(1024*4, dimension),
                 # This is optional. The final results are the same though the convergence is faster with this.
                 # nn.Tanh(),
-            )
-        elif model == 5:
-            projection_builder = lambda: nn.Sequential(
-                nn.Linear(768, 1024),
-                nn.Tanh(),
-                nn.Linear(1024, 1024),
-                nn.Tanh(),
-                nn.Linear(1024, 1024),
-                nn.Tanh(),
-                nn.Linear(1024, 1024),
-                nn.Tanh(),
-                nn.Linear(1024, 1024),
-                nn.Tanh(),
-                nn.Linear(1024, 768),
-                nn.Tanh(),
-                nn.Linear(768, dimension),
-                # This is optional. The final results are the same though the convergence is faster with this.
-                nn.Tanh(),
             )
         else:
             raise Exception("Unknown model specified")

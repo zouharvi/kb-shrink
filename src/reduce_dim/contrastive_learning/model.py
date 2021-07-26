@@ -23,13 +23,13 @@ def report(prefix, encoded, data, post_cn):
 
 def create_generator(data, batchSize, dataOrganization):
     if dataOrganization == "qd2":
-        query_order_all = order_l2(data["queries"].cpu(), data["docs"].cpu(), [5] * len(data["queries"]), fast=True)
+        query_order_all = order_l2(data["queries"].cpu(), data["docs"].cpu(), [2] * len(data["queries"]), fast=True)
         dataLoader1 = torch.utils.data.DataLoader(
             dataset=list(zip(data["queries"], query_order_all)), batch_size=1, shuffle=True
         )
 
         for query, query_order in dataLoader1:
-            random_docs = data["docs"].cpu()[np.random.choice(np.arange(len(data["docs"])), 5)]
+            random_docs = data["docs"].cpu()[np.random.choice(np.arange(len(data["docs"])), 64)]
             close_docs = data["docs"][query_order[0]]
             yield query.to(DEVICE), close_docs.to(DEVICE), random_docs.to(DEVICE)
     else:
