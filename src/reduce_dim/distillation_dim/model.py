@@ -1,9 +1,10 @@
 import sys
 sys.path.append("src")
-from misc.utils import DEVICE, rprec_ip, rprec_l2, center_data, norm_data
+from misc.utils import DEVICE, order_l2, rprec_ip, rprec_l2, center_data, norm_data
 import numpy as np
 import torch.nn as nn
 import torch
+import random
 
 def report(prefix, encoded, data, post_cn):
     if post_cn:
@@ -50,6 +51,27 @@ def create_generator(data, batchSize, dataOrganization):
         )
         for x, y in zip(dataLoader1, dataLoader2):
             yield x, y, None
+    elif dataOrganization == "qd2":
+        query_order_all = order_l2(data["queries"].cpu(), data["docs"].cpu(), [5] * len(data["queries"]), fast=True)
+        dataLoader1 = torch.utils.data.DataLoader(
+            dataset=list(zip(data["queries"], query_order_all)), batch_size=1, shuffle=True
+        )
+
+        batch_queries = []
+        batch_docs = []
+        for query, query_order in dataLoader1:
+            random_docs = data["docs"].cpu()[np.random.choice(np.arange(len(data["docs"])), 5)]
+            close_docs = data["docs"][query_order[0]]
+            batch_queries.append(np.repeat(query.cpu(), 10, axis=0))
+            batch_docs.append(np.concatenate((random_docs, close_docs.cpu()), axis=0))
+            yield torch.tensor(batch_queries[-1], device=DEVICE), torch.tensor(batch_docs[-1], device=DEVICE), None
+
+        batch_queries = np.concatenate(batch_queries, axis=0)
+        batch_docs = np.concatenate(batch_docs, axis=0)
+        print(batch_queries.shape)
+        print(batch_docs.shape)
+        # yield torch.tensor(batch_queries, device=DEVICE), torch.tensor(batch_docs, device=DEVICE), None
+
     elif dataOrganization == "rel":
         dataLoader1 = torch.utils.data.DataLoader(
             dataset=list(enumerate(data["queries"])), batch_size=batchSize, shuffle=True
@@ -195,6 +217,7 @@ class SimDistilModel(nn.Module):
                 data, self.batchSize, self.dataOrganization)
             for sample1, sample2, sampleRelevancy in self.dataGenerator:
                 if sample1.shape[0] != sample2.shape[0]:
+                    print(sample1.shape, sample2.shape)
                     # hotfix for qd not matching dimensions when at the end of the epoch
                     continue
 
@@ -210,7 +233,7 @@ class SimDistilModel(nn.Module):
                 loss.backward()
                 self.optimizer.step()
 
-            if (epoch + 1) % 50 == 0:
+            if (epoch + 1) % 1 == 0:
                 self.train(False)
                 with torch.no_grad():
                     encoded = {

@@ -66,10 +66,8 @@ def norm_data(data):
     data["queries"] /= np.linalg.norm(data["queries"], axis=1)[:, np.newaxis]
     return data
 
-
 def l2_sim(x, y):
     return -minkowski(x, y)
-
 
 def order_l2_kdtree(data_queries, data_docs, fast):
     from sklearn.neighbors import KDTree
@@ -85,7 +83,6 @@ def order_l2_kdtree(data_queries, data_docs, fast):
 
     # pass generators so that the resulting vectors don't have to be stored in memory
     return n_new_gen()
-
 
 def order_l2(data_queries, data_docs, retrieve_counts, fast):
     """
