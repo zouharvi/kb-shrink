@@ -11,19 +11,25 @@ def report(prefix, encoded, data, post_cn):
         encoded = norm_data(encoded)
     val_l2 = rprec_l2(
         encoded["queries"], encoded["docs"],
-        data["relevancy"], fast=True, report=False)
+        data["relevancy"], fast=True, report=False
+    )
     if post_cn:
         val_ip = val_l2
     else:
         val_ip = rprec_ip(
             encoded["queries"], encoded["docs"],
-            data["relevancy"], fast=True, report=False)
+            data["relevancy"], fast=True, report=False
+        )
     print(f'{prefix} rprec_ip: {val_ip:.3f}, rprec_l2: {val_l2:.3f}')
     return val_ip, val_l2
 
+query_order_all = None
+
 def create_generator(data, batchSize, dataOrganization):
-    # TODO: this will result in 5000, 5000, 1369 which is incorrect
+    global query_order_all
+
     if dataOrganization == "dd":
+    # TODO: this will result in 5000, 5000, 1369 which is incorrect
         dataLoader1 = torch.utils.data.DataLoader(
             dataset=data["docs"], batch_size=batchSize, shuffle=True
         )
@@ -51,11 +57,15 @@ def create_generator(data, batchSize, dataOrganization):
         for x, y in zip(dataLoader1, dataLoader2):
             yield x, y, None
     elif dataOrganization == "qd2":
-        RANDOM_N = 40
+        RANDOM_N = 20
         CLOSE_N = 5
         QUERY_N = RANDOM_N + CLOSE_N
 
-        query_order_all = order_l2(data["queries"].cpu(), data["docs"].cpu(), [CLOSE_N] * len(data["queries"]), fast=True)
+        # fill global storage variable only once as this is expensive
+        if query_order_all is None:
+            query_order_all = list(order_l2(data["queries"].cpu(), data["docs"].cpu(), [CLOSE_N] * len(data["queries"]), fast=True))
+            print("Finished computing L2 order")
+
         dataLoader1 = torch.utils.data.DataLoader(
             dataset=list(zip(data["queries"], query_order_all)), batch_size=1, shuffle=True
         )
@@ -157,16 +167,16 @@ class SimDistilModel(nn.Module):
                 raise Exception("Incompatible criterion and data organization")
             self.similarityGold = lambda d1, d2, relevancy: relevancy
         elif similarityGold == "l2":
-            self.similarityGold = lambda d1, d2, relevancy: nn.PairwiseDistance(
-                p=2)(d1, d2)
+            self.similarityGold = lambda d1, d2, relevancy: \
+                nn.PairwiseDistance(p=2)(d1, d2)
         elif similarityGold == "ip":
             self.similarityGold = lambda d1, d2, relevancy: torch.mul(d1, d2).sum(dim=1)
         else:
             raise Exception("Unknown similarity gold")
 
         if similarityModel == "l2":
-            self.similarityModel = lambda d1, d2: nn.PairwiseDistance(
-                p=2)(d1, d2)
+            self.similarityModel = lambda d1, d2: \
+                nn.PairwiseDistance(p=2)(d1, d2)
         elif similarityModel == "ip":
             self.similarityModel = lambda d1, d2: torch.mul(d1, d2).sum(dim=1)
         else:

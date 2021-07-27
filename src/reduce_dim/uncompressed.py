@@ -13,6 +13,7 @@ parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
 parser.add_argument('--all', action="store_true")
 parser.add_argument('--metric', default="rprec")
+parser.add_argument('--without-faiss', action="store_true")
 args = parser.parse_args()
 data = read_pickle(args.data)
 
@@ -66,15 +67,17 @@ else:
         data = norm_data(data)
 
     # RPrec
-    print(f"{args.metric}_ip", rprec_ip(
+    print(f"{args.metric}_ip (fast)", rprec_ip(
         data["queries"], data["docs"], data["relevancy"], fast=True
     ))
-    print("rprec_ip", rprec_ip(
-        data["queries"], data["docs"], data["relevancy"]
-    ))
-    print(f"{args.metric}_l2", rprec_l2(
+    if args.without_faiss:
+        print(f"{args.metric}_ip", rprec_ip(
+            data["queries"], data["docs"], data["relevancy"]
+        ))
+    print(f"{args.metric}_l2 (fast)", rprec_l2(
         data["queries"], data["docs"], data["relevancy"], fast=True
     ))
-    print("rprec_l2", rprec_l2(
-        data["queries"], data["docs"], data["relevancy"]
-    ))
+    if args.without_faiss:
+        print(f"{args.metric}_l2", rprec_l2(
+            data["queries"], data["docs"], data["relevancy"]
+        ))

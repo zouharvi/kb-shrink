@@ -132,6 +132,7 @@ def precision_performance(newType):
 
 data_log = []
 for dim in np.linspace(32, 768, num=768//32, endpoint=True):
+    # dim = 64
     dim = int(dim)
     val_ip, val_l2, loss_q, loss_d = pca_performance_d(dim)
     data_log.append({"type": "train_doc", "dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
