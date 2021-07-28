@@ -73,6 +73,7 @@ def create_generator(data, batchSize, dataOrganization):
         batch_queries = []
         batch_docs = []
         for query, query_order in dataLoader1:
+            # rewrite using torch functions so that it can stay in the GPU
             random_docs = data["docs"].cpu()[np.random.choice(np.arange(len(data["docs"])), RANDOM_N)]
             close_docs = data["docs"][query_order[0]]
             batch_queries.append(np.repeat(query.cpu(), QUERY_N, axis=0))
@@ -121,6 +122,7 @@ class SimDistilModel(nn.Module):
         
         if model == 1:
             projection_builder = lambda: nn.Linear(768, dimension)
+            self.decoder = nn.Linear(dimension, 768)
         elif model == 2:
             projection_builder = lambda: nn.Sequential(
                 nn.Linear(768, 1024),
@@ -189,7 +191,7 @@ class SimDistilModel(nn.Module):
         y1 = self.projection1(x1)
         y2 = self.projection2(x2)
         out = self.similarityModel(y1, y2)
-        return out
+        return y1, y2, out
 
     def encode1(self, x):
         return self.projection1(x)
@@ -197,11 +199,16 @@ class SimDistilModel(nn.Module):
     def encode2(self, x):
         return self.projection2(x)
 
+    def decode(self, x):
+        return self.decoder(x)
+
     def trainModel(self, data, epochs, post_cn):
         for epoch in range(epochs):
             self.train(True)
             self.dataGenerator = create_generator(
                 data, self.batchSize, self.dataOrganization)
+            weight_2 = [(i/5-1)**2 if i <= 5 else 0.01 for i in range(epochs)]
+            weight_1 = [1.0-w for w in weight_2]
             for sample1, sample2, sampleRelevancy in self.dataGenerator:
                 if sample1.shape[0] != sample2.shape[0]:
                     print(sample1.shape, sample2.shape)
@@ -209,12 +216,21 @@ class SimDistilModel(nn.Module):
                     continue
 
                 # Predictions
-                output = self(sample1, sample2)
+                encoded1, encoded2, output = self(sample1, sample2)
                 sample_sim = self.similarityGold(
                     sample1, sample2, sampleRelevancy
                 )
+                decoded1 = self.decode(encoded1)
+                decoded2 = self.decode(encoded2)
                 # Calculate Loss
-                loss = self.criterion(output, sample_sim)
+                loss = (
+                    weight_1[epoch] * self.criterion(output, sample_sim) +
+                    weight_2[epoch] * (
+                        0.001 * self.criterion(sample1, decoded1) +
+                        0.999 * self.criterion(sample2, decoded2)
+                    )
+                )
+
                 # Backpropagation
                 self.optimizer.zero_grad()
                 loss.backward()

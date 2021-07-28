@@ -6,6 +6,7 @@ from misc.utils import read_pickle, save_pickle, DEVICE
 import argparse
 import torch
 from reduce_dim.distillation_dim.model import SimDistilModel, report
+from reduce_dim.distillation_dim.model_from_autoencoder import SimDistillationFromAutoencoderModel
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -41,6 +42,11 @@ if __name__ == '__main__':
         similarityModel=args.similarity_model,
         similarityGold=args.similarity_gold,
     )
+    # model = SimDistillationFromAutoencoderModel(
+    #     args.model, args.dimension,
+    #     batchSize=args.batch_size,
+    #     learningRate=args.learning_rate,
+    # )
     print(model)
     model.trainModel(data, args.epochs, args.post_cn)
     model.train(False)
