@@ -8,11 +8,9 @@ import numpy as np
 
 parser = argparse.ArgumentParser(description='Explore vector distribution')
 parser.add_argument(
-    '--embd', default="data/eli5-dev.embd",
-    help='Input keys')
+    '--embd', default="/data/kilt-hp/dpr-c.embd_cn")
 parser.add_argument(
-    '--dataset', default="data/eli5-dev.jsonl",
-    help='KILT (sub)dataset with JSON lines')
+    '--dataset', default="/data/kilt-hp/full.json")
 args = parser.parse_args()
 
 data = read_pickle(args.embd)

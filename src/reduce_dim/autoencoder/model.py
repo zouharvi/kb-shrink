@@ -30,6 +30,11 @@ class AutoencoderModel(nn.Module):
 
         if model == 1:
             self.layers = [
+                nn.Linear(768, bottleneck_width),  # 1
+                nn.Linear(bottleneck_width, 768),  # 2
+            ]
+        elif model == 2:
+            self.layers = [
                 nn.Linear(768, 512),               # 1
                 nn.Tanh(),                         # 2
                 nn.Linear(512, 256),               # 3
@@ -42,60 +47,6 @@ class AutoencoderModel(nn.Module):
                 nn.Tanh(),                         # 10
                 nn.Linear(512, 768),               # 11
                 nn.Tanh(),                         # 12
-            ]
-        elif model == 2:
-            self.layers = [
-                nn.Linear(768, 512),               # 1
-                nn.Identity(),                     # 2
-                nn.Linear(512, 256),               # 3
-                nn.Identity(),                     # 4
-                nn.Linear(256, bottleneck_width),  # 5
-                nn.Identity(),                     # 6
-                nn.Linear(bottleneck_width, 256),  # 7
-                nn.Identity(),                     # 8
-                nn.Linear(256, 512),               # 9
-                nn.Identity(),                     # 10
-                nn.Linear(512, 768),               # 11
-                nn.Identity(),                     # 12
-            ]
-        elif model == 3:
-            self.layers = [
-                nn.Linear(768, 512),               # 1
-                nn.Tanh(),                         # 2
-                nn.Linear(512, 256),               # 3
-                nn.Tanh(),                         # 4
-                nn.Linear(256, bottleneck_width),  # 5
-                nn.Tanh(),                         # 6
-                nn.Linear(bottleneck_width, 256),  # 7
-                nn.Tanh(),                         # 8
-                nn.Linear(256, 512),               # 9
-                nn.Tanh(),                         # 10
-                nn.Linear(512, 768),               # 11
-            ]
-        elif model == 4:
-            self.layers = [
-                nn.Linear(768, 512),               # 1
-                nn.Tanh(),                         # 2
-                nn.Linear(512, 256),               # 3
-                nn.Tanh(),                         # 4
-                nn.Linear(256, bottleneck_width),  # 5
-                nn.Tanh(),                         # 6
-                nn.Linear(bottleneck_width, 768),  # 7
-            ]
-        elif model == 5:
-            self.layers = [
-                nn.Linear(768, 2048),              # 1
-                nn.Tanh(),                         # 2
-                nn.Linear(2048, 2048),             # 3
-                nn.Tanh(),                         # 4
-                nn.Linear(2048, bottleneck_width), # 5
-                nn.Tanh(),                         # 6
-                nn.Linear(bottleneck_width, 768),  # 7
-            ]
-        elif model == 6:
-            self.layers = [
-                nn.Linear(768, bottleneck_width),  # 1
-                nn.Linear(bottleneck_width, 768),  # 2
             ]
         else:
             raise Exception("Unknown model specified")
@@ -148,7 +99,7 @@ class AutoencoderModel(nn.Module):
                 loss.backward()
                 self.optimizer.step()
 
-            if (epoch + 1) % 10 == 0:
+            if (epoch + 1) % 5 == 0:
                 self.train(False)
                 with torch.no_grad():
                     encoded = {

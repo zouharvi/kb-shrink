@@ -14,7 +14,6 @@ parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
 parser.add_argument('--post-cn', action="store_true")
-parser.add_argument('--dim', type=int, default=128)
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 data = read_pickle(args.data)
@@ -45,6 +44,9 @@ def summary_performance(name, dataReduced, dataReconstructed):
         torch.Tensor(dataReconstructed["docs"])
     )
     name = name.replace("float", "f")
+    avg_norm_q = np.average(
+        torch.linalg.norm(torch.Tensor(dataReduced["queries"]), axis=1)
+    )
     print(f"{name:<21} {loss_d:>7.5f} {loss_q:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
     return val_ip, val_l2, loss_q.item(), loss_d.item()
 
@@ -108,7 +110,41 @@ def pca_performance_dq(components):
         dataReconstructed
     )
 
-val_ip, val_l2, loss_q, loss_d = pca_performance_dq(args.dim)
-exit()
-val_ip, val_l2, loss_q, loss_d = pca_performance_d(args.dim)
-val_ip, val_l2, loss_q, loss_d = pca_performance_q(args.dim)
+
+def precision_performance(newType):
+    dataReduced = {
+        "queries": np.array(data["queries"], dtype=newType),
+        "docs": np.array(data["docs"], dtype=newType)
+    }
+    dataReconstructed = {
+        "queries": dataReduced["queries"].astype("float32"),
+        "docs": dataReduced["docs"].astype("float32")
+    }
+    return summary_performance(
+        f"Prec ({newType})",
+        dataReduced,
+        dataReconstructed
+    )
+
+
+# precision_performance("float32")
+# precision_performance("float16")
+
+data_log = []
+for dim in np.linspace(32, 768, num=768//32, endpoint=True):
+    # dim = 64
+    dim = int(dim)
+    val_ip, val_l2, loss_q, loss_d = pca_performance_d(dim)
+    data_log.append({"type": "train_doc", "dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
+    val_ip, val_l2, loss_q, loss_d = pca_performance_q(dim)
+    data_log.append({"type": "train_query", "dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
+    val_ip, val_l2, loss_q, loss_d = pca_performance_dq(dim)
+    data_log.append({"type": "train_both", "dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
+    # continuously override the file
+    with open(args.logfile, "w") as f:
+        f.write(str(data_log))
+
+# pca_precision_preformance(32, "float16")
+# pca_precision_preformance(64, "float16")
+# pca_precision_preformance(128, "float16")
+# precision_pca_performance(128, "float16")

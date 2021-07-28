@@ -49,7 +49,7 @@ class ContrastiveLearningModel(nn.Module):
                 nn.Tanh(),
                 nn.Linear(768, dimension),
                 # This is optional. The final results are the same though the convergence is faster with this.
-                nn.Tanh(),
+                # nn.Tanh(),
             )
         else:
             raise Exception("Unknown model specified")

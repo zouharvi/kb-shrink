@@ -224,11 +224,12 @@ class SimDistilModel(nn.Module):
                 decoded2 = self.decode(encoded2)
                 # Calculate Loss
                 loss = (
-                    weight_1[epoch] * self.criterion(output, sample_sim) +
-                    weight_2[epoch] * (
-                        0.001 * self.criterion(sample1, decoded1) +
-                        0.999 * self.criterion(sample2, decoded2)
-                    )
+                    self.criterion(output, sample_sim)
+                    # weight_1[epoch] * self.criterion(output, sample_sim) +
+                    # weight_2[epoch] * (
+                    #     0.001 * self.criterion(sample1, decoded1) +
+                    #     0.999 * self.criterion(sample2, decoded2)
+                    # )
                 )
 
                 # Backpropagation

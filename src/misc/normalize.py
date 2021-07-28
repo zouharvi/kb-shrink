@@ -20,8 +20,8 @@ data = read_pickle(args.data_in)
 print("First query element[:4]", data["queries"][0][:4], "Norm:", np.linalg.norm(data["queries"][0]))
 
 if args.small:
-    print(f"Downsizing to {args.small}")
-    data = small_data(data, 1000)
+    print(f"Downsizing to {args.small} queries")
+    data = small_data(data, args.small)
 
 if args.center:
     print("Centering")
