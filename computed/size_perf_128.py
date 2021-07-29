@@ -35,15 +35,15 @@
     { "method": "autoencoder_single", "count": 30000, "rprec_ip": 0.342, "rprec_l2": 0.330, },
     { "method": "autoencoder_single", "count": 68659, "rprec_ip": 0.304, "rprec_l2": 0.291, },
 
-# Similarity Distillation
-    { "method": "pca", "count": 500, "rprec_ip": 0., "rprec_l2": 0., },
-    { "method": "pca", "count": 1000, "rprec_ip": 0., "rprec_l2": 0., },
-    { "method": "pca", "count": 2000, "rprec_ip": 0., "rprec_l2": 0., },
-    { "method": "pca", "count": 3000, "rprec_ip": 0., "rprec_l2": 0., },
-    { "method": "pca", "count": 4000, "rprec_ip": 0., "rprec_l2": 0., },
-    { "method": "pca", "count": 5000, "rprec_ip": 0.433, "rprec_l2": 0.426, },
-    { "method": "pca", "count": 10000, "rprec_ip": 0., "rprec_l2": 0., },
-    { "method": "pca", "count": 20000, "rprec_ip": 0., "rprec_l2": 0., },
-    { "method": "pca", "count": 30000, "rprec_ip": 0., "rprec_l2": 0., },
-    { "method": "pca", "count": 68659, "rprec_ip": 0., "rprec_l2": 0., },
+# Similarity Distillation L2
+    { "method": "distill_l2", "count": 500, "rprec_ip": 0.616, "rprec_l2": 0.625, },
+    { "method": "distill_l2", "count": 1000, "rprec_ip": 0.570, "rprec_l2": 0.581, },
+    { "method": "distill_l2", "count": 2000, "rprec_ip": 0.502, "rprec_l2": 0.504, },
+    { "method": "distill_l2", "count": 3000, "rprec_ip": 0.472, "rprec_l2": 0.478, },
+    { "method": "distill_l2", "count": 4000, "rprec_ip": 0., "rprec_l2": 0., },
+    { "method": "distill_l2", "count": 5000, "rprec_ip": 0.433, "rprec_l2": 0.426, },
+    { "method": "distill_l2", "count": 10000, "rprec_ip": 0., "rprec_l2": 0., },
+    { "method": "distill_l2", "count": 20000, "rprec_ip": 0., "rprec_l2": 0., },
+    { "method": "distill_l2", "count": 30000, "rprec_ip": 0., "rprec_l2": 0., },
+    { "method": "distill_l2", "count": 68659, "rprec_ip": 0., "rprec_l2": 0., },
 ]
