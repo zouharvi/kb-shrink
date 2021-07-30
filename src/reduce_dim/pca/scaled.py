@@ -22,7 +22,7 @@ if args.center:
 if args.norm:
     data = norm_data(data)
 
-assert args.center
+# assert args.center
 
 print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
 

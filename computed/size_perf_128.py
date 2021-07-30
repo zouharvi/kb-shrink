@@ -23,6 +23,18 @@
     { "method": "pca", "count": 30000, "rprec_ip": 0.316, "rprec_l2": 0.313, },
     { "method": "pca", "count": 68659, "rprec_ip": 0.279, "rprec_l2": 0.276, },
 
+# PCA scaled
+    { "method": "pca_scaled", "count": 500, "rprec_ip": 0.620, "rprec_l2": 0.618, },
+    { "method": "pca_scaled", "count": 1000, "rprec_ip": 0.568, "rprec_l2": 0.572, },
+    { "method": "pca_scaled", "count": 2000, "rprec_ip": 0.500, "rprec_l2": 0.501, },
+    { "method": "pca_scaled", "count": 3000, "rprec_ip": 0.473, "rprec_l2": 0.468, },
+    { "method": "pca_scaled", "count": 4000, "rprec_ip": 0.450, "rprec_l2": 0.447, },
+    { "method": "pca_scaled", "count": 5000, "rprec_ip": 0.434, "rprec_l2": 0.430, },
+    { "method": "pca_scaled", "count": 10000, "rprec_ip": 0.368, "rprec_l2": 0.382, },
+    { "method": "pca_scaled", "count": 20000, "rprec_ip": 0.345, "rprec_l2": 0.342, },
+    { "method": "pca_scaled", "count": 30000, "rprec_ip": 0.323, "rprec_l2": 0.320, },
+    { "method": "pca_scaled", "count": 68659, "rprec_ip": 0.285, "rprec_l2": 0.283, },
+
 # Autoencoder_single
     { "method": "autoencoder_single", "count": 500, "rprec_ip": 0.622, "rprec_l2": 0.613, },
     { "method": "autoencoder_single", "count": 1000, "rprec_ip": 0.590, "rprec_l2": 0.573, },
@@ -40,10 +52,10 @@
     { "method": "distill_l2", "count": 1000, "rprec_ip": 0.570, "rprec_l2": 0.581, },
     { "method": "distill_l2", "count": 2000, "rprec_ip": 0.502, "rprec_l2": 0.504, },
     { "method": "distill_l2", "count": 3000, "rprec_ip": 0.472, "rprec_l2": 0.478, },
-    { "method": "distill_l2", "count": 4000, "rprec_ip": 0., "rprec_l2": 0., },
+    { "method": "distill_l2", "count": 4000, "rprec_ip": 0.447, "rprec_l2": 0.454, },
     { "method": "distill_l2", "count": 5000, "rprec_ip": 0.433, "rprec_l2": 0.426, },
     { "method": "distill_l2", "count": 10000, "rprec_ip": 0., "rprec_l2": 0., },
     { "method": "distill_l2", "count": 20000, "rprec_ip": 0., "rprec_l2": 0., },
     { "method": "distill_l2", "count": 30000, "rprec_ip": 0., "rprec_l2": 0., },
-    { "method": "distill_l2", "count": 68659, "rprec_ip": 0., "rprec_l2": 0., },
+    { "method": "distill_l2", "count": 68659, "rprec_ip": 0.281, "rprec_l2": 0.285, },
 ]
