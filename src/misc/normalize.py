@@ -27,7 +27,7 @@ if args.center:
     print("Centering")
     data = center_data(data)
     
-if args.center:
+if args.norm:
     print("Normalizing")
     data = norm_data(data)
 

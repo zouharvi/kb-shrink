@@ -49,18 +49,22 @@ def summary_performance(name, dataReduced, dataReconstructed):
     return val_ip, val_l2, loss_q.item(), loss_d.item()
 
 
-def pca_performance_d(components):
-    model = PCA(
+def pca_performance_split(components):
+    model_d = PCA(
         n_components=components,
         random_state=args.seed
     ).fit(data["docs"])
+    model_q = PCA(
+        n_components=components,
+        random_state=args.seed
+    ).fit(data["queries"])
     dataReduced = {
-        "queries": model.transform(data["queries"]),
-        "docs": model.transform(data["docs"])
+        "queries": model_q.transform(data["queries"]),
+        "docs": model_d.transform(data["docs"])
     }
     dataReconstructed = {
-        "queries": model.inverse_transform(dataReduced["queries"]),
-        "docs": model.inverse_transform(dataReduced["docs"])
+        "queries": model_q.inverse_transform(dataReduced["queries"]),
+        "docs": model_d.inverse_transform(dataReduced["docs"])
     }
     return summary_performance(
         f"PCA-D ({components})",
@@ -69,45 +73,4 @@ def pca_performance_d(components):
     )
 
 
-def pca_performance_q(components):
-    model = PCA(
-        n_components=components,
-        random_state=args.seed
-    ).fit(data["queries"])
-    dataReduced = {
-        "queries": model.transform(data["queries"]),
-        "docs": model.transform(data["docs"])
-    }
-    dataReconstructed = {
-        "queries": model.inverse_transform(dataReduced["queries"]),
-        "docs": model.inverse_transform(dataReduced["docs"])
-    }
-    return summary_performance(
-        f"PCA-Q ({components})",
-        dataReduced,
-        dataReconstructed
-    )
-
-
-def pca_performance_dq(components):
-    model = PCA(
-        n_components=components,
-        random_state=args.seed
-    ).fit(np.concatenate((data["queries"], data["docs"])))
-    dataReduced = {
-        "queries": model.transform(data["queries"]),
-        "docs": model.transform(data["docs"])
-    }
-    dataReconstructed = {
-        "queries": model.inverse_transform(dataReduced["queries"]),
-        "docs": model.inverse_transform(dataReduced["docs"])
-    }
-    return summary_performance(
-        f"PCA-DQ ({components})",
-        dataReduced,
-        dataReconstructed
-    )
-
-val_ip, val_l2, loss_q, loss_d = pca_performance_dq(args.dim)
-val_ip, val_l2, loss_q, loss_d = pca_performance_d(args.dim)
-val_ip, val_l2, loss_q, loss_d = pca_performance_q(args.dim)
+val_ip, val_l2, loss_q, loss_d = pca_performance_split(args.dim)
