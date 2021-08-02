@@ -2,6 +2,7 @@ import pickle
 import json
 import numpy as np
 from scipy.spatial.distance import minkowski
+from sklearn import preprocessing
 import torch
 
 if torch.cuda.is_available():
@@ -65,6 +66,14 @@ def norm_data(data):
     data["docs"] /= np.linalg.norm(data["docs"], axis=1)[:, np.newaxis]
     data["queries"] /= np.linalg.norm(data["queries"], axis=1)[:, np.newaxis]
     return data
+
+def zscore_data(data):
+    model_d = preprocessing.StandardScaler(with_std=True, with_mean=True).fit(data["docs"])
+    model_q = preprocessing.StandardScaler(with_std=True, with_mean=True).fit(data["queries"])
+    data["docs"] = model_d.transform(data["docs"])
+    data["queries"] = model_q.transform(data["queries"])
+    return data
+
 
 def l2_sim(x, y):
     return -minkowski(x, y)

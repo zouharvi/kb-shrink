@@ -69,7 +69,10 @@ def random_projection_performance(dim, metric):
         f"Delete :{dim}", val_ip, val_l2
     )
 
-for dim in range(768):
+for dim in np.linspace(32, 768, num=768//32, endpoint=True):
+    dim = int(dim)
     random_projection_performance(dim, "ip")
-for dim in range(768):
+
+for dim in np.linspace(32, 768, num=768//32, endpoint=True):
+    dim = int(dim)
     random_projection_performance(dim, "l2")

@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import rprec_ip, rprec_l2, read_pickle, center_data, norm_data
+from misc.utils import rprec_ip, rprec_l2, read_pickle, center_data, norm_data, zscore_data
 import argparse
 from sklearn.random_projection import SparseRandomProjection, GaussianRandomProjection
 import random
@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--data')
 parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--post-cn', action="store_true")
+parser.add_argument('--post-zn', action="store_true")
 parser.add_argument('--seed', type=int, default=0)
 
 args = parser.parse_args()
@@ -73,6 +74,9 @@ def random_projection_performance(components, model_name, runs=5):
         if args.post_cn:
             dataReduced = center_data(dataReduced)
             dataReduced = norm_data(dataReduced)
+        if args.post_zn:
+            dataReduced = zscore_data(dataReduced)
+            dataReduced = norm_data(dataReduced)
 
         # copy to make it C-continuous
         val_ip = rprec_ip(
@@ -98,7 +102,6 @@ def random_projection_performance(components, model_name, runs=5):
     )
 
 for model in ["crop", "sparse", "gauss"]:
-    # for dim in np.linspace(32, 768, num=768//32, endpoint=True):
-    #     dim = int(dim)
-    dim = 128
-    random_projection_performance(dim, model)
+    for dim in np.linspace(32, 768, num=768//32, endpoint=True):
+        dim = int(dim)
+        random_projection_performance(dim, model)
