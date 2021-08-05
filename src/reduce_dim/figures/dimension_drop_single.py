@@ -12,6 +12,7 @@ with open(args.logfile, "r") as f:
     DATA = eval(f.read())
 DIMS = list(range(768))
 BASELINE = [x for x in DATA if x["dim"] == False][0]
+DATA = [x for x in DATA if x["dim"] != False]
 # IMPR_IP = [x["dim"] for x in sorted(DATA, key=lambda x: x["val_ip"], reverse=True) if x["val_ip"] > BASELINE["val_ip"]]
 # IMPR_L2 = [x["dim"] for x in sorted(DATA, key=lambda x: x["val_l2"], reverse=True) if x["val_l2"] > BASELINE["val_l2"]]
 print([x["dim"] for x in sorted(DATA, key=lambda x: x["val_ip"], reverse=True)])

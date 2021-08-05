@@ -59,7 +59,7 @@ ax.plot(
 # ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "train_both"], label="L2, Both", color="tab:red", linestyle="-.")
 
 # uncompressed
-ax.axhline(y=0.456, alpha=0.5, linestyle="--", color="black")
+ax.axhline(y=0.454, alpha=0.5, linestyle="--", color="black")
 # ax.axhline(y=0.2610, alpha=0.5, linestyle="--", color="tab:red")
 
 # plt.legend(bbox_to_anchor=(-0.1, 1, 1.2, 0), loc="center", ncol=2)
@@ -72,7 +72,6 @@ ax.set_xlabel("Dimension")
 
 plt.tight_layout()
 plt.show()
-plt.savefig("out.png")
 
 
 loss_against_avg_l2 = np.average([max(x["vals_l2"]) - np.average(x["vals_l2"]) for x in DATA])
