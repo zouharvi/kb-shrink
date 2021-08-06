@@ -25,6 +25,7 @@ def report(prefix, encoded, data, post_cn):
     return val_ip, val_l2
 
 class AutoencoderModel(nn.Module):
+    # prev learningRate 0.001
     def __init__(self, model, bottleneck_width, batchSize=128, learningRate=0.001):
         super().__init__()
 
