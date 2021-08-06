@@ -11,18 +11,10 @@ from sklearn.decomposition import PCA
 parser = argparse.ArgumentParser(description='PCA performance summary')
 parser.add_argument('--data')
 parser.add_argument('--logfile', default="computed/tmp.log")
-parser.add_argument('--center', action="store_true")
-parser.add_argument('--norm', action="store_true")
 parser.add_argument('--post-cn', action="store_true")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 data = read_pickle(args.data)
-if args.center:
-    data = center_data(data)
-if args.norm:
-    data = norm_data(data)
-
-# assert args.center
 
 print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
 
@@ -57,10 +49,19 @@ def pca_performance_d(components):
     # model.components_ = model.components_[1:]
     eigenvalues = model.explained_variance_
     scaling = np.ones(components)
-    scaling[0] = 1.75
-    scaling[1] = 1.25
-    scaling[2] = 1.25
-    model.components_ /= scaling[:, np.newaxis]
+    # IP optimized
+    # scaling[0] = 0.5
+    # scaling[1] = 0.8
+    # scaling[2] = 0.8
+    # scaling[3] = 0.9
+    # scaling[4] = 0.8
+    # L2 optimized
+    scaling[0] = 0.5
+    scaling[1] = 0.8
+    scaling[2] = 0.7
+    scaling[3] = 0.9
+    scaling[4] = 0.6
+    model.components_ *= scaling[:, np.newaxis]
     
     print(eigenvalues[:6])
 

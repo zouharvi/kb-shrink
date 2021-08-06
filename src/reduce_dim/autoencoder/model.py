@@ -29,28 +29,72 @@ class AutoencoderModel(nn.Module):
         super().__init__()
 
         if model == 1:
-            self.layers = [
-                nn.Linear(768, bottleneck_width),  # 1
-                nn.Linear(bottleneck_width, 768),  # 2
+            # learned PCA
+            self.layers_enc = [
+                nn.Linear(768, bottleneck_width),
+            ]
+            self.layers_dec = [
+                nn.Linear(bottleneck_width, 768),
             ]
         elif model == 2:
-            self.layers = [
-                nn.Linear(768, 512),               # 1
-                nn.Tanh(),                         # 2
-                nn.Linear(512, 256),               # 3
-                nn.Tanh(),                         # 4
-                nn.Linear(256, bottleneck_width),  # 5
-                nn.Tanh(),                         # 6
-                nn.Linear(bottleneck_width, 256),  # 7
-                nn.Tanh(),                         # 8
-                nn.Linear(256, 512),               # 9
-                nn.Tanh(),                         # 10
-                nn.Linear(512, 768),               # 11
-                nn.Tanh(),                         # 12
+            # symmetric
+            self.layers_enc = [
+                nn.Linear(768, 512),             
+                nn.Tanh(),                       
+                nn.Linear(512, 256),             
+                nn.Tanh(),                       
+                nn.Linear(256, bottleneck_width),
+            ]
+            self.layers_dec = [
+                nn.Linear(bottleneck_width, 256),
+                nn.Tanh(),                       
+                nn.Linear(256, 512),             
+                nn.Tanh(),                       
+                nn.Linear(512, 768),             
+            ]
+        elif model == 3:
+            # shallow decoder
+            self.layers_enc = [
+                nn.Linear(768, 512),             
+                nn.Tanh(),                       
+                nn.Linear(512, 256),             
+                nn.Tanh(),                       
+                nn.Linear(256, bottleneck_width),
+            ]
+            self.layers_dec = [
+                nn.Linear(bottleneck_width, 768),
+            ]
+        elif model == 4:
+            # double bottleneck
+            self.layers_enc = [
+                nn.Linear(768, 512),             
+                nn.Tanh(),                       
+                nn.Linear(512, 256),             
+                nn.Tanh(),                       
+                nn.Linear(256, bottleneck_width),
+            ]
+            self.layers_dec = [
+                nn.Linear(bottleneck_width, bottleneck_width//2),
+                nn.Tanh(),                       
+                nn.Linear(bottleneck_width//2, 768),
+            ]
+        elif model == 5:
+            # convolution upscaler
+            self.layers_enc = [
+                nn.Linear(768, 512),             
+                nn.Tanh(),                       
+                nn.Linear(512, 256),             
+                nn.Tanh(),                       
+                nn.Linear(256, bottleneck_width),
+            ]
+            self.layers_dec = [
+                nn.Conv1d(1, 768//bottleneck_width, 2, stride=1, padding='same'),
+                nn.Flatten()
             ]
         else:
             raise Exception("Unknown model specified")
-        self.all_layers = nn.Sequential(*self.layers)
+        self.encoder = nn.Sequential(*self.layers_enc)
+        self.decoder = nn.Sequential(*self.layers_dec)
 
         self.model = model
         self.batchSize = batchSize
@@ -64,17 +108,20 @@ class AutoencoderModel(nn.Module):
         self.to(DEVICE)
 
     def forward(self, x):
-        return self.all_layers(x)
+        if self.model == 5:
+            x = self.encoder(x)
+            x = torch.reshape(x, (x.shape[0], 1, 64))
+            return self.decoder(x)
+        else:
+            return self.decoder(self.encoder(x))
 
-    def encode(self, x, bottleneck_index):
-        encoder = nn.Sequential(*self.layers[:bottleneck_index])
-        return encoder(x)
+    def encode(self, x):
+        return self.encoder(x)
 
-    def decode(self, x, bottleneck_index):
-        decoder = nn.Sequential(*self.layers[bottleneck_index:])
-        return decoder(x)
+    def decode(self, x):
+        return self.decoder(x)
 
-    def trainModel(self, data, epochs, bottleneck_index, post_cn):
+    def trainModel(self, data, epochs, post_cn, regularize):
         self.dataLoader = torch.utils.data.DataLoader(
             dataset=torch.cat((data["docs"],data["queries"])), batch_size=self.batchSize, shuffle=True
         )
@@ -89,13 +136,10 @@ class AutoencoderModel(nn.Module):
                 # Backpropagation
                 self.optimizer.zero_grad()
 
-                if self.model == 6:
-                    pass
+                if regularize:
                     # L1
-                    # regularization_loss = 0.00001 * sum([p.abs().sum() for p in self.all_layers[-1].parameters()])
-                    # L2
-                    # regularization_loss = 0.0001 * sum([p.pow(2).sum() for p in self.all_layers[-1].parameters()])
-                    # loss += regularization_loss
+                    regularization_loss = 0.00000001 * sum([p.abs().sum() for p in self.decoder.parameters()])
+                    loss += regularization_loss
                 loss.backward()
                 self.optimizer.step()
 
@@ -103,8 +147,8 @@ class AutoencoderModel(nn.Module):
                 self.train(False)
                 with torch.no_grad():
                     encoded = {
-                        "queries": self.encode(data["queries"], bottleneck_index).cpu().numpy(),
-                        "docs": self.encode(data["docs"], bottleneck_index).cpu().numpy(),
+                        "queries": self.encode(data["queries"]).cpu().numpy(),
+                        "docs": self.encode(data["docs"]).cpu().numpy(),
                     }
 
                 report(

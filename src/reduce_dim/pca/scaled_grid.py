@@ -42,11 +42,11 @@ def pca_performance_d(params, components):
         n_components=components,
         random_state=args.seed
     ).fit(data["docs"])
-    eigenvalues = model.explained_variance_
+    
     scaling = np.ones(components)
     for k,v in params.items():
-        scaling[k] *= v
-    model.components_ /= scaling[:, np.newaxis]
+        scaling[k] = v
+    model.components_ *= scaling[:, np.newaxis]
     
     dataReduced = {
         "queries": model.transform(data["queries"]),

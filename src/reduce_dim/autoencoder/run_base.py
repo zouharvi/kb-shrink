@@ -15,13 +15,9 @@ parser.add_argument(
 parser.add_argument(
     '--data-out', default="/data/kilt-hp/tmp.embd")
 parser.add_argument('--model', default=1, type=int)
-parser.add_argument(
-    '--bottleneck-width', default=128, type=int,
-    help='Dimension of the bottleneck layer')
-parser.add_argument(
-    '--bottleneck-index', default=6, type=int,
-    help='Position of the last encoder layer')
+parser.add_argument('--bottleneck-width', default=128, type=int)
 parser.add_argument('--post-cn', action="store_true")
+parser.add_argument('--regularize', action="store_true")
 parser.add_argument('--epochs', default=1000, type=int)
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
@@ -36,14 +32,14 @@ data = {
 model = AutoencoderModel(args.model, args.bottleneck_width)
 print(model)
 
-model.trainModel(data, args.epochs, bottleneck_index=-1, post_cn=args.post_cn)
+model.trainModel(data, args.epochs, post_cn=args.post_cn, regularize=args.regularize)
 model.train(False)
 
 # encode data
 with torch.no_grad():
     encoded = {
-        "queries": model.encode(data["queries"], args.bottleneck_index).cpu().numpy(),
-        "docs": model.encode(data["docs"], args.bottleneck_index).cpu().numpy(),
+        "queries": model.encode(data["queries"]).cpu().numpy(),
+        "docs": model.encode(data["docs"]).cpu().numpy(),
         "relevancy": data["relevancy"],
     }
 report(f"Final:", encoded, data.cpu())
