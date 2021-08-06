@@ -2,13 +2,14 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import rprec_ip, rprec_l2, read_pickle
+from misc.utils import rprec_ip, rprec_l2, read_pickle, center_data, norm_data
 import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data')
 parser.add_argument('--logfile-single', default="computed/dimension_drop_single.log")
+parser.add_argument('--post-cn', action="store_true")
 parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--seed', type=int, default=0)
 
@@ -50,6 +51,9 @@ def random_projection_performance(dim, metric):
         "queries": model.transform(data["queries"], dim, impr_array),
         "docs": model.transform(data["docs"], dim, impr_array)
     }
+    if args.post_cn:
+        dataReduced = center_data(dataReduced)
+        dataReduced = norm_data(dataReduced)
 
     # copy to make it C-continuous
     val_ip = rprec_ip(
@@ -69,10 +73,12 @@ def random_projection_performance(dim, metric):
         f"Delete :{dim}", val_ip, val_l2
     )
 
+print("by IP")
 for dim in np.linspace(32, 768, num=768//32, endpoint=True):
     dim = int(dim)
     random_projection_performance(dim, "ip")
 
+print("by L2")
 for dim in np.linspace(32, 768, num=768//32, endpoint=True):
     dim = int(dim)
     random_projection_performance(dim, "l2")
