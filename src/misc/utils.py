@@ -10,6 +10,7 @@ if torch.cuda.is_available():
 else:
     DEVICE = torch.device("cpu")
 
+
 def read_json(path):
     with open(path, "r") as fread:
         return json.load(fread)
@@ -45,6 +46,7 @@ def save_keys_pickle(path, data):
         for line in data:
             pickler.dump(np.array(line))
 
+
 def small_data(data, n_queries):
     return {
         "queries": data["queries"][:n_queries],
@@ -52,11 +54,12 @@ def small_data(data, n_queries):
         "relevancy": data["relevancy"][:n_queries]
     }
 
+
 def center_data(data):
     data["docs"] = np.array(data["docs"])
     data["queries"] = np.array(data["queries"])
     data["docs"] -= data["docs"].mean(axis=0)
-    data["queries"] -=  data["queries"].mean(axis=0)
+    data["queries"] -= data["queries"].mean(axis=0)
     return data
 
 
@@ -67,9 +70,14 @@ def norm_data(data):
     data["queries"] /= np.linalg.norm(data["queries"], axis=1)[:, np.newaxis]
     return data
 
+
 def zscore_data(data):
-    model_d = preprocessing.StandardScaler(with_std=True, with_mean=True).fit(data["docs"])
-    model_q = preprocessing.StandardScaler(with_std=True, with_mean=True).fit(data["queries"])
+    model_d = preprocessing.StandardScaler(
+        with_std=True, with_mean=True
+    ).fit(data["docs"])
+    model_q = preprocessing.StandardScaler(
+        with_std=True, with_mean=True
+    ).fit(data["queries"])
     data["docs"] = model_d.transform(data["docs"])
     data["queries"] = model_q.transform(data["queries"])
     return data
@@ -77,6 +85,7 @@ def zscore_data(data):
 
 def l2_sim(x, y):
     return -minkowski(x, y)
+
 
 def order_l2_kdtree(data_queries, data_docs, fast):
     from sklearn.neighbors import KDTree
@@ -92,6 +101,7 @@ def order_l2_kdtree(data_queries, data_docs, fast):
 
     # pass generators so that the resulting vectors don't have to be stored in memory
     return n_new_gen()
+
 
 def order_l2(data_queries, data_docs, retrieve_counts, fast):
     """
