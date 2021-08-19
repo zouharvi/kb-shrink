@@ -6,7 +6,6 @@ from misc.utils import read_pickle, save_pickle, DEVICE
 from reduce_dim.autoencoder.model import AutoencoderModel, report
 import torch.nn as nn
 import torch
-import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser()

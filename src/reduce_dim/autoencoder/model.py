@@ -2,9 +2,8 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import read_keys_pickle, save_keys_pickle, DEVICE, rprec_ip, rprec_l2, center_data, norm_data
+from misc.utils import DEVICE, rprec_ip, rprec_l2, center_data, norm_data
 import argparse
-import numpy as np
 import torch
 import torch.nn as nn
 

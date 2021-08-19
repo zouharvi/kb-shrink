@@ -5,6 +5,9 @@ sys.path.append("src")
 from misc.utils import read_pickle, save_pickle, DEVICE
 import argparse
 import torch
+
+raise NotImplementedError()
+
 from reduce_dim.distillation_dim.model_combined import SimDistilModelCombined, report
 
 if __name__ == '__main__':
