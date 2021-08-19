@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-import sys; sys.path.append("src")
-import argparse
-from misc.utils import read_pickle, save_pickle, norm_data, center_data, small_data, zscore_data
 import numpy as np
+from misc.utils import read_pickle, save_pickle, norm_data, center_data, small_data, zscore_data
+import argparse
+import sys
+sys.path.append("src")
 
 parser = argparse.ArgumentParser(description='Normalize embeddings')
 parser.add_argument('--data-in', default="/data/kilt-hp/dpr-c-5000.embd")
@@ -18,7 +19,11 @@ assert args.center or args.norm or args.small or args.zscore
 
 print("Loading")
 data = read_pickle(args.data_in)
-print("First query element[:4]", data["queries"][0][:4], "Norm:", np.linalg.norm(data["queries"][0]))
+print(
+    "First query element[:4]",
+    data["queries"][0][:4],
+    "Norm:", np.linalg.norm(data["queries"][0])
+)
 
 if args.small:
     print(f"Downsizing to {args.small} queries")
@@ -37,7 +42,11 @@ if args.norm:
     data = norm_data(data)
 
 
-print("First query element[:4]", data["queries"][0][:4], "Norm:", np.linalg.norm(data["queries"][0]))
+print(
+    "First query element[:4]",
+    data["queries"][0][:4],
+    "Norm:", np.linalg.norm(data["queries"][0])
+)
 
 print("Saving")
 save_pickle(args.data_out, data)

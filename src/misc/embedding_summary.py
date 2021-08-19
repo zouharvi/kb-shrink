@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-import sys; sys.path.append("src")
-from misc.utils import read_pickle
-import numpy as np
-import argparse
 import torch
+import argparse
+import numpy as np
+from misc.utils import read_pickle
+import sys
+sys.path.append("src")
 
 parser = argparse.ArgumentParser(description='Explore embedding distribution')
 parser.add_argument('keys')
@@ -12,12 +13,22 @@ args = parser.parse_args()
 data = read_pickle(args.keys)
 print(data.keys())
 
+
 def analysis(data):
     data = torch.Tensor(data)
     print('Data shape', data.shape)
-    print('Avg. L1 norm:  ', np.average(torch.linalg.norm(data, axis=1, ord=1)))
-    print('Avg. L2 norm:  ', np.average(torch.linalg.norm(data, axis=1, ord=2)))
-    print('Avg. Linf norm:', np.average(torch.linalg.norm(data, axis=1, ord=np.inf)))
+    print(
+        'Avg. L1 norm:  ',
+        np.average(torch.linalg.norm(data, axis=1, ord=1))
+    )
+    print(
+        'Avg. L2 norm:  ',
+        np.average(torch.linalg.norm(data, axis=1, ord=2))
+    )
+    print(
+        'Avg. Linf norm:',
+        np.average(torch.linalg.norm(data, axis=1, ord=np.inf))
+    )
 
 print("QUERIES")
 analysis(data["queries"])
