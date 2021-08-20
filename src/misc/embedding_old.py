@@ -2,7 +2,8 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import DEVICE, save_pickle, read_pickle
+from misc.utils import DEVICE, save_pickle, read_json
+import json
 import torch
 from transformers import AutoTokenizer, AutoModel
 from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer, DPRContextEncoder, DPRContextEncoderTokenizer
@@ -150,10 +151,11 @@ class DPRWrap():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data-in', default="/data/big-hp/full.pkl")
-    parser.add_argument('--data-out', default="/data/big-hp/full.embd")
+    parser.add_argument('--data-in', default="/data/kilt-triv/full.json")
+    parser.add_argument('--data-out', default="/data/kilt-triv/full.embd")
     parser.add_argument('--model', default="bert")
     parser.add_argument('--type-out', default="cls")
+    parser.add_argument('--n', type=int, default=None)
     args = parser.parse_args()
 
     if args.model == "bert":
@@ -165,21 +167,38 @@ if __name__ == "__main__":
     else:
         raise Exception("Unknown model")
 
-    data = read_pickle(args.data_in)
+    data = read_json(args.data_in)
+
+    data_relevancy = []
+    data_queries = []
+    data_docs = []
+    highest_doc = 0
 
     # compute query embedding
-    for i, _ in enumerate(data["queries"]):
-        output = model.query_embd(data["queries"][i], args.type_out)
-        if i % 500 == 0:
-            print(i, data["queries"][i], output.shape)
-        data["queries"][i] = output
+    for i, sample in enumerate(data["queries"]):
+        if i == args.n:
+            break
+
+        output = model.query_embd(sample["input"], args.type_out)
+        data_queries.append(output)
+        assert len(sample["doc_ids"]) != 0
+        data_relevancy.append(sample["doc_ids"])
+        highest_doc = max(max(sample["doc_ids"]), highest_doc)
+
+        if i % 50 == 0:
+            print(i, sample["input"], output.shape)
 
     # compute doc embedding
-    for i, _ in enumerate(data["docs"]):
-        output = model.doc_embd(data["docs"][i], args.type_out)
-        if i % 500 == 0:
-            print(i, data["docs"][i], output.shape)
-        data["docs"][i] = output
+    for i, doc in enumerate(data["docs"]):
+        if i == highest_doc+1:
+            break
+        output = model.doc_embd(doc, args.type_out)
+        data_docs.append(output)
+
+        if i % 50 == 0:
+            print(i, doc, output.shape)
 
     # store data
-    save_pickle(args.data_out, data)
+    data_out = {"queries": data_queries,
+                "docs": data_docs, "relevancy": data_relevancy}
+    save_pickle(args.data_out, data_out)
