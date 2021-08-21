@@ -25,7 +25,7 @@ def report(prefix, encoded, data, post_cn):
 
 class AutoencoderModel(nn.Module):
     # prev learningRate 0.001
-    def __init__(self, model, bottleneck_width, batchSize=128, learningRate=0.001):
+    def __init__(self, model, bottleneck_width, batchSize=128, learningRate=0.001, skip_move=False):
         super().__init__()
 
         if model == 1:
@@ -105,7 +105,8 @@ class AutoencoderModel(nn.Module):
             lr=self.learningRate
         )
         self.criterion = nn.MSELoss()
-        self.to(DEVICE)
+        if not skip_move:
+            self.to(DEVICE)
 
     def forward(self, x):
         if self.model == 5:
