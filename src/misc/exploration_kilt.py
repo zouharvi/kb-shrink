@@ -8,6 +8,7 @@ from datasets import load_dataset
 import argparse
 import numpy as np
 from collections import defaultdict
+from itertools import chain
 
 def split_paragraph(text):
     text = text.rstrip("\n").split(" ")
@@ -23,14 +24,13 @@ def split_paragraph_list(text_list):
         for span in span_list
     ]
 
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--data-in', default="/data/kilt-hp/full.json")
     parser.add_argument('--data-out', default="/data/big-hp/full.pkl")
-    parser.add_argument('--wiki-n', type=int, default=10000)
+    parser.add_argument('--wiki-n', type=int, default=None)
     parser.add_argument('--query-n', type=int, default=None)
+    parser.add_argument('--prune-unused', action="store_true")
     args = parser.parse_args()
 
     # get the knowledge source
@@ -49,15 +49,27 @@ if __name__ == "__main__":
     print(np.average([len(x["spans"]) for x in data.values()]), "spans on average")
 
     print("Processing Dataset")
-    data_hotpot = load_dataset("kilt_tasks", name="hotpotqa")["train"]
+    hotpot_all = load_dataset("kilt_tasks", name="hotpotqa")
+    data_hotpot = chain(hotpot_all["train"], hotpot_all["validation"], hotpot_all["test"])
 
-    print("Loaded", len(data_hotpot), "queries")
+    print(
+        len(hotpot_all["train"]), "train queries",
+        len(hotpot_all["validation"]), "dev queries", 
+        len(hotpot_all["test"]), "test queries",
+    )
 
     data_query = []
     query_i = 0
+    query_train_max = None
+    query_dev_max = None
+    query_test_max = None
     for sample_i, sample in enumerate(data_hotpot):
         if args.query_n is not None and sample_i >= args.query_n:
             break
+
+        if len(sample["output"]) == 0:
+            continue
+
         assert len(sample["output"]) == 1
 
         provenances = sample["output"][0]["provenance"]
@@ -70,19 +82,29 @@ if __name__ == "__main__":
                 data[provenance["wikipedia_id"]]["relevancy"].append(query_i)
             data_query.append(sample["input"])                
             query_i += 1
+
+            # set boundaries
+            if sample_i < len(hotpot_all["train"]):
+                query_train_max = query_i
+            elif sample_i < len(hotpot_all["train"]) + len(hotpot_all["validation"]):
+                query_dev_max = query_i
+            else:
+                query_test_max = query_i
         
-    print("Added queries:", len(data_query))
+    print(
+        "Added queries:", len(data_query),
+        "boundaries", {"train": query_train_max, "dev": query_dev_max, "test": query_test_max}
+    )
 
     print("Reshaping data")
     data_docs = []
     data_relevancy = [[] for _ in data_query]
 
-
-    data = list(data.items())
-    while len(data):
-        _, tmp = data.pop(0)
-        span_texts = tmp["spans"]
-        span_relevancy = tmp["relevancy"]
+    for span_obj in data.values():
+        span_texts = span_obj["spans"]
+        span_relevancy = span_obj["relevancy"]
+        if args.prune_unused and len(span_relevancy) == 0:
+            continue
         for span_i, span in enumerate(span_texts):
             data_docs.append(span)
             for relevancy in span_relevancy:
@@ -95,4 +117,10 @@ if __name__ == "__main__":
         len(data_relevancy), "relevancies",
         sum([len(x) for x in data_relevancy]), "relevancies total",
     )
-    save_pickle(args.data_out, {"queries": data_query, "docs": data_docs, "relevancy": data_relevancy})
+    save_pickle(
+        args.data_out,
+        {
+            "queries": data_query, "docs": data_docs, "relevancy": data_relevancy,
+            "boundaries": {"train": query_train_max, "dev": query_dev_max, "test": query_test_max}
+        }
+    )
