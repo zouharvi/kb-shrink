@@ -3,55 +3,75 @@
 import sys
 import numpy as np
 sys.path.append("src")
-from misc.utils import read_pickle, rprec_l2, rprec_ip, center_data, norm_data
+from misc.utils import read_pickle, rprec_l2, rprec_ip, center_data, norm_data, DEVICE
+from reduce_dim.autoencoder.model import AutoencoderModel
 import argparse
 import timeit
-from sklearn.decomposition import PCA
+import torch
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data', default="/data/kilt-hp/dpr-c.embd_cn")
-parser.add_argument('--logfile', default="computed/pca_time.log")
+parser.add_argument('--logfile', default="computed/asingle_time.log")
+# parser.add_argument('--thresholds', nargs='+')
 parser.add_argument('--thresholds-epochs', action="store_true")
 parser.add_argument('--step', type=int, default=10000)
 parser.add_argument('--seed', type=int, default=0)
+parser.add_argument('--model', type=int, default=1)
 args = parser.parse_args()
 data = read_pickle(args.data)
 
+
 logdata = []
-EPOCHS = [
-    1000,
-    5000,
-    10000,
-    15000,
-    20000,
-    40000,
-    60000,
-    80000,
-    100000,
-    len(data['docs'])
-]
+EPOCHS = {
+    1000: 90,
+    5000: 75,
+    10000: 50,
+    15000: 35,
+    20000: 25,
+    40000: 30,
+    60000: 25,
+    80000: 15,
+    100000: 15,
+    len(data['docs']): 15
+}
 
 # override if argument passed
 if args.thresholds_epochs:
-    thresholds = EPOCHS
+    thresholds = list(EPOCHS.keys())
 else:
     thresholds = range(1000, len(data['docs'])+args.step-1, args.step)
     print(f"Making {(len(data['docs'])-1000)//args.step} steps from {1000} (base) to {len(data['docs'])} (total doc count)")
 
 
-for threshold in EPOCHS:
+data = {
+    "queries": torch.Tensor(data["queries"]).to(DEVICE),
+    "docs": torch.Tensor(data["docs"]).to(DEVICE),
+    "relevancy": data["relevancy"],
+}
+
+for threshold in thresholds:
     threshold = min(threshold, len(data['docs']))
 
-    model = PCA(
-        n_components=128,
-        random_state=args.seed
+    model = AutoencoderModel(
+        model=args.model,
+        bottleneck_width=128,
     )
-    train_time = timeit.timeit(lambda: model.fit(data["docs"][:threshold]), number=1)
 
-    dataReduced = {
-        "queries": model.transform(data["queries"]),
-        "docs": model.transform(data["docs"])
-    }
+    train_time = timeit.timeit(
+        lambda: model.trainModel(
+            data, EPOCHS[threshold],
+            post_cn=True, regularize=True,
+            skip_eval=True, train_crop_n=threshold
+        ),
+        number=1,
+    )
+
+    model.train(False)
+    with torch.no_grad():
+        dataReduced = {
+            "queries": model.encode(data["queries"]).cpu(),
+            "docs": model.encode(data["docs"]).cpu(),
+        }
     
     dataReduced = center_data(dataReduced)
     dataReduced = norm_data(dataReduced)

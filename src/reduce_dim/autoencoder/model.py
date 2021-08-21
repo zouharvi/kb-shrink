@@ -122,10 +122,15 @@ class AutoencoderModel(nn.Module):
     def decode(self, x):
         return self.decoder(x)
 
-    def trainModel(self, data, epochs, post_cn, regularize):
-        self.dataLoader = torch.utils.data.DataLoader(
-            dataset=torch.cat((data["docs"],data["queries"])), batch_size=self.batchSize, shuffle=True
-        )
+    def trainModel(self, data, epochs, post_cn, regularize, skip_eval=False, train_crop_n=None):
+        if train_crop_n is not None:
+            self.dataLoader = torch.utils.data.DataLoader(
+                dataset=data["docs"][:train_crop_n], batch_size=self.batchSize, shuffle=True
+            )
+        else:
+            self.dataLoader = torch.utils.data.DataLoader(
+                dataset=torch.cat((data["docs"],data["queries"])), batch_size=self.batchSize, shuffle=True
+            )
 
         for epoch in range(epochs):
             self.train(True)
@@ -145,14 +150,20 @@ class AutoencoderModel(nn.Module):
                 self.optimizer.step()
 
             if (epoch + 1) % 5 == 0:
-                self.train(False)
-                with torch.no_grad():
-                    encoded = {
-                        "queries": self.encode(data["queries"]).cpu().numpy(),
-                        "docs": self.encode(data["docs"]).cpu().numpy(),
-                    }
+                if not skip_eval:
+                    print("evaling")
+                    self.train(False)
+                    with torch.no_grad():
+                        encoded = {
+                            "queries": self.encode(data["queries"]).cpu().numpy(),
+                            "docs": self.encode(data["docs"]).cpu().numpy(),
+                        }
 
-                report(
-                    f"epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f},",
-                    encoded, data, post_cn
-                )
+                    report(
+                        f"epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f},",
+                        encoded, data, post_cn
+                    )
+                else:
+                    print(
+                        f"epoch [{epoch+1}/{epochs}]",
+                    )
