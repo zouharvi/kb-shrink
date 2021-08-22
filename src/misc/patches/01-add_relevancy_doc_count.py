@@ -8,8 +8,6 @@ regarding the articles.
 import sys; sys.path.append("src")
 from misc.load_utils import save_pickle, read_pickle
 import argparse
-import numpy as np
-import torch
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data-1', default="/data/big-hp/full.pkl")
@@ -19,32 +17,45 @@ args = parser.parse_args()
 data1 = read_pickle(args.data_1)
 data2 = read_pickle(args.data_2)
 
-if "relevancy" not in data1:
-    raise Exception("First data does not have relevancy entry")
+if "relevancy" not in data2:
+    raise Exception("Second data does not have relevancy entry")
+if "relevancy_articles" not in data2:
+    raise Exception("Second data does not have relevancy_articles entry")
+if "docs_articles" not in data2:
+    raise Exception("Second data does not have docs_articles entry")
 if len(data1["queries"]) != len(data2["queries"]):
     raise Exception("Data lengths (queries) are not matching")
 if len(data1["docs"]) != len(data2["docs"]):
     raise Exception("Data lengths (docs) are not matching")
-if not all([type(x) in [str, list, np.ndarray, torch.Tensor] for x in data1["queries"]]):
-    raise Exception("First data does not contain a simple list/array")
-if not all([type(x) is tuple for x in data2["queries"]]) or not all([type(x) is tuple for x in data2["docs"]]):
-    raise Exception("Second data does not contain tuples")
 
 print("query type1:", type(data1["queries"][0]))
 print("docs type1:", type(data1["docs"][0]))
 print("query type2:", type(data2["queries"][0]))
 print("docs type2:", type(data2["docs"][0]))
+print("relevancy type2:", type(data2["relevancy"][0]))
+print("relevancy_articles type2:", type(data2["relevancy_articles"][0]))
+print("relevancy_articles item type2:", type(list(data2["relevancy_articles"][0])[0]))
+print("docs_articles type2:", type(data2["docs_articles"][0]))
 
-print("Updating queries")
-for query_i, (query2, relevancy_docs, relevancy_articles) in enumerate(data2["queries"]):
-    data1["queries"][query_i] = (data1["queries"][query_i], relevancy_docs, relevancy_articles)
+# print("Changing article ids to ints")
+# data2["docs_articles"] = [int(x) for x in data2["docs_articles"]]
 
-print("Updating docs")
-for doc_i, (doc2, doc_article) in enumerate(data2["docs"]):
-    data1["docs"][doc_i] = (data1["docs"][doc_i], doc_article)
+print("Updating data1")
+data1["relevancy"] = data2["relevancy"]
+data1["relevancy_articles"] = data2["relevancy_articles"]
+data1["docs_articles"] = data2["docs_articles"]
 
-print("Deleting relevancies")
-del data1["relevancy"]
+print("Examples")
+print("data_query[0]:")
+print(data1["queries"][0])
+print("\ndata_docs[0]:")
+print(data1["docs"][0])
+print("\ndata_relevancy[0]:")
+print(data1["relevancy"][0])
+print("\ndata_relevancy_articles[0]:")
+print(data1["relevancy_articles"][0])
+print("\ndata_docs_articles[0]:")
+print(data1["docs_articles"][0])
 
 print("Saving")
 save_pickle(args.data_out, data1)

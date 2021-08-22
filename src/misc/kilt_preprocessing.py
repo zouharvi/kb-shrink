@@ -57,8 +57,8 @@ if __name__ == "__main__":
     )
 
     data_query = []
-    # store document counts which is required for evaluation
-    data_query_doc_count = []
+    # store articles which is required for evaluation
+    data_relevancy_articles = []
     query_i = 0
     query_train_max = None
     query_dev_max = None
@@ -82,7 +82,8 @@ if __name__ == "__main__":
             for provenance in provenances:
                 provenance_articles.add(int(provenance["wikipedia_id"]))
                 data[provenance["wikipedia_id"]]["relevancy"].append(query_i)
-            data_query.append((sample["input"], [], provenance_articles))                
+            data_query.append(sample["input"])
+            data_relevancy_articles.append(provenance_articles)                
             query_i += 1
 
             # set boundaries
@@ -100,6 +101,8 @@ if __name__ == "__main__":
 
     print("Reshaping data")
     data_docs = []
+    data_docs_articles = []
+    data_relevancy = [[] for _ in data_query]
 
     for span_article, span_obj in data.items():
         span_texts = span_obj["spans"]
@@ -107,26 +110,36 @@ if __name__ == "__main__":
         if args.prune_unused and len(span_relevancy) == 0:
             continue
         for span_i, span in enumerate(span_texts):
-            data_docs.append((span, span_article))
+            data_docs.append(span)
+            data_docs_articles.append(span_article)
             for relevancy in span_relevancy:
-                data_query[relevancy][1].append(len(data_docs))
+                data_relevancy[relevancy].append(len(data_docs))
 
     print(
         "Saving",
         len(data_query), "queries,",
         len(data_docs), "docs,",
-        sum([len(x[1]) for x in data_query]), "relevancies total",
-        np.average([len(x[1]) for x in data_query]), "relevancies average",
-        sum([len(x[2]) for x in data_query]), "articles total",
-        np.average([len(x[2]) for x in data_query]), "articles average",
+        sum([len(x) for x in data_relevancy]), "relevancies total",
+        np.average([len(x) for x in data_relevancy]), "relevancies average",
+        sum([len(x) for x in data_relevancy_articles]), "articles total",
+        np.average([len(x) for x in data_relevancy_articles]), "articles average",
     )
     save_pickle(
         args.data_out,
         {
             "queries": data_query, "docs": data_docs,
+            "relevancy": data_relevancy, "relevancy_articles": data_relevancy_articles,
+            "docs_articles": data_docs_articles,
             "boundaries": {"train": query_train_max, "dev": query_dev_max, "test": query_test_max}
         }
     )
-    print(data_query[:2])
-    print()
-    print(data_docs[:2])
+    print("data_query[0]:")
+    print(data_query[0])
+    print("\ndata_docs[0]:")
+    print(data_docs[0])
+    print("\ndata_relevancy[0]:")
+    print(data_relevancy[0])
+    print("\ndata_relevancy_articles[0]:")
+    print(data_relevancy_articles[0])
+    print("\ndata_docs_articles[0]:")
+    print(data_docs_articles[0])

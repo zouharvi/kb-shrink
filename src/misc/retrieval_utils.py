@@ -102,17 +102,26 @@ def order_ip(data_queries, data_docs, retrieve_counts, fast):
     return n_new_gen()
 
 
-def acc_l2(data_queries, data_docs, data_relevancy, n=20, fast=False, report=False):
+def acc_l2(
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
+    n=20, fast=False, report=False
+):
     n_new_gen = order_l2(data_queries, data_docs, [n]*len(data_queries), fast)
     return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
 
 
-def acc_ip(data_queries, data_docs, data_relevancy, n=20, fast=False, report=False):
+def acc_ip(
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
+    n=20, fast=False, report=False
+):
     n_new_gen = order_ip(data_queries, data_docs, [n]*len(data_queries), fast)
     return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
 
 
-def rprec_l2(data_queries, data_docs, data_relevancy, fast=False, report=False):
+def rprec_l2(
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
+    n=20, fast=False, report=False
+):
     n_new_gen = order_l2(
         data_queries, data_docs,
         [len(x) for x in data_relevancy],
@@ -120,7 +129,10 @@ def rprec_l2(data_queries, data_docs, data_relevancy, fast=False, report=False):
     )
     return rprec_from_relevancy(data_relevancy, n_new_gen, report)
 
-def rprec_ip(data_queries, data_docs, data_relevancy, fast=False, report=False):
+def rprec_ip(
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
+    n=20, fast=False, report=False
+):
     n_new_gen = order_ip(
         data_queries, data_docs,
         [len(x) for x in data_relevancy],
@@ -128,21 +140,31 @@ def rprec_ip(data_queries, data_docs, data_relevancy, fast=False, report=False):
     )
     return rprec_from_relevancy(data_relevancy, n_new_gen, report)
 
-def rprec_n_ip(data_queries, data_docs, data_relevancy, n=2, fast=False, report=False):
+def rprec_a_ip(
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
+    n=20, fast=False, report=False
+):
     n_new_gen = order_ip(
         data_queries, data_docs,
-        [n] * len(data_relevancy),
+        [len(x) for x in data_relevancy],
         fast
     )
-    return rprec_n_from_relevancy(data_relevancy, n_new_gen, n, report)
+    return rprec_a_from_relevancy(
+        data_relevancy, n_new_gen, data_relevancy_articles, data_docs_articles, report
+    )
 
-def rprec_n_l2(data_queries, data_docs, data_relevancy, n=2, fast=False, report=False):
+def rprec_a_l2(
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
+    n=20, fast=False, report=False
+):
     n_new_gen = order_l2(
         data_queries, data_docs,
-        [n] * len(data_relevancy),
+        [len(x) for x in data_relevancy],
         fast
     )
-    return rprec_n_from_relevancy(data_relevancy, n_new_gen, n, report)
+    return rprec_a_from_relevancy(
+        data_relevancy, n_new_gen, data_relevancy_articles, data_docs_articles, report
+    )
 
 def acc_from_relevancy(relevancy, n_new, n, report=False):
     def acc_local(doc_true, doc_hyp):
@@ -178,16 +200,19 @@ def rprec_from_relevancy(relevancy, n_new, report=False):
     return rprec_val
 
 
-def rprec_n_from_relevancy(relevancy, n_new, n=2, report=False):
-    def rprec_local(doc_true, doc_hyp):
+def rprec_a_from_relevancy(relevancy, n_new, relevancy_articles, docs_articles, report=False):
+    def rprec_local(doc_true, articles_true, doc_hyp):
         """
         R-Precision for one query
         """
-        return len(set(doc_hyp[:len(doc_true)]) & set(doc_true))/n
+        articles_hyp = {docs_articles[doc] for doc in doc_hyp[:len(doc_true)]}
+        # print(articles_hyp, articles_true)
+        # exit()
+        return len(articles_hyp & articles_true)/len(articles_true)
 
     rprec_val = np.average([
-        rprec_local(x, y)
-        for x, y in zip(relevancy, n_new)
+        rprec_local(*x)
+        for x in zip(relevancy, relevancy_articles, n_new)
     ])
     if report:
         print(f"RPrec is {rprec_val:.3f} (best is 1, worst is 0)")

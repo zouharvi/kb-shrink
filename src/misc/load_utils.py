@@ -1,7 +1,6 @@
 import pickle
 import json
 import numpy as np
-from scipy.spatial.distance import minkowski
 from sklearn import preprocessing
 import torch
 
@@ -48,12 +47,29 @@ def save_keys_pickle(path, data):
 
 
 def small_data(data, n_queries):
+    """
+    Warning: The data is only being cropped from the top and may not lead to significant reduction
+    """
+    docs_crop = max([max(l) for l in data["relevancy"][:n_queries]])
     return {
         "queries": data["queries"][:n_queries],
-        "docs": data["docs"][:max([max(l) for l in data["relevancy"][:n_queries]])],
-        "relevancy": data["relevancy"][:n_queries]
+        "docs": data["docs"][:docs_crop],
+        "relevancy": data["relevancy"][:n_queries],
+        "relevancy_articles": data["relevancy_articles"][:n_queries],
+        "docs_articles": data["docs_articles"][:docs_crop],
     }
 
+def sub_data(data, train=False, in_place=True):
+    assert in_place
+    if train:
+        data["queries"] = data["queries"][:data["boundaries"]["train"]]
+        data["relevancy"] = data["relevancy"][:data["boundaries"]["train"]]
+        data["relevancy_articles"] = data["relevancy_articles"][:data["boundaries"]["train"]]
+    else:
+        data["queries"] = data["queries"][data["boundaries"]["train"]:data["boundaries"]["dev"]]
+        data["relevancy"] = data["relevancy"][data["boundaries"]["train"]:data["boundaries"]["dev"]]
+        data["relevancy_articles"] = data["relevancy_articles"][data["boundaries"]["train"]:data["boundaries"]["dev"]]
+    return data
 
 def center_data(data):
     data["docs"] = np.array(data["docs"])
@@ -62,14 +78,12 @@ def center_data(data):
     data["queries"] -= data["queries"].mean(axis=0)
     return data
 
-
 def norm_data(data):
     data["docs"] = np.array(data["docs"])
     data["queries"] = np.array(data["queries"])
     data["docs"] /= np.linalg.norm(data["docs"], axis=1)[:, np.newaxis]
     data["queries"] /= np.linalg.norm(data["queries"], axis=1)[:, np.newaxis]
     return data
-
 
 def zscore_data(data):
     model_d = preprocessing.StandardScaler(
