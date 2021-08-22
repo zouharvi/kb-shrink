@@ -25,7 +25,7 @@ SIZES_ASINGLE = [x["threshold"] for x in DATA_ASINGLE]
 
 DISPLAY_DIMS = [1000, 10000, 30000, 50000, 70000, 90000, 110000]
 
-plt.figure(figsize=(4.8, 3.2))
+plt.figure(figsize=(5.1, 3.7))
 ax1 = plt.gca()
 ax2 = ax1.twinx()
 
@@ -47,6 +47,10 @@ handle2t, = ax2.plot(
     label="Autoencoder (single) time", color="tab:red", linestyle=":"
 )
 
+ax1.set_ylabel("R-Prec")
+ax1.set_xlabel("Training data")
+ax2.set_ylabel("Training time (s)")
+
 # handle2p, = ax1.plot(
 #     SIZES_ASHALLOW, [x["val_ip"] for x in DATA_ASHALLOW],
 #     label="Autoencoder (shallow) R-Prec", color="tab:green", linestyle="-"
@@ -63,7 +67,7 @@ handle2t, = ax2.plot(
 handleAll = [handle1p, handle1t, handle2p, handle2t]
 plt.legend(
     handleAll, [x.get_label() for x in handleAll], ncol=2,
-    bbox_to_anchor=(-0.1, 1.2, 1.2, -0.1), loc="center"
+    bbox_to_anchor=(-0.1, 1.2, 1.2, -0.2), loc="center"
 )
 
 ax1.set_xticks(DISPLAY_DIMS)
@@ -71,5 +75,5 @@ ax1.set_xticklabels([f"{x//1000}k" for x in DISPLAY_DIMS])
 # ax.set_ylabel("R-Precision")
 # ax.set_xlabel("Dimension")
 
-plt.tight_layout(rect=(-0.03, -0.04, 1.02, 1.03))
+plt.tight_layout(rect=(-0.02, -0.04, 1.02, 1.03))
 plt.show()
