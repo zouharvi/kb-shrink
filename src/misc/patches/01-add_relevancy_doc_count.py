@@ -30,8 +30,10 @@ if not all([type(x) in [str, list, np.ndarray, torch.Tensor] for x in data1["que
 if not all([type(x) is tuple for x in data2["queries"]]) or not all([type(x) is tuple for x in data2["docs"]]):
     raise Exception("Second data does not contain tuples")
 
-print("type1:", type(data1["relevancy"]))
-print("type2:", type(data2["relevancy"]))
+print("query type1:", type(data1["queries"][0]))
+print("docs type1:", type(data1["docs"][0]))
+print("query type2:", type(data2["queries"][0]))
+print("docs type2:", type(data2["docs"][0]))
 
 print("Updating queries")
 for query_i, (query2, relevancy_docs, relevancy_articles) in enumerate(data2["queries"]):
@@ -44,4 +46,5 @@ for doc_i, (doc2, doc_article) in enumerate(data2["docs"]):
 print("Deleting relevancies")
 del data1["relevancy"]
 
+print("Saving")
 save_pickle(args.data_out, data1)
