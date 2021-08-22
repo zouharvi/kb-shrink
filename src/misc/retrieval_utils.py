@@ -1,8 +1,5 @@
-import pickle
-import json
 import numpy as np
 from scipy.spatial.distance import minkowski
-from sklearn import preprocessing
 import torch
 
 if torch.cuda.is_available():

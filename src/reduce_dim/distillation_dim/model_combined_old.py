@@ -1,3 +1,5 @@
+raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+
 import sys; sys.path.append("src")
 from misc.load_utils import center_data, norm_data
 from misc.retrieval_utils import DEVICE, rprec_ip, rprec_l2

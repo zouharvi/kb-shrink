@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+
 import sys; sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data
 from misc.retrieval_utils import rprec_l2, rprec_ip, DEVICE

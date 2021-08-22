@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+
 import sys; sys.path.append("src")
 from misc.load_utils import DEVICE, save_pickle, read_pickle
 import torch

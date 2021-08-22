@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-import sys
-import numpy as np
-sys.path.append("src")
-from misc.utils import read_pickle, rprec_l2, rprec_ip
+raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+
+import sys; sys.path.append("src")
+from misc.load_utils import read_pickle
+from misc.retrieval_utils import rprec_ip, rprec_l2
 import argparse
 from sklearn import cluster
 

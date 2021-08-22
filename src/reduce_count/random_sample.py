@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+
 import pickle
 import argparse
 import random

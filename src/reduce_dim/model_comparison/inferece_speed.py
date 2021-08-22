@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-import sys
+raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
 
-import torch; sys.path.append("src")
+import sys; sys.path.append("src")
 from misc.retrieval_utils import DEVICE
+import torch
 from reduce_dim.autoencoder.model import AutoencoderModel
 import numpy as np
 import timeit

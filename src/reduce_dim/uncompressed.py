@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
-import sys
+raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+
+import sys; sys.path.append("src")
 import numpy as np
 import torch
-sys.path.append("src")
-from misc.utils import acc_ip, acc_l2, read_pickle, rprec_l2, rprec_ip, rprec_n_l2, rprec_n_ip, center_data, norm_data
+from misc.load_utils import read_pickle, center_data, norm_data
 import argparse
+from misc.retrieval_utils import acc_ip, acc_l2, rprec_l2, rprec_ip, rprec_n_l2, rprec_n_ip
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
 parser.add_argument('--data', default="data/hotpot.embd")

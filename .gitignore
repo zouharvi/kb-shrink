@@ -8,5 +8,5 @@ personal_notes.md
 tmp*
 computed/*.out
 computed/*.log
-nohup.out
+nohup*.out
 .empty

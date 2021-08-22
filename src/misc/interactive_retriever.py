@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
+raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+
 import sys; sys.path.append("src")
 from misc.load_utils import load_dataset, read_keys_pickle
 import numpy as np
 import scann
 import argparse
 from misc.embedding import BertWrap, SentenceBertWrap, DPRWrap
-
-raise Exception("Unimplemented for new structured data")
 
 parser = argparse.ArgumentParser(description='Interactive retrieval prompt')
 parser.add_argument('--dataset', default="data/eli5-dev.jsonl")

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
+raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+
 import sys; sys.path.append("src")
 from misc.load_utils import read_pickle, save_pickle
 from misc.retrieval_utils import DEVICE
 import argparse
 import torch
-
-raise NotImplementedError()
 
 from reduce_dim.distillation_dim.model_combined import SimDistilModelCombined, report
 

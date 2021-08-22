@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Data and retrieval structure changed")
+raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
 
 import argparse
 from sklearn.neighbors import NearestNeighbors
