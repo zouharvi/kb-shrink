@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
-import sys
-import numpy as np
-sys.path.append("src")
-from misc.utils import read_pickle, rprec_l2, rprec_ip, center_data, norm_data, DEVICE
+import sys; sys.path.append("src")
+from misc.load_utils import read_pickle, center_data, norm_data
+from misc.retrieval_utils import rprec_l2, rprec_ip, DEVICE
 from reduce_dim.autoencoder.model import AutoencoderModel
 import argparse
 import timeit

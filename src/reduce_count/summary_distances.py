@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+raise NotImplementedError("Data and retrieval structure changed")
+
 import sys
 sys.path.append("src")
 from misc.utils import l2_sim, read_keys_pickle, vec_sim
@@ -7,6 +9,7 @@ import argparse
 from scipy.spatial.distance import minkowski
 import numpy as np
 import matplotlib.pyplot as plt
+
 
 parser = argparse.ArgumentParser(description='Reduce KB key count')
 parser.add_argument(

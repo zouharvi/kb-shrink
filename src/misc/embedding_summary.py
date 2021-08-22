@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
+import sys; sys.path.append("src")
+from misc.load_utils import read_pickle
 import torch
 import argparse
 import numpy as np
-from misc.utils import read_pickle
-import sys
-sys.path.append("src")
 
 parser = argparse.ArgumentParser(description='Explore embedding distribution')
 parser.add_argument('keys')

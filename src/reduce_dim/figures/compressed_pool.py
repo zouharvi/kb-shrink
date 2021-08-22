@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
 from collections import defaultdict
-import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 

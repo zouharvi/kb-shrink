@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
-import scann
+import sys; sys.path.append("src")
+from misc.load_utils import load_dataset, read_keys_pickle
 import numpy as np
-from misc.utils import load_dataset, read_keys_pickle
+import scann
 import argparse
 from misc.embedding import BertWrap, SentenceBertWrap, DPRWrap
-import sys
-sys.path.append("src")
 
 raise Exception("Unimplemented for new structured data")
 

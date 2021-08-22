@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
-from misc.utils import rprec_ip, rprec_l2, read_pickle, center_data, norm_data, zscore_data
+import sys; sys.path.append("src")
+from misc.load_utils import read_pickle, center_data, norm_data, zscore_data
+from misc.retrieval_utils import rprec_ip, rprec_l2
 import argparse
 from sklearn.random_projection import SparseRandomProjection, GaussianRandomProjection
 import random

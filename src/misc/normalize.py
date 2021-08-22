@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
+import sys; sys.path.append("src")
+from misc.load_utils import read_pickle, save_pickle, norm_data, center_data, small_data, zscore_data
 import numpy as np
-from misc.utils import read_pickle, save_pickle, norm_data, center_data, small_data, zscore_data
 import argparse
-import sys
-sys.path.append("src")
 
 parser = argparse.ArgumentParser(description='Normalize embeddings')
 parser.add_argument('--data-in', default="/data/kilt-hp/dpr-c-5000.embd")

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
-from misc.utils import read_pickle, save_pickle, DEVICE
+import sys; sys.path.append("src")
+from misc.retrieval_utils import DEVICE
+from misc.load_utils import read_pickle, save_pickle
 from reduce_dim.autoencoder.model import AutoencoderModel, report
 import torch.nn as nn
 import torch

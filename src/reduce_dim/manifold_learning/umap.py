@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import sys
+import sys; sys.path.append("src")
+from misc.load_utils import read_pickle
+from misc.retrieval_utils import rprec_l2, rprec_ip
 import numpy as np
-sys.path.append("src")
-from misc.utils import read_pickle, rprec_l2, rprec_ip
 import argparse
 from umap import UMAP
 

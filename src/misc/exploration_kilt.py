@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
-from misc.utils import save_pickle
+import sys; sys.path.append("src")
+from misc.load_utils import save_pickle
 from kilt.knowledge_source import KnowledgeSource
 import argparse
 import numpy as np

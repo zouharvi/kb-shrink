@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import sys
+import sys; sys.path.append("src")
+from misc.load_utils import read_pickle, center_data, norm_data
+from misc.retrieval_utils import rprec_l2, rprec_ip, order_ip, order_l2
 import numpy as np
-sys.path.append("src")
-from misc.utils import read_pickle, rprec_l2, rprec_ip, center_data, norm_data, order_ip, order_l2
 import argparse
 from sklearn.decomposition import PCA
 

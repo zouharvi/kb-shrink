@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
-import numpy as np
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--logfile', default="computed/tmp.log")

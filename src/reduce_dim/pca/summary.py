@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 
-import sys
-
+import sys; sys.path.append("src")
+from misc.load_utils import read_keys_pickle, save_keys_pickle
 import torch
-sys.path.append("src")
 import argparse
 from sklearn.decomposition import PCA
 from scipy.spatial.distance import minkowski
 import numpy as np
 import matplotlib.pyplot as plt
-from misc.utils import read_keys_pickle, save_keys_pickle
 
 parser = argparse.ArgumentParser(description='PCA summary plots')
 parser.add_argument(

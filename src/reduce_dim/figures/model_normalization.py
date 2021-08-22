@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
 import numpy as np
 import matplotlib.pyplot as plt
 from reduce_dim.figures.model_normalization_data import *

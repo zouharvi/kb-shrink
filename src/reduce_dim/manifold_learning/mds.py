@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import sys
+import sys; sys.path.append("src")
+from misc.load_utils import read_pickle, rprec_l2, rprec_ip
+from misc.retrieval_utils import read_pickle, rprec_l2, rprec_ip
 import numpy as np
-sys.path.append("src")
-from misc.utils import read_pickle, rprec_l2, rprec_ip
 from sklearn.metrics import euclidean_distances
 import argparse
 from sklearn.manifold import MDS

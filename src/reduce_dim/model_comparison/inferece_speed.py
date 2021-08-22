@@ -2,9 +2,8 @@
 
 import sys
 
-import torch
-sys.path.append("src")
-from misc.utils import read_pickle, DEVICE
+import torch; sys.path.append("src")
+from misc.retrieval_utils import DEVICE
 from reduce_dim.autoencoder.model import AutoencoderModel
 import numpy as np
 import timeit

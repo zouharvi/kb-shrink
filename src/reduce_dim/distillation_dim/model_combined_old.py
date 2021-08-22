@@ -1,6 +1,6 @@
-import sys
-sys.path.append("src")
-from misc.utils import DEVICE, rprec_ip, rprec_l2, center_data, norm_data
+import sys; sys.path.append("src")
+from misc.load_utils import center_data, norm_data
+from misc.retrieval_utils import DEVICE, rprec_ip, rprec_l2
 import numpy as np
 import torch.nn as nn
 import torch

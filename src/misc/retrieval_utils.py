@@ -10,79 +10,6 @@ if torch.cuda.is_available():
 else:
     DEVICE = torch.device("cpu")
 
-
-def read_json(path):
-    with open(path, "r") as fread:
-        return json.load(fread)
-
-
-def read_pickle(path):
-    with open(path, "rb") as fread:
-        reader = pickle.Unpickler(fread)
-        return reader.load()
-
-
-def save_pickle(path, data):
-    with open(path, "wb") as fwrite:
-        pickler = pickle.Pickler(fwrite)
-        pickler.dump(data)
-
-
-def read_keys_pickle(path):
-    data = []
-    with open(path, "rb") as fread:
-        reader = pickle.Unpickler(fread)
-        while True:
-            try:
-                data.append(reader.load())
-            except EOFError:
-                break
-    return np.array(data)
-
-
-def save_keys_pickle(path, data):
-    with open(path, "wb") as fwrite:
-        pickler = pickle.Pickler(fwrite)
-        for line in data:
-            pickler.dump(np.array(line))
-
-
-def small_data(data, n_queries):
-    return {
-        "queries": data["queries"][:n_queries],
-        "docs": data["docs"][:max([max(l) for l in data["relevancy"][:n_queries]])],
-        "relevancy": data["relevancy"][:n_queries]
-    }
-
-
-def center_data(data):
-    data["docs"] = np.array(data["docs"])
-    data["queries"] = np.array(data["queries"])
-    data["docs"] -= data["docs"].mean(axis=0)
-    data["queries"] -= data["queries"].mean(axis=0)
-    return data
-
-
-def norm_data(data):
-    data["docs"] = np.array(data["docs"])
-    data["queries"] = np.array(data["queries"])
-    data["docs"] /= np.linalg.norm(data["docs"], axis=1)[:, np.newaxis]
-    data["queries"] /= np.linalg.norm(data["queries"], axis=1)[:, np.newaxis]
-    return data
-
-
-def zscore_data(data):
-    model_d = preprocessing.StandardScaler(
-        with_std=True, with_mean=True
-    ).fit(data["docs"])
-    model_q = preprocessing.StandardScaler(
-        with_std=True, with_mean=True
-    ).fit(data["queries"])
-    data["docs"] = model_d.transform(data["docs"])
-    data["queries"] = model_q.transform(data["queries"])
-    return data
-
-
 def l2_sim(x, y):
     return -minkowski(x, y)
 
@@ -196,7 +123,6 @@ def rprec_l2(data_queries, data_docs, data_relevancy, fast=False, report=False):
     )
     return rprec_from_relevancy(data_relevancy, n_new_gen, report)
 
-
 def rprec_ip(data_queries, data_docs, data_relevancy, fast=False, report=False):
     n_new_gen = order_ip(
         data_queries, data_docs,
@@ -205,6 +131,21 @@ def rprec_ip(data_queries, data_docs, data_relevancy, fast=False, report=False):
     )
     return rprec_from_relevancy(data_relevancy, n_new_gen, report)
 
+def rprec_n_ip(data_queries, data_docs, data_relevancy, n=2, fast=False, report=False):
+    n_new_gen = order_ip(
+        data_queries, data_docs,
+        [n] * len(data_relevancy),
+        fast
+    )
+    return rprec_n_from_relevancy(data_relevancy, n_new_gen, n, report)
+
+def rprec_n_l2(data_queries, data_docs, data_relevancy, n=2, fast=False, report=False):
+    n_new_gen = order_l2(
+        data_queries, data_docs,
+        [n] * len(data_relevancy),
+        fast
+    )
+    return rprec_n_from_relevancy(data_relevancy, n_new_gen, n, report)
 
 def acc_from_relevancy(relevancy, n_new, n, report=False):
     def acc_local(doc_true, doc_hyp):
@@ -229,6 +170,23 @@ def rprec_from_relevancy(relevancy, n_new, report=False):
         R-Precision for one query
         """
         return len(set(doc_hyp[:len(doc_true)]) & set(doc_true))/len(doc_true)
+
+    rprec_val = np.average([
+        rprec_local(x, y)
+        for x, y in zip(relevancy, n_new)
+    ])
+    if report:
+        print(f"RPrec is {rprec_val:.3f} (best is 1, worst is 0)")
+
+    return rprec_val
+
+
+def rprec_n_from_relevancy(relevancy, n_new, n=2, report=False):
+    def rprec_local(doc_true, doc_hyp):
+        """
+        R-Precision for one query
+        """
+        return len(set(doc_hyp[:len(doc_true)]) & set(doc_true))/n
 
     rprec_val = np.average([
         rprec_local(x, y)

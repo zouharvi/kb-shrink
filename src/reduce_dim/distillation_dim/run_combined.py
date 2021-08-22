@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
-from misc.utils import read_pickle, save_pickle, DEVICE
+import sys; sys.path.append("src")
+from misc.load_utils import read_pickle, save_pickle
+from misc.retrieval_utils import DEVICE
 import argparse
 import torch
 

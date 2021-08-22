@@ -2,8 +2,7 @@
 
 import sys
 sys.path.append("src")
-from misc.utils import DEVICE, save_pickle, read_json
-import json
+from misc.load_utils import DEVICE, save_pickle, read_json
 import torch
 from transformers import AutoTokenizer, AutoModel
 from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer, DPRContextEncoder, DPRContextEncoderTokenizer

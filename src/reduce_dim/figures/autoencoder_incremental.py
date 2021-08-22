@@ -2,11 +2,9 @@
 
 import argparse
 from collections import defaultdict
-import sys
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import matplotlib.colors as mcolors
-import numpy as np
 
 xtick_labels = [
     "768", "512", "512\ntanh", "256", "256\ntanh", "NECK",

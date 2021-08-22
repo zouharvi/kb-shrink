@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
-from misc.utils import read_keys_pickle, acc_ip, acc_l2
+import sys; sys.path.append("src")
+from misc.load_utils import read_keys_pickle
+from misc.retrieval_utils import acc_ip, acc_l2
 import argparse
 from sklearn.manifold import TSNE, Isomap, MDS, SpectralEmbedding
 

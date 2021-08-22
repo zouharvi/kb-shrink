@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 
-import sys
-import numpy as np
-import torch
-sys.path.append("src")
-from misc.utils import read_pickle, rprec_l2, rprec_ip, center_data, norm_data
+import sys; sys.path.append("src")
+from misc.load_utils import read_pickle, center_data, norm_data
+from misc.retrieval_utils import rprec_l2, rprec_ip
 import argparse
-from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-parser = argparse.ArgumentParser(description='PCA performance summary')
+parser = argparse.ArgumentParser(description='LDA performance summary')
 parser.add_argument('--data')
 parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--center', action="store_true")
@@ -41,7 +38,7 @@ def summary_performance(name, dataReduced, dataReconstructed):
     print(f"{name:<21} {val_ip:>5.3f} {val_l2:>5.3f}")
     return val_ip, val_l2
 
-def pca_performance_d(components):
+def lda_performance_d(components):
     model = LinearDiscriminantAnalysis(
         n_components=components,
     )
@@ -60,4 +57,4 @@ def pca_performance_d(components):
         data
     )
 
-pca_performance_d(args.dim)
+lda_performance_d(args.dim)

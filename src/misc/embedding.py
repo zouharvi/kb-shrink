@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
-from misc.utils import DEVICE, save_pickle, read_pickle
+import sys; sys.path.append("src")
+from misc.load_utils import DEVICE, save_pickle, read_pickle
 import torch
 from transformers import AutoTokenizer, AutoModel
 from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer, DPRContextEncoder, DPRContextEncoderTokenizer
