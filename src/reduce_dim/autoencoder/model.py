@@ -29,7 +29,17 @@ class AutoencoderModel(nn.Module):
     def __init__(self, model, bottleneck_width, batchSize=128, learningRate=0.001, skip_move=False):
         super().__init__()
 
-        if model == 1:
+        if model == 0:
+            # learned PCA
+            self.layers_enc = [
+                nn.Linear(768, bottleneck_width),
+                nn.Tanh(),                       
+            ]
+            self.layers_dec = [
+                nn.Linear(bottleneck_width, 768),
+                nn.Tanh(),                       
+            ]
+        elif model == 1:
             # learned PCA
             self.layers_enc = [
                 nn.Linear(768, bottleneck_width),

@@ -26,11 +26,8 @@ args = parser.parse_args()
 
 torch.manual_seed(args.seed)
 data = read_pickle(args.data)
-data = {
-    "queries": torch.Tensor(data["queries"]).to(DEVICE),
-    "docs": torch.Tensor(data["docs"]).to(DEVICE),
-    "relevancy": data["relevancy"],
-}
+data["queries"] = torch.Tensor(data["queries"]).to(DEVICE)
+data["docs"] = torch.Tensor(data["docs"]).to(DEVICE)
 model = AutoencoderModel(args.model, args.bottleneck_width)
 print(model)
 
@@ -40,13 +37,3 @@ model.trainModel(
     train_crop_n=args.train_crop_n,    
 )
 model.train(False)
-
-# encode data
-with torch.no_grad():
-    encoded = {
-        "queries": model.encode(data["queries"]).cpu().numpy(),
-        "docs": model.encode(data["docs"]).cpu().numpy(),
-        "relevancy": data["relevancy"],
-    }
-report(f"Final:", encoded, data.cpu())
-save_pickle(encoded, args.data_out)
