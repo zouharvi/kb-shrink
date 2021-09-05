@@ -42,7 +42,10 @@ if __name__ == "__main__":
     data = defaultdict(lambda: {"relevancy": [], "spans": None})
 
     print("Processing Wikipedia spans")
-    for cur_page in cursor[:args.wiki_n]:
+    total_pages = ks.get_num_pages()
+    for cur_page_i, cur_page in enumerate(cursor[:args.wiki_n]):
+        if cur_page_i % 10000 == 0:
+            print(f'\r{cur_page_i/total_pages*100:0.2f}%', end='')
         data[cur_page["wikipedia_id"]]["spans"] = split_paragraph_list(cur_page["text"])
     print(np.average([len(x["spans"]) for x in data.values()]), "spans on average")
 
