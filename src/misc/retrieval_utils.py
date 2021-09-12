@@ -104,7 +104,7 @@ def order_ip(data_queries, data_docs, retrieve_counts, fast):
 
 def acc_l2(
     data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=False, report=False
+    n=20, fast=True, report=False
 ):
     n_new_gen = order_l2(data_queries, data_docs, [n]*len(data_queries), fast)
     return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
@@ -112,7 +112,7 @@ def acc_l2(
 
 def acc_ip(
     data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=False, report=False
+    n=20, fast=True, report=False
 ):
     n_new_gen = order_ip(data_queries, data_docs, [n]*len(data_queries), fast)
     return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
@@ -120,7 +120,7 @@ def acc_ip(
 
 def rprec_l2(
     data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=False, report=False
+    n=20, fast=True, report=False
 ):
     n_new_gen = order_l2(
         data_queries, data_docs,
@@ -131,7 +131,7 @@ def rprec_l2(
 
 def rprec_ip(
     data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=False, report=False
+    n=20, fast=True, report=False
 ):
     n_new_gen = order_ip(
         data_queries, data_docs,
@@ -142,7 +142,7 @@ def rprec_ip(
 
 def rprec_a_ip(
     data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=False, report=False
+    n=20, fast=True, report=False
 ):
     n_new_gen = order_ip(
         data_queries, data_docs,
@@ -155,7 +155,7 @@ def rprec_a_ip(
 
 def rprec_a_l2(
     data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=False, report=False
+    n=20, fast=True, report=False
 ):
     n_new_gen = order_l2(
         data_queries, data_docs,
@@ -205,9 +205,8 @@ def rprec_a_from_relevancy(relevancy, n_new, relevancy_articles, docs_articles, 
         """
         R-Precision for one query
         """
+        
         articles_hyp = {docs_articles[doc] for doc in doc_hyp[:len(doc_true)]}
-        # print(articles_hyp, articles_true)
-        # exit()
         return len(articles_hyp & articles_true)/len(articles_true)
 
     rprec_val = np.average([

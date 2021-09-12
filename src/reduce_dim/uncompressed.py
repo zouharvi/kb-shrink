@@ -6,13 +6,14 @@ from misc.retrieval_utils import acc_ip, acc_l2, rprec_l2, rprec_ip, rprec_a_l2,
 import argparse
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
-parser.add_argument('--data', default="data/hotpot.embd")
+parser.add_argument('--data', default="/data/big-hp/dpr-c-pruned.embd")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
 parser.add_argument('--all', action="store_true")
 parser.add_argument('--metric', default="rprec")
 parser.add_argument('--train', action="store_true")
 parser.add_argument('--without-faiss', action="store_true")
+parser.add_argument('--queries-n', type=int, default=None)
 args = parser.parse_args()
 data = read_pickle(args.data)
 if args.train:
@@ -20,6 +21,9 @@ if args.train:
 else:
     # default is dev only
     data = sub_data(data, train=False, in_place=True)
+
+# crop number of queries
+data["queries"] = data["queries"][:args.queries_n]
 
 if args.metric == "rprec":
     metric_l2 = rprec_l2

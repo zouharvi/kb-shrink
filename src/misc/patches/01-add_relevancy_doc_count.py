@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--data-1', default="/data/big-hp/full.pkl")
 parser.add_argument('--data-2', default="/data/big-hp/full.embd")
 parser.add_argument('--data-out', default="/data/big-hp/full_fixed.embd")
+
 args = parser.parse_args()
 data1 = read_pickle(args.data_1)
 data2 = read_pickle(args.data_2)

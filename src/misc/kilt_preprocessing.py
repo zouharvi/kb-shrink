@@ -114,7 +114,7 @@ if __name__ == "__main__":
             continue
         for span_i, span in enumerate(span_texts):
             data_docs.append(span)
-            data_docs_articles.append(span_article)
+            data_docs_articles.append(int(span_article))
             for relevancy in span_relevancy:
                 data_relevancy[relevancy].append(len(data_docs))
 
