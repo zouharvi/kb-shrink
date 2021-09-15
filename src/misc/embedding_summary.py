@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
-
 import sys; sys.path.append("src")
 from misc.load_utils import read_pickle
 import torch
@@ -13,7 +11,6 @@ parser.add_argument('keys')
 args = parser.parse_args()
 data = read_pickle(args.keys)
 print(data.keys())
-
 
 def analysis(data):
     data = torch.Tensor(data)

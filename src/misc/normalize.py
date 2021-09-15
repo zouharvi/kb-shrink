@@ -11,7 +11,7 @@ parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
 parser.add_argument('--zscore', action="store_true")
 parser.add_argument('--small', type=int)
-args = parser.parse_args()
+args,_ = parser.parse_known_args()
 
 assert args.center or args.norm or args.small or args.zscore
 

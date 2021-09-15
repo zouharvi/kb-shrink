@@ -4,7 +4,8 @@ raise Exception("Not adapted to new data orgnization (docs and queries as tuples
 
 import sys
 sys.path.append("src")
-from misc.load_utils import DEVICE, save_pickle, read_json
+from misc.load_utils import save_pickle, read_json
+from misc.retrieval_utils import DEVICE
 import torch
 from transformers import AutoTokenizer, AutoModel
 from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer, DPRContextEncoder, DPRContextEncoderTokenizer

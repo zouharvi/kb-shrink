@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
-
 import sys; sys.path.append("src")
-from misc.load_utils import DEVICE, save_pickle, read_pickle
+from misc.load_utils import save_pickle, read_pickle
+from misc.retrieval_utils import DEVICE
 import torch
 from transformers import AutoTokenizer, AutoModel
 from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer, DPRContextEncoder, DPRContextEncoderTokenizer
@@ -155,7 +154,7 @@ if __name__ == "__main__":
     parser.add_argument('--data-out', default="/data/big-hp/full.embd")
     parser.add_argument('--model', default="bert")
     parser.add_argument('--type-out', default="cls")
-    args = parser.parse_args()
+    args,_ = parser.parse_known_args()
 
     if args.model == "bert":
         model = BertWrap()

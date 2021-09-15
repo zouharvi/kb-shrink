@@ -1,9 +1,14 @@
 import numpy as np
 from scipy.spatial.distance import minkowski
+import argparse
 import torch
 
 if torch.cuda.is_available():
-    DEVICE = torch.device("cuda:0")
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--gpu', default="0")
+    args,_ = parser.parse_known_args()
+    DEVICE = torch.device("cuda:" + args.gpu)
+    print(args.gpu, DEVICE)
 else:
     DEVICE = torch.device("cpu")
 

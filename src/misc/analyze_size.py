@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
-
 import sys; sys.path.append("src")
 from misc.load_utils import read_pickle, read_json
 import argparse
@@ -9,10 +7,8 @@ from pympler.asizeof import asizeof
 import numpy as np
 
 parser = argparse.ArgumentParser(description='Explore vector distribution')
-parser.add_argument(
-    '--embd', default="/data/kilt-hp/dpr-c.embd_cn")
-parser.add_argument(
-    '--dataset', default="/data/kilt-hp/full.json")
+parser.add_argument('--embd', default="/data/big-hp/dpr-c.embd")
+parser.add_argument('--dataset', default="/data/big-hp/full.pkl")
 args = parser.parse_args()
 
 data = read_pickle(args.embd)
@@ -20,7 +16,7 @@ sizee_all = asizeof(data)
 sizee_queries = asizeof(data["queries"])
 sizee_docs = asizeof(data["docs"])
 
-data_raw = read_json(args.dataset)
+data_raw = read_pickle(args.dataset)
 sizer_all = asizeof(data_raw)
 sizer_queries = asizeof(data_raw["queries"])
 sizer_docs = asizeof(data_raw["docs"])
@@ -47,7 +43,8 @@ print()
 print(f"Number of queries:   {len(data['queries']):>7}")
 print(f"Number of docs:      {len(data['docs']):>7}")
 print()
-print(f'Average number of documents per question: {np.average([len(x) for x in data["relevancy"]]):.2f}')
+print(f'Average number of spans per question: {np.average([len(x) for x in data["relevancy"]]):.2f}')
+print(f'Average number of spans per document: {np.average([len(x) for x in data["data_docs_articles"]]):.2f}')
 print()
 
 data["queries"] = np.array(data["queries"])

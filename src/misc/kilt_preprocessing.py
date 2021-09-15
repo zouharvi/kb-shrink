@@ -29,7 +29,7 @@ if __name__ == "__main__":
     parser.add_argument('--wiki-n', type=int, default=None)
     parser.add_argument('--query-n', type=int, default=None)
     parser.add_argument('--prune-unused', action="store_true")
-    args = parser.parse_args()
+    args,_ = parser.parse_known_args()
 
     # get the knowledge source
     ks = KnowledgeSource(database="kilt")
