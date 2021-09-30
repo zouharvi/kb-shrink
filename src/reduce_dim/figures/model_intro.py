@@ -42,38 +42,77 @@ DATA_RPREC = {
     },
 }
 
-POS = np.arange(len(DATA_RPREC))
+DATA_RPREC_A = {
+    "DPR\n(Avg)": {
+        "ip_fast": -1,
+        "ip": -1,
+        "l2_fast": -1,
+        "l2": -1,
+    },
+    "Sentence\nBERT\n(Avg)": {
+        "ip_fast": -1,
+        "ip": -1,
+        "l2_fast": -1,
+        "l2": -1,
+    },
+    "BERT\n(Avg)": {
+        "ip_fast": -1,
+        "ip": -1,
+        "l2_fast": -1,
+        "l2": -1,
+    },
+    "DPR\n[CLS]": {
+        "ip_fast": 0.427,
+        "ip": 0.446,
+        "l2_fast": 0.092,
+        "l2": 0.095,
+    },
+    "Sentence\nBERT\n[CLS]": {
+        "ip_fast": -1,
+        "ip": -1,
+        "l2_fast": -1,
+        "l2": -1,
+    },
+    "BERT\n[CLS]": {
+        "ip_fast": -1,
+        "ip": -1,
+        "l2_fast": -1,
+        "l2": -1,
+    },
+}
+
+POS = np.arange(len(DATA_RPREC_A))
 BARHEIGHT = 0.2
-YERRMOCK = np.random.rand(len(DATA_RPREC))/10000
+YERRMOCK = np.random.rand(len(DATA_RPREC_A))/10000
 
 plt.figure(figsize=(4.4, 4))
 ax = plt.gca()
 ax.bar(
     POS + 0.2 * 0,
-    [x["ip"] for x in DATA_RPREC.values()],
+    [x["ip"] for x in DATA_RPREC_A.values()],
     width=BARHEIGHT, label="IP",
     color="tab:blue", hatch="",
 )
 ax.bar(
     POS + 0.2 * 1,
-    [x["ip_fast"] for x in DATA_RPREC.values()],
+    [x["ip_fast"] for x in DATA_RPREC_A.values()],
     width=BARHEIGHT, label="IP fast",
     color="lightskyblue", hatch="...",
 )
 ax.bar(
     POS + 0.2 * 2,
-    [x["l2"] for x in DATA_RPREC.values()],
+    [x["l2"] for x in DATA_RPREC_A.values()],
     width=BARHEIGHT, label="L2",
     color="tab:red", hatch="",
 )
 ax.bar(
     POS + 0.2 * 3,
-    [x["l2_fast"] for x in DATA_RPREC.values()],
+    [x["l2_fast"] for x in DATA_RPREC_A.values()],
     width=BARHEIGHT, label="L2 fast",
     color="lightcoral", hatch="...",
 )
 ax.set_xticks(POS + 0.15 * 2)
-ax.set_xticklabels(DATA_RPREC.keys())
+ax.set_xticklabels(DATA_RPREC_A.keys())
 ax.set_ylabel("R-Precision")
 plt.legend(bbox_to_anchor=(0, 1, 1, 0), loc="lower left", mode="expand", ncol=4)
 plt.tight_layout()
