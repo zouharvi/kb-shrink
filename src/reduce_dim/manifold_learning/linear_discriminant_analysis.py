@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
-
 import sys; sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data
-from misc.retrieval_utils import rprec_l2, rprec_ip
+from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 import argparse
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 parser = argparse.ArgumentParser(description='LDA performance summary')
-parser.add_argument('--data')
+parser.add_argument('--data', default="/data/big-hp/dpr-c.embd_cn")
 parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
@@ -30,11 +28,11 @@ def summary_performance(name, dataReduced, dataReconstructed):
         dataReduced = center_data(dataReduced)
         dataReduced = norm_data(dataReduced)
 
-    val_ip = rprec_ip(
-        dataReduced["queries"], dataReduced["docs"], data["relevancy"], fast=True
+    val_ip = rprec_a_ip(
+        dataReduced["queries"], dataReduced["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=True
     )
-    val_l2 = rprec_l2(
-        dataReduced["queries"], dataReduced["docs"], data["relevancy"], fast=True
+    val_l2 = rprec_a_l2(
+        dataReduced["queries"], dataReduced["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=True
     )
     name = name.replace("float", "f")
     print(f"{name:<21} {val_ip:>5.3f} {val_l2:>5.3f}")

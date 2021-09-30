@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
-
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.load_utils import read_pickle
-from misc.retrieval_utils import rprec_l2, rprec_ip
-import numpy as np
+from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 import argparse
 from sklearn import preprocessing
 
@@ -18,33 +16,32 @@ args = parser.parse_args()
 data = read_pickle(args.data)
 
 print("Preparing model")
-model_d = preprocessing.StandardScaler(with_std=args.std, with_mean=args.center).fit(data["docs"])
-model_q = preprocessing.StandardScaler(with_std=args.std, with_mean=args.center).fit(data["queries"])
-#model_dq = preprocessing.StandardScaler(with_std=args.std, with_mean=args.center).fit(
-#        np.concatenate((data["docs"],data["queries"]))
-#)
-
-#print(model_d.mean_[:5])
+model_d = preprocessing.StandardScaler(
+    with_std=args.std, with_mean=args.center
+).fit(data["docs"])
+model_q = preprocessing.StandardScaler(
+    with_std=args.std, with_mean=args.center
+).fit(data["queries"])
 
 dataNew = {
-        "docs": model_d.transform(data["docs"]),
-        "queries": model_q.transform(data["queries"]),
+    "docs": model_d.transform(data["docs"]),
+    "queries": model_q.transform(data["queries"]),
 }
 print(data["docs"][0][:5])
 print(dataNew["docs"][0][:5])
 
-val_ip_pca = rprec_ip(
-    data["queries"], data["docs"], data["relevancy"], fast=True
+val_ip_pca = rprec_a_ip(
+    dataNew["queries"], dataNew["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=True
 )
-val_l2_pca = rprec_l2(
-    data["queries"], data["docs"], data["relevancy"], fast=True
-)
-print(f"ip: {val_ip_pca:.4f}, l2: {val_l2_pca:.4f} (orig)")
-
-val_ip_pca = rprec_ip(
-    dataNew["queries"], dataNew["docs"], data["relevancy"], fast=True
-)
-val_l2_pca = rprec_l2(
-    dataNew["queries"], dataNew["docs"], data["relevancy"], fast=True
+val_l2_pca = rprec_a_l2(
+    dataNew["queries"], dataNew["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=True
 )
 print(f"ip: {val_ip_pca:.4f}, l2: {val_l2_pca:.4f} (zscores)")
+
+val_ip_pca = rprec_a_ip(
+    data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=True
+)
+val_l2_pca = rprec_a_l2(
+    data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=True
+)
+print(f"ip: {val_ip_pca:.4f}, l2: {val_l2_pca:.4f} (orig)")
