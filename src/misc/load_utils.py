@@ -85,13 +85,13 @@ def norm_data(data):
     data["queries"] /= np.linalg.norm(data["queries"], axis=1)[:, np.newaxis]
     return data
 
-def zscore_data(data):
-    model_d = preprocessing.StandardScaler(
-        with_std=True, with_mean=True
-    ).fit(data["docs"])
-    model_q = preprocessing.StandardScaler(
-        with_std=True, with_mean=True
-    ).fit(data["queries"])
-    data["docs"] = model_d.transform(data["docs"])
-    data["queries"] = model_q.transform(data["queries"])
+def zscore_data(data, center=True):
+    import gc
+    data["docs"] = preprocessing.StandardScaler(
+        with_std=True, with_mean=center
+    ).fit_transform(data["docs"])
+    print("Freeing", gc.collect(), "via gc")
+    data["queries"] = preprocessing.StandardScaler(
+        with_std=True, with_mean=center
+    ).fit_transform(data["queries"])
     return data

@@ -10,6 +10,7 @@ parser.add_argument('--data-out')
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
 parser.add_argument('--zscore', action="store_true")
+parser.add_argument('--std', action="store_true")
 parser.add_argument('--small', type=int)
 args,_ = parser.parse_known_args()
 
@@ -34,6 +35,10 @@ if args.center:
 if args.zscore:
     print("z-scoring")
     data = zscore_data(data)
+
+if args.std:
+    print("z-scoring")
+    data = zscore_data(data, center=False)
 
 if args.norm:
     print("Normalizing")
