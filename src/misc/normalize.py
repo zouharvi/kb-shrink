@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-import sys; sys.path.append("src")
+import sys
+
+from numpy.core.defchararray import center; sys.path.append("src")
 from misc.load_utils import read_pickle, save_pickle, norm_data, center_data, small_data, zscore_data
 import numpy as np
 import argparse
@@ -9,7 +11,6 @@ parser.add_argument('--data-in', default="/data/kilt-hp/dpr-c-5000.embd")
 parser.add_argument('--data-out')
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
-parser.add_argument('--zscore', action="store_true")
 parser.add_argument('--std', action="store_true")
 parser.add_argument('--small', type=int)
 args,_ = parser.parse_known_args()
@@ -32,12 +33,8 @@ if args.center:
     print("Centering")
     data = center_data(data)
 
-if args.zscore:
-    print("z-scoring")
-    data = zscore_data(data)
-
 if args.std:
-    print("z-scoring")
+    print("Dividing by std")
     data = zscore_data(data, center=False)
 
 if args.norm:
@@ -51,6 +48,7 @@ print(
     "Norm:", np.linalg.norm(data["queries"][0])
 )
 
+print("output shape", data["docs"][0].shape)
 # pickler does not support serialization for objects over 4GB
 data["docs"] = data["docs"].tolist()
 data["queries"] = data["queries"].tolist()

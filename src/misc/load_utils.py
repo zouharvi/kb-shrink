@@ -86,12 +86,10 @@ def norm_data(data):
     return data
 
 def zscore_data(data, center=True):
-    import gc
-    data["docs"] = preprocessing.StandardScaler(
-        with_std=True, with_mean=center
+    preprocessing.StandardScaler(
+        copy=False, with_std=True, with_mean=center
     ).fit_transform(data["docs"])
-    print("Freeing", gc.collect(), "via gc")
-    data["queries"] = preprocessing.StandardScaler(
-        with_std=True, with_mean=center
+    preprocessing.StandardScaler(
+        copy=False, with_std=True, with_mean=center
     ).fit_transform(data["queries"])
     return data

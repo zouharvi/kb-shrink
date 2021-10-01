@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 import sys
+
+from numpy.core.defchararray import center
 sys.path.append("src")
-from misc.load_utils import read_pickle
+from misc.load_utils import read_pickle, zscore_data
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 import argparse
-from sklearn import preprocessing
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data', default="/data/big-hp/dpr-c.embd")
@@ -14,14 +15,10 @@ parser.add_argument('--std', action="store_true")
 args = parser.parse_args()
 data = read_pickle(args.data)
 
-print("Preparing model")
-data["docs"] = preprocessing.StandardScaler(
-    with_std=args.std, with_mean=args.center
-).fit_transform(data["docs"])
-data["queries"] = preprocessing.StandardScaler(
-    with_std=args.std, with_mean=args.center
-).fit_transform(data["queries"])
+print(data["docs"][0][:5])
 
+print("Preparing model")
+data = zscore_data(data, center=True)
 print(data["docs"][0][:5])
 
 val_ip_pca = rprec_a_ip(
