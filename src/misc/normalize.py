@@ -51,5 +51,9 @@ print(
     "Norm:", np.linalg.norm(data["queries"][0])
 )
 
+# pickler does not support serialization for objects over 4GB
+data["docs"] = data["docs"].tolist()
+data["queries"] = data["queries"].tolist()
+
 print("Saving")
 save_pickle(args.data_out, data)
