@@ -15,8 +15,6 @@ parser.add_argument('--std', action="store_true")
 parser.add_argument('--small', type=int)
 args,_ = parser.parse_known_args()
 
-assert args.center or args.norm or args.small or args.zscore
-
 print("Loading")
 data = read_pickle(args.data_in)
 print(

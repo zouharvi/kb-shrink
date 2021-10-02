@@ -6,14 +6,14 @@ DATA = {
     "BERT\n(Avg)": """
     """,
     "DPR\n[CLS]": """
-acc_ip: 0.8220
-acc_l2: 0.5742
-acc_ip (norm): 0.7656
-acc_l2 (norm): 0.7590
-acc_ip (center): 0.8680
-acc_l2 (center): 0.8322
-acc_ip (center, norm): 0.8666
-acc_l2 (center, norm): 0.8608
+acc_ip: 0.4274
+acc_l2: 0.0915
+acc_ip (norm): 0.
+acc_l2 (norm): 0.
+acc_ip (center): 0.
+acc_l2 (center): 0.
+acc_ip (center, norm): 0.4295
+acc_l2 (center, norm): 0.4305
     """,
     "Sentence\nBERT\n[CLS]": """
     """,
