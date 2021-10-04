@@ -4,6 +4,7 @@ date|action|status
 18 sep|embd for the rest of the models|partially finished
 2 oct|norm dpr-c_c|running
 2 oct|norm dpr-c_csn|running
+4 oct|uncompressed sbert-t|13|running
 ||
 finished|
 2 oct|uncompressed dpr-c_cn|finished+removed (quota)
