@@ -9,10 +9,8 @@ from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer, DPRCon
 from transformers import BertTokenizer, BertModel
 import argparse
 
-# Mean Pooling - Take attention mask into account for correct averaging
-
-
 def mean_pooling(model_output, attention_mask, layer_i=0):
+    # Mean Pooling - Take attention mask into account for correct averaging
     # first element of model_output contains all token embeddings
     token_embeddings = model_output[layer_i]
     input_mask_expanded = attention_mask.unsqueeze(

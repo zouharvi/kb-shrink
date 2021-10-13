@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# done on --pruned
 DATA_RPREC = {
     "DPR\n(Avg)": {
         "ip_fast": 0.3159,
@@ -50,10 +51,10 @@ DATA_RPREC_A = {
         "l2": -1,
     },
     "Sentence\nBERT\n(Avg)": {
-        "ip_fast": -1,
-        "ip": -1,
-        "l2_fast": -1,
-        "l2": -1,
+        "ip_fast": 0.118,
+        "ip": 0.125,
+        "l2_fast": 0.176,
+        "l2": 0.179,
     },
     "BERT\n(Avg)": {
         "ip_fast": -1,
@@ -68,10 +69,10 @@ DATA_RPREC_A = {
         "l2": 0.095,
     },
     "Sentence\nBERT\n[CLS]": {
-        "ip_fast": -1,
-        "ip": -1,
-        "l2_fast": -1,
-        "l2": -1,
+        "ip_fast": 0.141,
+        "ip": 0.146,
+        "l2_fast": 0.140,
+        "l2": 0.140,
     },
     "BERT\n[CLS]": {
         "ip_fast": -1,

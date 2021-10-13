@@ -5,7 +5,7 @@ from misc.load_utils import read_pickle, center_data, norm_data, sub_data
 from misc.retrieval_utils import acc_ip, acc_l2, rprec_l2, rprec_ip, rprec_a_l2, rprec_a_ip
 import argparse
 
-parser = argparse.ArgumentParser(description='PCA performance summary')
+parser = argparse.ArgumentParser(description='Performance on uncompressed data')
 parser.add_argument('--data', default="/data/big-hp/dpr-c-pruned.embd")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
