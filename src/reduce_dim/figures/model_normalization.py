@@ -2,8 +2,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from reduce_dim.figures.model_normalization_data import *
-
+#from reduce_dim.figures.model_normalization_data import *
+from model_normalization_data import *
 
 POS = np.arange(len(DATA_BASE))
 BARHEIGHT = 0.15
@@ -50,8 +50,8 @@ ax.bar(
 )
 ax.set_xticks(POS + BARSPACE * 2.5)
 ax.set_xticklabels(DATA_BASE.keys())
-ax.set_ylabel("RPrec")
-ax.set_ylabel("Accuracy @ 20")
+ax.set_ylabel("R-Precision")
+#ax.set_ylabel("Accuracy @ 20")
 plt.legend(bbox_to_anchor=(0, 1, 1, 0), loc="lower left", mode="expand", ncol=2)
 plt.tight_layout()
 plt.show()
