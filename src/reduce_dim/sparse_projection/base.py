@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
-
-import sys; sys.path.append("src")
-from misc.load_utils import read_pickle, center_data, norm_data, zscore_data
-from misc.retrieval_utils import rprec_ip, rprec_l2
+import sys
+sys.path.append("src")
+from misc.load_utils import read_pickle, center_data, norm_data
+from misc.retrieval_utils import rprec_a_ip, rprec_a_l2
 import argparse
 from sklearn.random_projection import SparseRandomProjection, GaussianRandomProjection
 import random
@@ -13,12 +12,14 @@ import numpy as np
 parser = argparse.ArgumentParser()
 parser.add_argument('--data')
 parser.add_argument('--logfile', default="computed/tmp.log")
+parser.add_argument('--dims', default="custom")
 parser.add_argument('--post-cn', action="store_true")
-parser.add_argument('--post-zn', action="store_true")
 parser.add_argument('--seed', type=int, default=0)
 
 args = parser.parse_args()
 data = read_pickle(args.data)
+
+# make sure the vectors are np arrays
 data["queries"] = np.array(data["queries"])
 data["docs"] = np.array(data["docs"])
 
@@ -76,22 +77,40 @@ def random_projection_performance(components, model_name, runs=5):
         if args.post_cn:
             dataReduced = center_data(dataReduced)
             dataReduced = norm_data(dataReduced)
-        if args.post_zn:
-            dataReduced = zscore_data(dataReduced)
-            dataReduced = norm_data(dataReduced)
 
         # copy to make it C-continuous
-        val_ip = rprec_ip(
-            dataReduced["queries"].copy(), dataReduced["docs"].copy(), data["relevancy"], report=False, fast=True
-        )
-        vals_ip.append(val_ip)
-        val_l2 = rprec_l2(
-            dataReduced["queries"].copy(), dataReduced["docs"].copy(), data["relevancy"], report=False, fast=True
+        val_l2 = rprec_a_l2(
+            dataReduced["queries"].copy(),
+            dataReduced["docs"].copy(),
+            data["relevancy"],
+            data["relevancy_articles"],
+            data["docs_articles"],
+            report=False,
+            fast=True,
         )
         vals_l2.append(val_l2)
 
-    data_log.append({"dim": components, "vals_ip": vals_ip,
-                    "vals_l2": vals_l2, "model": model_name})
+        # skip IP computation because the vectors are normalized
+        if not args.post_cn:
+            val_ip = rprec_a_ip(
+                dataReduced["queries"].copy(),
+                dataReduced["docs"].copy(),
+                data["relevancy"],
+                data["relevancy_articles"],
+                data["docs_articles"],
+                report=False,
+                fast=True,
+            )
+            vals_ip.append(val_ip)
+        else:
+            vals_ip.append(val_l2)
+
+    data_log.append({
+        "dim": components,
+        "vals_ip": vals_ip,
+        "vals_l2": vals_l2,
+        "model": model_name
+    })
 
     # continuously override the file
     with open(args.logfile, "w") as f:
@@ -103,7 +122,15 @@ def random_projection_performance(components, model_name, runs=5):
         max(vals_l2), np.average(vals_l2)
     )
 
+
+if args.dims == "custom":
+    DIMS = [32, 64, 96, 128, 160, 192, 224, 256, 320, 384, 448, 512, 640, 768]
+elif args.dims == "linspace":
+    DIMS = np.linspace(32, 768, num=768 // 32, endpoint=True)
+else:
+    raise Exception(f"Unknown --dims {args.dims} scheme")
+
 for model in ["crop", "sparse", "gauss"]:
-    for dim in np.linspace(32, 768, num=768//32, endpoint=True):
+    for dim in DIMS:
         dim = int(dim)
         random_projection_performance(dim, model)

@@ -1,13 +1,15 @@
 date|action|machine|status
 -|-|-|-
 ||||running
-7 oct|uncompressed dpr-t `--without-faiss`|14|running
-7 oct|uncompressed bert-t `--without-faiss`|14|running
-7 oct|uncompressed bert-c `--without-faiss`|13|running
 ||||
+16 oct|sparse projection base `dpr-c-pruned_cn` `--post-cn` (test)|14|running
+16 oct|sparse projection base `dpr-c_cn` `--post-cn`|14|to run
 ||||
 ||||finished
 ||||
+7 oct|uncompressed dpr-t `--without-faiss`|14|ok
+7 oct|uncompressed bert-t `--without-faiss`|14|ok
+7 oct|uncompressed bert-c `--without-faiss`|13|ok
 18 sep|embd dpr-t|14|ok
 18 sep|embd bert-t|14|ok
 18 sep|embd bert-c|14|ok
