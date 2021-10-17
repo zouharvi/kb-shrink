@@ -2,11 +2,12 @@ date|action|machine|status
 -|-|-|-
 ||||running
 ||||
-16 oct|sparse projection base `dpr-c-pruned_cn` `--post-cn` (test)|14|running
-16 oct|sparse projection base `dpr-c_cn` `--post-cn`|14|to run
+16 oct|sparse projection base `dpr-c-pruned_cn` `--post-cn` *finickyking* (test)|14|running
+16 oct|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry*|13|running
 ||||
 ||||finished
 ||||
+16 oct|norm dpr-c-pruned_cn|14|ok
 7 oct|uncompressed dpr-t `--without-faiss`|14|ok
 7 oct|uncompressed bert-t `--without-faiss`|14|ok
 7 oct|uncompressed bert-c `--without-faiss`|13|ok

@@ -50,7 +50,7 @@ class CropRandomProjection():
 data_log = []
 
 
-def random_projection_performance(components, model_name, runs=5):
+def random_projection_performance(components, model_name, runs=3):
     if model_name == "gauss":
         Model = GaussianRandomProjection
     elif model_name == "sparse":
