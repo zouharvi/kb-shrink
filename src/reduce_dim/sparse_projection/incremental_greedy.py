@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
-
 import sys; sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data
-from misc.retrieval_utils import rprec_ip, rprec_l2
+from misc.retrieval_utils import rprec_a_ip, rprec_a_l2
 import numpy as np
 import argparse
 
@@ -13,6 +11,7 @@ parser.add_argument('--data')
 parser.add_argument('--logfile-single', default="computed/dimension_drop_single.log")
 parser.add_argument('--post-cn', action="store_true")
 parser.add_argument('--logfile', default="computed/tmp.log")
+parser.add_argument('--dims', default="custom")
 parser.add_argument('--seed', type=int, default=0)
 
 args = parser.parse_args()
@@ -23,16 +22,9 @@ data["docs"] = np.array(data["docs"])
 with open(args.logfile_single, "r") as f:
     DATA_SINGLE = eval(f.read())
 DATA_BASE = [x for x in DATA_SINGLE if x["dim"] == False][0]
-IMPR_IP = [x["dim"] for x in sorted(DATA_SINGLE, key=lambda x: x["val_ip"], reverse=True)]
 IMPR_L2 = [x["dim"] for x in sorted(DATA_SINGLE, key=lambda x: x["val_l2"], reverse=True)]
 
-print("ip_impr count", len([x for x in DATA_SINGLE if x["val_ip"] >= DATA_BASE["val_ip"]]))
-print("l2_impr count", len([x for x in DATA_SINGLE if x["val_ip"] >= DATA_BASE["val_ip"]]))
-
-print(f"{'Method':<12} {'(IP)':<8} {'(L2)':<8}")
-
-def summary_performance_custom(name, acc_val_ip, acc_val_l2):
-    print(f"{name:<12} {acc_val_ip:<8.5f} {acc_val_l2:<8.5f}")
+print("l2_impr count", len([x for x in DATA_SINGLE if x["val_l2"] >= DATA_BASE["val_l2"]]))
 
 
 class DropRandomProjection():
@@ -41,46 +33,55 @@ class DropRandomProjection():
 
 data_log = []
 
-def random_projection_performance(dim, metric):
-    if metric == "l2":
-        impr_array = IMPR_L2
-    elif metric == "ip":
-        impr_array = IMPR_IP
-
+def random_projection_performance(dim):
     model = DropRandomProjection()
         
     dataReduced = {
-        "queries": model.transform(data["queries"], dim, impr_array),
-        "docs": model.transform(data["docs"], dim, impr_array)
+        "queries": model.transform(data["queries"], dim, IMPR_L2),
+        "docs": model.transform(data["docs"], dim, IMPR_L2)
     }
     if args.post_cn:
         dataReduced = center_data(dataReduced)
         dataReduced = norm_data(dataReduced)
 
     # copy to make it C-continuous
-    val_ip = rprec_ip(
-        dataReduced["queries"].copy(), dataReduced["docs"].copy(), data["relevancy"], report=False, fast=True
+    val_l2 = rprec_a_l2(
+        dataReduced["queries"].copy(),
+        dataReduced["docs"].copy(),
+        data["relevancy"],
+        data["relevancy_articles"],
+        data["docs_articles"],
+        report=False,
+        fast=True,
     )
-    val_l2 = rprec_l2(
-        dataReduced["queries"].copy(), dataReduced["docs"].copy(), data["relevancy"], report=False, fast=True
-    )
+    if not args.post_cn:
+        val_ip = rprec_a_ip(
+            dataReduced["queries"].copy(),
+            dataReduced["docs"].copy(),
+            data["relevancy"],
+            data["relevancy_articles"],
+            data["docs_articles"],
+            report=False,
+            fast=True,
+        )
+    else:
+        val_ip = val_l2
 
-    data_log.append({"del_dim": dim, "val_ip": val_ip, "val_l2": val_l2, "metric": metric})
+    data_log.append({"del_dim": dim, "val_ip": val_ip, "val_l2": val_l2})
     
     # continuously override the file
     with open(args.logfile, "w") as f:
         f.write(str(data_log))
 
-    summary_performance_custom(
-        f"Delete :{dim}", val_ip, val_l2
-    )
+    print(f"Delete {dim} dims: {val_l2:<8.5f}")
 
-print("by IP")
-for dim in np.linspace(32, 768, num=768//32, endpoint=True):
-    dim = int(dim)
-    random_projection_performance(dim, "ip")
+if args.dims == "custom":
+    DIMS = [32, 64, 96, 128, 160, 192, 224, 256, 320, 384, 448, 512, 640, 768]
+elif args.dims == "linspace":
+    DIMS = np.linspace(32, 768, num=768 // 32, endpoint=True)
+else:
+    raise Exception(f"Unknown --dims {args.dims} scheme")
 
-print("by L2")
-for dim in np.linspace(32, 768, num=768//32, endpoint=True):
-    dim = int(dim)
-    random_projection_performance(dim, "l2")
+for dim in DIMS:
+    dim = 768 - int(dim)
+    random_projection_performance(dim)
