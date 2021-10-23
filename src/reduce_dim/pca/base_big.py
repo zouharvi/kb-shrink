@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 import numpy as np
@@ -10,20 +11,34 @@ from sklearn.decomposition import PCA
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
 parser.add_argument('--data')
+parser.add_argument('--data-small', default=None)
 parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
 parser.add_argument('--post-cn', action="store_true")
-parser.add_argument('--dim', type=int, default=128)
+parser.add_argument('--dims', default="custom")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 data = read_pickle(args.data)
-if args.center:
-    data = center_data(data)
-if args.norm:
-    data = norm_data(data)
+
+
+if args.data_small is None:
+    if args.center:
+        data = center_data(data)
+    if args.norm:
+        data = norm_data(data)
+    data_small = data
+else:
+    data_small = read_pickle(args.data_small)
+    if args.center:
+        data = center_data(data)
+        data_small = center_data(data_small)
+    if args.norm:
+        data = norm_data(data)
+        data_small = norm_data(data_small)
 
 print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
+
 
 def summary_performance(name, dataReduced, dataReconstructed):
     if args.post_cn:
@@ -38,14 +53,17 @@ def summary_performance(name, dataReduced, dataReconstructed):
         data["docs_articles"],
         fast=True,
     )
-    val_ip = rprec_a_ip(
-        dataReduced["queries"],
-        dataReduced["docs"],
-        data["relevancy"],
-        data["relevancy_articles"],
-        data["docs_articles"],
-        fast=True,
-    )
+    if args.post_cn:
+        val_ip = val_l2
+    else:
+        val_ip = rprec_a_ip(
+            dataReduced["queries"],
+            dataReduced["docs"],
+            data["relevancy"],
+            data["relevancy_articles"],
+            data["docs_articles"],
+            fast=True,
+        )
     loss_q = torch.nn.MSELoss()(
         torch.Tensor(data["queries"]),
         torch.Tensor(dataReconstructed["queries"])
@@ -63,7 +81,7 @@ def pca_performance_d(components):
     model = PCA(
         n_components=components,
         random_state=args.seed
-    ).fit(data["docs"])
+    ).fit(data_small["docs"])
     dataReduced = {
         "queries": model.transform(data["queries"]),
         "docs": model.transform(data["docs"])
@@ -83,7 +101,7 @@ def pca_performance_q(components):
     model = PCA(
         n_components=components,
         random_state=args.seed
-    ).fit(data["queries"])
+    ).fit(data_small["queries"])
     dataReduced = {
         "queries": model.transform(data["queries"]),
         "docs": model.transform(data["docs"])
@@ -103,7 +121,7 @@ def pca_performance_dq(components):
     model = PCA(
         n_components=components,
         random_state=args.seed
-    ).fit(np.concatenate((data["queries"], data["docs"])))
+    ).fit(np.concatenate((data_small["queries"], data_small["docs"])))
     dataReduced = {
         "queries": model.transform(data["queries"]),
         "docs": model.transform(data["docs"])
@@ -118,21 +136,31 @@ def pca_performance_dq(components):
         dataReconstructed
     )
 
-val_ip, val_l2, loss_q, loss_d = pca_performance_dq(args.dim)
-print({
-    "val_ip": val_ip, "val_l2": val_l2,
-    "loss_q": loss_q, "loss_d": loss_d,
-    "type": "dq"
-})
-val_ip, val_l2, loss_q, loss_d = pca_performance_d(args.dim)
-print({
-    "val_ip": val_ip, "val_l2": val_l2,
-    "loss_q": loss_q, "loss_d": loss_d,
-    "type": "d"
-})
-val_ip, val_l2, loss_q, loss_d = pca_performance_q(args.dim)
-print({
-    "val_ip": val_ip, "val_l2": val_l2,
-    "loss_q": loss_q, "loss_d": loss_d,
-    "type": "q"
-})
+if args.dims == "custom":
+    DIMS = [32, 64, 96, 128, 160, 192, 224, 256, 320, 384, 448, 512, 640, 768]
+elif args.dims == "linspace":
+    DIMS = np.linspace(32, 768, num=768 // 32, endpoint=True)
+else:
+    raise Exception(f"Unknown --dims {args.dims} scheme")
+
+logdata = []
+for dim in DIMS:
+    dim = int(dim)
+    val_ip, val_l2, loss_q, loss_d = pca_performance_dq(dim)
+    logdata.append({
+        "val_ip": val_ip, "val_l2": val_l2,
+        "loss_q": loss_q, "loss_d": loss_d,
+        "type": "dq"
+    })
+    val_ip, val_l2, loss_q, loss_d = pca_performance_d(dim)
+    logdata.append({
+        "val_ip": val_ip, "val_l2": val_l2,
+        "loss_q": loss_q, "loss_d": loss_d,
+        "type": "d"
+    })
+    val_ip, val_l2, loss_q, loss_d = pca_performance_q(dim)
+    logdata.append({
+        "val_ip": val_ip, "val_l2": val_l2,
+        "loss_q": loss_q, "loss_d": loss_d,
+        "type": "q"
+    })
