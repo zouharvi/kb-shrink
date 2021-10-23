@@ -1,8 +1,8 @@
-date|action|machine|status
+(re)start|action|machine|status
 -|-|-|-
 ||||running
 ||||
-16 oct|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry*|13|running
+23 oct|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry*|13|restarted
 22 oct|dimension single `dpr-c-pruned_cn` `--post-cn` *dimsingle_unusedoven*|14|running
 ||||
 ||||finished

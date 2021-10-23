@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("src")
-from misc.load_utils import read_pickle, center_data, norm_data
+from misc.load_utils import read_pickle, center_data, norm_data, sub_data
 from misc.retrieval_utils import rprec_a_ip, rprec_a_l2
 import argparse
 from sklearn.random_projection import SparseRandomProjection, GaussianRandomProjection
@@ -18,6 +18,9 @@ parser.add_argument('--seed', type=int, default=0)
 
 args = parser.parse_args()
 data = read_pickle(args.data)
+
+# take only dev queries
+data = sub_data(data, train=False, in_place=True)
 
 # make sure the vectors are np arrays
 data["queries"] = np.array(data["queries"])
