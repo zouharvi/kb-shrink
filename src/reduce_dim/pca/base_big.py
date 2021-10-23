@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("src")
-from misc.load_utils import read_pickle, center_data, norm_data
+from misc.load_utils import read_pickle, center_data, norm_data, sub_data
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 import numpy as np
 import torch
@@ -27,7 +27,12 @@ if args.data_small is None:
         data = center_data(data)
     if args.norm:
         data = norm_data(data)
-    data_small = data
+    print("Because args.data_small is not provided, I'm copying the whole structure")
+    data_small = dict(data)
+
+    data = sub_data(data, train=False, in_place=True)
+    data_small = sub_data(data_small, train=True, in_place=True)
+
 else:
     data_small = read_pickle(args.data_small)
     if args.center:
@@ -36,6 +41,8 @@ else:
     if args.norm:
         data = norm_data(data)
         data_small = norm_data(data_small)
+    data = sub_data(data, train=False, in_place=True)
+    data_small = sub_data(data_small, train=True, in_place=True)
 
 print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
 

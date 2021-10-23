@@ -10,3 +10,4 @@ computed/*.out
 computed/*.log
 nohup*.out
 .empty
+runs/*

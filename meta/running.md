@@ -2,11 +2,13 @@
 -|-|-|-
 ||||running
 ||||
-23 oct|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry*|13|restarted
+23 oct|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry_2*|13|running
 22 oct|dimension single `dpr-c-pruned_cn` `--post-cn` *dimsingle_unusedoven*|14|running
+23 oct|pca base_big `dpr-c` `--post-cn --data-small pruned` *tupperwear*|15|running
 ||||
 ||||finished
 ||||
+16 oct|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry*|13|killed
 16 oct|sparse projection base `dpr-c-pruned_cn` `--post-cn` *finickyking* (test)|14|ok
 16 oct|norm dpr-c-pruned_cn|14|ok
 7 oct|uncompressed dpr-t `--without-faiss`|14|ok
