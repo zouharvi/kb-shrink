@@ -74,9 +74,10 @@ def summary_performance(name, dataReduced, dataReconstructed):
         data["queries"],
         dataReconstructed["queries"]
     )
+    # loss of only the first 10k documents because it has to get copied
     loss_d = sklearn.metrics.mean_squared_error(
-        data["docs"],
-        dataReconstructed["docs"]
+        data["docs"][:10000],
+        dataReconstructed["docs"][:10000]
     )
     name = name.replace("float", "f")
     print(f"{name:<21} {loss_d:>7.5f} {loss_q:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
