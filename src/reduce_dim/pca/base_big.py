@@ -5,9 +5,9 @@ sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data, sub_data
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 import numpy as np
-import torch
 import argparse
 from sklearn.decomposition import PCA
+import sklearn.metrics
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
 parser.add_argument('--data')
@@ -20,7 +20,6 @@ parser.add_argument('--dims', default="custom")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 data = read_pickle(args.data)
-
 
 if args.data_small is None:
     if args.center:
@@ -71,13 +70,13 @@ def summary_performance(name, dataReduced, dataReconstructed):
             data["docs_articles"],
             fast=True,
         )
-    loss_q = torch.nn.MSELoss()(
-        torch.Tensor(data["queries"]),
-        torch.Tensor(dataReconstructed["queries"])
+    loss_q = sklearn.metrics.mean_squared_error(
+        data["queries"],
+        dataReconstructed["queries"]
     )
-    loss_d = torch.nn.MSELoss()(
-        torch.Tensor(data["docs"]),
-        torch.Tensor(dataReconstructed["docs"])
+    loss_d = sklearn.metrics.mean_squared_error(
+        data["docs"],
+        dataReconstructed["docs"]
     )
     name = name.replace("float", "f")
     print(f"{name:<21} {loss_d:>7.5f} {loss_q:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
@@ -142,6 +141,7 @@ def pca_performance_dq(components):
         dataReduced,
         dataReconstructed
     )
+
 
 if args.dims == "custom":
     DIMS = [32, 64, 96, 128, 160, 192, 224, 256, 320, 384, 448, 512, 640, 768]
