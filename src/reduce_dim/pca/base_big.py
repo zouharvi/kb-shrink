@@ -83,6 +83,11 @@ def summary_performance(name, dataReduced, dataReconstructed):
     print(f"{name:<21} {loss_d:>7.5f} {loss_q:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
     return val_ip, val_l2, loss_q.item(), loss_d.item()
 
+def safe_transform(model, array):
+    return [model.transform([x])[0] for x in array]
+
+def safe_inv_transform(model, array):
+    return [model.inverse_transform([x])[0] for x in array]
 
 def pca_performance_d(components):
     model = PCA(
@@ -90,12 +95,12 @@ def pca_performance_d(components):
         random_state=args.seed
     ).fit(data_small["docs"])
     dataReduced = {
-        "queries": model.transform(data["queries"]),
-        "docs": model.transform(data["docs"])
+        "queries": safe_transform(model, data["queries"]),
+        "docs": safe_transform(model, data["docs"])
     }
     dataReconstructed = {
-        "queries": model.inverse_transform(dataReduced["queries"]),
-        "docs": model.inverse_transform(dataReduced["docs"])
+        "queries": safe_inverse_transform(model, dataReduced["queries"]),
+        "docs": safe_inverse_transform(model, dataReduced["docs"])
     }
     return summary_performance(
         f"PCA-D ({components})",
