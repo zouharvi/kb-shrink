@@ -9,6 +9,8 @@ from sklearn.random_projection import SparseRandomProjection, GaussianRandomProj
 import random
 import numpy as np
 
+print("A")
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--data')
 parser.add_argument('--logfile', default="computed/tmp.log")
@@ -18,9 +20,12 @@ parser.add_argument('--seed', type=int, default=0)
 
 args = parser.parse_args()
 data = read_pickle(args.data)
+print("B")
 
 # take only dev queries
 data = sub_data(data, train=False, in_place=True)
+
+print("C")
 
 # make sure the vectors are np arrays
 data["queries"] = np.array(data["queries"])
@@ -41,7 +46,7 @@ class CropRandomProjection():
         self.indicies = None
 
     def transform(self, data):
-        return np.array(data).take(self.indicies, axis=1)
+        return data.take(self.indicies, axis=1)
 
     def fit(self, _data):
         self.indicies = self.random.sample(
@@ -71,7 +76,7 @@ def random_projection_performance(components, model_name, runs=3):
             n_components=components,
             random_state=random.randint(0, 2**8 - 1)
         )
-        model.fit(np.concatenate((data["queries"], data["docs"])))
+        model.fit(data["docs"])
 
         dataReduced = {
             "queries": model.transform(data["queries"]),
