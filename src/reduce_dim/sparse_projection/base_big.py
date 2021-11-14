@@ -9,8 +9,6 @@ from sklearn.random_projection import SparseRandomProjection, GaussianRandomProj
 import random
 import numpy as np
 
-print("A")
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--data')
 parser.add_argument('--logfile', default="computed/tmp.log")
@@ -19,17 +17,6 @@ parser.add_argument('--post-cn', action="store_true")
 parser.add_argument('--seed', type=int, default=0)
 
 args = parser.parse_args()
-data = read_pickle(args.data)
-print("B")
-
-# take only dev queries
-data = sub_data(data, train=False, in_place=True)
-
-print("C")
-
-# make sure the vectors are np arrays
-data["queries"] = np.array(data["queries"])
-data["docs"] = np.array(data["docs"])
 
 print(f"{'':<12} {'IP':<12} {'L2':<12}")
 print(f"{'Method':<12} {'(max)|(avg)':<12} {'(max)|(avg)':<12}")
@@ -50,13 +37,11 @@ class CropRandomProjection():
 
     def fit(self, _data):
         self.indicies = self.random.sample(
-            range(data["queries"][0].shape[0]),
+            range(_data["queries"][0].shape[0]),
             k=self.n_components
         )
 
-
 data_log = []
-
 
 def random_projection_performance(components, model_name, runs=3):
     if model_name == "gauss":
@@ -72,6 +57,13 @@ def random_projection_performance(components, model_name, runs=3):
     vals_ip = []
     vals_l2 = []
     for i in range(runs):
+        data = read_pickle(args.data)
+        # take only dev queries
+        data = sub_data(data, train=False, in_place=True)
+        # make sure the vectors are np arrays
+        data["queries"] = np.array(data["queries"])
+        data["docs"] = np.array(data["docs"])
+
         model = Model(
             n_components=components,
             random_state=random.randint(0, 2**8 - 1)
@@ -82,14 +74,17 @@ def random_projection_performance(components, model_name, runs=3):
             "queries": model.transform(data["queries"]),
             "docs": model.transform(data["docs"])
         }
+        del data["queries"]
+        del data["docs"]
+
         if args.post_cn:
             dataReduced = center_data(dataReduced)
             dataReduced = norm_data(dataReduced)
 
         # copy to make it C-continuous
         val_l2 = rprec_a_l2(
-            dataReduced["queries"].copy(),
-            dataReduced["docs"].copy(),
+            np.ascontiguousarray(dataReduced["queries"]),
+            np.ascontiguousarray(dataReduced["docs"]),
             data["relevancy"],
             data["relevancy_articles"],
             data["docs_articles"],
@@ -101,8 +96,8 @@ def random_projection_performance(components, model_name, runs=3):
         # skip IP computation because the vectors are normalized
         if not args.post_cn:
             val_ip = rprec_a_ip(
-                dataReduced["queries"].copy(),
-                dataReduced["docs"].copy(),
+                np.ascontiguousarray(dataReduced["queries"]),
+                np.ascontiguousarray(dataReduced["docs"]),
                 data["relevancy"],
                 data["relevancy_articles"],
                 data["docs_articles"],
