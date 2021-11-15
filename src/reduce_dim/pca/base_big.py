@@ -156,6 +156,9 @@ elif args.dims == "linspace":
 else:
     raise Exception(f"Unknown --dims {args.dims} scheme")
 
+# traverse from large to small
+DIMS.reverse()
+
 logdata = []
 for dim in DIMS:
     dim = int(dim)
@@ -177,3 +180,7 @@ for dim in DIMS:
         "loss_q": loss_q, "loss_d": loss_d,
         "type": "q"
     })
+    
+    # continuously override the file
+    with open(args.logfile, "w") as f:
+        f.write(str(logdata))
