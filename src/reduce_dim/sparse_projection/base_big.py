@@ -47,6 +47,9 @@ def safe_print(msg):
 
 data_log = [] 
 
+def safe_transform(model, array):
+    return [model.transform([x])[0] for x in array]
+
 def random_projection_performance(components, model_name, runs=3):
     if model_name == "gauss":
         Model = GaussianRandomProjection
@@ -81,8 +84,8 @@ def random_projection_performance(components, model_name, runs=3):
         safe_print("E")
 
         dataReduced = {
-            "queries": model.transform(data["queries"]),
-            "docs": model.transform(data["docs"])
+            "queries": safe_transform(model, data["queries"]),
+            "docs": safe_transform(model, data["docs"])
         }
         safe_print("F")
         del data["queries"]
@@ -95,9 +98,10 @@ def random_projection_performance(components, model_name, runs=3):
         safe_print("H")
 
         # copy to make it C-continuous
+        # (skipped)
         val_l2 = rprec_a_l2(
-            np.ascontiguousarray(dataReduced["queries"]),
-            np.ascontiguousarray(dataReduced["docs"]),
+            dataReduced["queries"],
+            dataReduced["docs"],
             data["relevancy"],
             data["relevancy_articles"],
             data["docs_articles"],
@@ -110,8 +114,8 @@ def random_projection_performance(components, model_name, runs=3):
         # skip IP computation because the vectors are normalized
         if not args.post_cn:
             val_ip = rprec_a_ip(
-                np.ascontiguousarray(dataReduced["queries"]),
-                np.ascontiguousarray(dataReduced["docs"]),
+                dataReduced["queries"],
+                dataReduced["docs"],
                 data["relevancy"],
                 data["relevancy_articles"],
                 data["docs_articles"],
