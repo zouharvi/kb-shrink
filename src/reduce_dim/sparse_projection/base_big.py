@@ -42,7 +42,7 @@ class CropRandomProjection():
         )
 
 def safe_print(msg):
-    with open("base_big.out", "w+") as f:
+    with open("base_big_rproj.out", "a") as f:
         f.write(msg+"\n")
 
 data_log = [] 

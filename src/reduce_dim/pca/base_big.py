@@ -46,6 +46,10 @@ else:
 print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
 
 
+def safe_print(msg):
+    with open("base_big_pca.out", "a") as f:
+        f.write(msg+"\n")
+
 def summary_performance(name, dataReduced, dataReconstructed):
     if args.post_cn:
         dataReduced = center_data(dataReduced)
@@ -92,12 +96,18 @@ def safe_inv_transform(model, array):
 def pca_performance_d(components):
     model = PCA(
         n_components=components,
-        random_state=args.seed
+        random_state=args.seed,
     ).fit(data_small["docs"])
+    safe_print("Ed")
     dataReduced = {
         "queries": safe_transform(model, data["queries"]),
         "docs": safe_transform(model, data["docs"])
     }
+    safe_print("Fd")
+    del data["queries"]
+    del data["docs"]
+    safe_print("Gd")
+
     dataReconstructed = {
         "queries": safe_inv_transform(model, dataReduced["queries"]),
         "docs": safe_inv_transform(model, dataReduced["docs"])
@@ -112,16 +122,19 @@ def pca_performance_d(components):
 def pca_performance_q(components):
     model = PCA(
         n_components=components,
-        random_state=args.seed
+        random_state=args.seed,
     ).fit(data_small["queries"])
+    safe_print("Eq")
     dataReduced = {
-        "queries": model.transform(data["queries"]),
-        "docs": model.transform(data["docs"])
+        "queries": safe_transform(model, data["queries"]),
+        "docs": safe_transform(model, data["docs"])
     }
+    safe_print("Fq")
     dataReconstructed = {
-        "queries": model.inverse_transform(dataReduced["queries"]),
-        "docs": model.inverse_transform(dataReduced["docs"])
+        "queries": safe_inv_transform(model, dataReduced["queries"]),
+        "docs": safe_inv_transform(model, dataReduced["docs"])
     }
+    safe_print("Gq")
     return summary_performance(
         f"PCA-Q ({components})",
         dataReduced,
@@ -132,16 +145,20 @@ def pca_performance_q(components):
 def pca_performance_dq(components):
     model = PCA(
         n_components=components,
-        random_state=args.seed
+        random_state=args.seed,
+        copy=False,
     ).fit(np.concatenate((data_small["queries"], data_small["docs"])))
+    safe_print("Edq")
     dataReduced = {
-        "queries": model.transform(data["queries"]),
-        "docs": model.transform(data["docs"])
+        "queries": safe_transform(model, data["queries"]),
+        "docs": safe_transform(model, data["docs"])
     }
+    safe_print("Fdq")
     dataReconstructed = {
-        "queries": model.inverse_transform(dataReduced["queries"]),
-        "docs": model.inverse_transform(dataReduced["docs"])
+        "queries": safe_inv_transform(model, dataReduced["queries"]),
+        "docs": safe_inv_transform(model, dataReduced["docs"])
     }
+    safe_print("Gdq")
     return summary_performance(
         f"PCA-DQ ({components})",
         dataReduced,
@@ -180,7 +197,6 @@ for dim in DIMS:
         "loss_q": loss_q, "loss_d": loss_d,
         "type": "q"
     })
-    
     # continuously override the file
     with open(args.logfile, "w") as f:
         f.write(str(logdata))

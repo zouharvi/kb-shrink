@@ -2,9 +2,9 @@
 -|-|-|-
 ||||running
 ||||
-12 nov|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry_3* (continue partial)|13|running
-12 nov|pca base_big `dpr-c` `--data-small pruned` *tupperwear*|14|failed, running
-12 nov|rproj incremental greedy `dpr-c_cn` `--post-cn` *recentyarn*|15|running
+12 nov|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry_3* (continue partial), `base_big.out`|13|5*failed,running
+12 nov|pca base_big `dpr-c` `--data-small pruned` *tupperwear*|14|3*failed, running
+12 nov|rproj incremental greedy `dpr-c_cn` `--post-cn` *recentyarn*|15|2*failed, running
 ||||
 ||||finished
 ||||
