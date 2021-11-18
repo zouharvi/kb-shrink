@@ -104,14 +104,11 @@ def pca_performance_d(components):
         "docs": safe_transform(model, data["docs"])
     }
     safe_print("Fd")
-    del data["queries"]
-    del data["docs"]
-    safe_print("Gd")
-
     dataReconstructed = {
         "queries": safe_inv_transform(model, dataReduced["queries"]),
         "docs": safe_inv_transform(model, dataReduced["docs"])
     }
+    safe_print("Gd")
     return summary_performance(
         f"PCA-D ({components})",
         dataReduced,
