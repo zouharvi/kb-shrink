@@ -90,7 +90,7 @@ else:
     raise Exception(f"Unknown --dims {args.dims} scheme")
 
 # TODO WARN quick hack to continue previous run
-DIMS = DIMS[10:]
+DIMS = DIMS[11:]
 
 for dim in DIMS:
     dim = 768 - int(dim)
