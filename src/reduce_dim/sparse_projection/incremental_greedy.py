@@ -37,12 +37,15 @@ class DropRandomProjection():
 
 data_log = []
 
+def safe_transform(model, array, dim, impr_array):
+    return [model.transform([x], dim, impr_array)[0] for x in array]
+
 def random_projection_performance(dim):
     model = DropRandomProjection()
         
     dataReduced = {
-        "queries": model.transform(data["queries"], dim, IMPR_L2),
-        "docs": model.transform(data["docs"], dim, IMPR_L2)
+        "queries": safe_transform(model, data["queries"], dim, IMPR_L2),
+        "docs": safe_transform(model, data["docs"], dim, IMPR_L2)
     }
     if args.post_cn:
         dataReduced = center_data(dataReduced)
@@ -50,8 +53,8 @@ def random_projection_performance(dim):
 
     # copy to make it C-continuous
     val_l2 = rprec_a_l2(
-        dataReduced["queries"].copy(),
-        dataReduced["docs"].copy(),
+        dataReduced["queries"],
+        dataReduced["docs"],
         data["relevancy"],
         data["relevancy_articles"],
         data["docs_articles"],
@@ -60,8 +63,8 @@ def random_projection_performance(dim):
     )
     if not args.post_cn:
         val_ip = rprec_a_ip(
-            dataReduced["queries"].copy(),
-            dataReduced["docs"].copy(),
+            dataReduced["queries"],
+            dataReduced["docs"],
             data["relevancy"],
             data["relevancy_articles"],
             data["docs_articles"],
@@ -85,6 +88,9 @@ elif args.dims == "linspace":
     DIMS = np.linspace(32, 768, num=768 // 32, endpoint=True)
 else:
     raise Exception(f"Unknown --dims {args.dims} scheme")
+
+# TODO WARN quick hack to continue previous run
+DIMS = DIMS[10:]
 
 for dim in DIMS:
     dim = 768 - int(dim)
