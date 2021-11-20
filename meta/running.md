@@ -3,11 +3,13 @@
 ||||running
 ||||
 12 nov|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry_3* (continue partial), `base_big.out`|13|5*failed,running
-12 nov|pca base_big `dpr-c` `--data-small pruned` *tupperwear*|14|4*failed, running
-18 nov|rproj incremental greedy `dpr-c_cn` `--post-cn` *recentyarn* (continue partial)|15|running
+19 nov|rproj incremental greedy `dpr-c_cn` `--post-cn` *recentyarn* (continue partial, 4)|15|waiting for 13,14 
+12 nov|pca base_big `dpr-c` `--data-small pruned` tbd|-|to run
 ||||
 ||||finished
 ||||
+12 nov|pca base_big `dpr-c` `--data-small pruned` *tupperwear*|14|4*failed
+18 nov|rproj incremental greedy `dpr-c_cn` `--post-cn` *recentyarn* (continue partial)|15|4*failed, partial 
 12 nov|rproj incremental greedy `dpr-c_cn` `--post-cn` *recentyarn*|15|3*failed, running
 28 oct|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry_3* (continue partial)|13|killed
 22 oct|dimension single `dpr-c-pruned_cn` `--post-cn` *dimsingle_unusedoven*|14|finished

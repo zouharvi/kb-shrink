@@ -6,7 +6,7 @@ from misc.load_utils import read_pickle, center_data, norm_data, sub_data
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 import numpy as np
 import argparse
-from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA, IncrementalPCA
 import sklearn.metrics
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
@@ -94,9 +94,10 @@ def safe_inv_transform(model, array):
     return [model.inverse_transform([x])[0] for x in array]
 
 def pca_performance_d(components):
-    model = PCA(
+    model = IncrementalPCA(
         n_components=components,
         random_state=args.seed,
+        batch_size=1024,
     ).fit(data_small["docs"])
     safe_print("Ed")
     dataReduced = {
@@ -117,9 +118,10 @@ def pca_performance_d(components):
 
 
 def pca_performance_q(components):
-    model = PCA(
+    model = IncrementalPCA(
         n_components=components,
         random_state=args.seed,
+        batch_size=1024,
     ).fit(data_small["queries"])
     safe_print("Eq")
     dataReduced = {
@@ -140,9 +142,10 @@ def pca_performance_q(components):
 
 
 def pca_performance_dq(components):
-    model = PCA(
+    model = IncrementalPCA(
         n_components=components,
         random_state=args.seed,
+        batch_size=1024,
         copy=False,
     ).fit(np.concatenate((data_small["queries"], data_small["docs"])))
     safe_print("Edq")
