@@ -16,37 +16,43 @@ ax.bar(
     POS + BARSPACE * 0,
     [x["ip"] for x in DATA_BASE.values()],
     width=BARHEIGHT, label="IP",
-    color="tab:blue", hatch="",
+    color="tab:red", hatch="",
+    edgecolor="black",
 )
 ax.bar(
     POS + BARSPACE * 2,
     [x["ip"] for x in DATA_C.values()],
     width=BARHEIGHT, label="IP (center)",
-    color="tab:blue", hatch="\\\\\\",
+    color="tab:red", hatch="\\\\\\",
+    edgecolor="black",
 )
 ax.bar(
     POS + BARSPACE * 4,
     [x for x in DATA_N.values()],
     width=BARHEIGHT, label="IP, L2 (norm)",
     color="silver", hatch="...",
+    edgecolor="black",
 )
 ax.bar(
     POS + BARSPACE * 1,
     [x["l2"] for x in DATA_BASE.values()],
     width=BARHEIGHT, label="L2",
-    color="tab:red", hatch="",
+    color="tab:blue", hatch="",
+    edgecolor="black",
 )
 ax.bar(
     POS + BARSPACE * 3,
     [x["l2"] for x in DATA_C.values()],
     width=BARHEIGHT, label="L2 (center)",
-    color="tab:red", hatch="\\\\\\",
+    color="tab:blue", hatch="\\\\\\",
+    edgecolor="black",
 )
 ax.bar(
     POS + BARSPACE * 5,
     [x for x in DATA_NC.values()],
     width=BARHEIGHT, label="IP, L2 (center, norm)",
     color="dimgray", hatch="...\\\\\\",
+    edgecolor="black",
 )
 ax.set_xticks(POS + BARSPACE * 2.5)
 ax.set_xticklabels(DATA_BASE.keys())

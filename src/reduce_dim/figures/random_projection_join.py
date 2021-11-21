@@ -18,44 +18,51 @@ DIMS = sorted(list(set([x["dim"] for x in DATA])), key=lambda x: int(x))
 DISPLAY_DIMS = [32, 256, 512, 768]
 
 plt.figure(figsize=(4.8, 3.8))
-ax = plt.gca() 
+ax = plt.gca()
 
 ax.plot(
     [x["dim"] for x in DATA if x["model"] == "crop"],
     [max(x["vals_l2"]) for x in DATA if x["model"] == "crop"],
-    label="Dim. Dropping", color="tab:green", linestyle="-"
+    label="Dim. Dropping", color="tab:red",
+    linewidth=1.7,
 )
 ax.plot(
     [x["dim"] for x in DATA if x["model"] == "crop"],
     [min(x["vals_l2"]) for x in DATA if x["model"] == "crop"],
-    alpha=0.4, color="tab:green", linestyle="-"
+    alpha=0.4, color="tab:red", linestyle="-",
+    linewidth=1.7,
 )
 
 ax.plot(
-    [768-x["del_dim"] for x in DATA_GR],
+    [768 - x["del_dim"] for x in DATA_GR],
     [x["val_l2"] for x in DATA_GR],
-    label="Greedy Dim. Dropping", color="tab:green", linestyle=":"
+    label="Greedy Dim. Dropping", color="tab:red", linestyle=":",
+    linewidth=1.7,
 )
 
 ax.plot(
     [x["dim"] for x in DATA if x["model"] == "sparse"],
     [max(x["vals_l2"]) for x in DATA if x["model"] == "sparse"],
-    label="Sparse", color="tab:brown", linestyle="-"
+    label="Sparse", color="tab:blue", linestyle="-",
+    linewidth=1.7,
 )
 ax.plot(
     [x["dim"] for x in DATA if x["model"] == "sparse"],
     [min(x["vals_l2"]) for x in DATA if x["model"] == "sparse"],
-    alpha=0.4, color="tab:brown", linestyle="-"
+    alpha=0.4, color="tab:blue", linestyle="-",
+    linewidth=1.7,
 )
 ax.plot(
     [x["dim"] for x in DATA if x["model"] == "gauss"],
     [max(x["vals_l2"]) for x in DATA if x["model"] == "gauss"],
-    label="Gaussian", color="tab:brown", linestyle=":"
+    label="Gaussian", color="tab:blue", linestyle=":",
+    linewidth=1.7,
 )
 ax.plot(
     [x["dim"] for x in DATA if x["model"] == "gauss"],
     [min(x["vals_l2"]) for x in DATA if x["model"] == "gauss"],
-    alpha=0.4, color="tab:brown", linestyle=":"
+    alpha=0.4, color="tab:blue", linestyle=":",
+    linewidth=1.7,
 )
 
 # uncompressed
@@ -72,6 +79,8 @@ ax.set_xlabel("Dimensions")
 plt.tight_layout()
 plt.show()
 
-loss_against_avg_l2 = np.average([max(x["vals_l2"]) - np.average(x["vals_l2"]) for x in DATA])
-loss_against_avg_ip = np.average([max(x["vals_ip"]) - np.average(x["vals_ip"]) for x in DATA])
-print((loss_against_avg_ip+loss_against_avg_l2)/2)
+loss_against_avg_l2 = np.average(
+    [max(x["vals_l2"]) - np.average(x["vals_l2"]) for x in DATA])
+loss_against_avg_ip = np.average(
+    [max(x["vals_ip"]) - np.average(x["vals_ip"]) for x in DATA])
+print((loss_against_avg_ip + loss_against_avg_l2) / 2)

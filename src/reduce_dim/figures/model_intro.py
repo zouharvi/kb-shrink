@@ -92,25 +92,29 @@ ax.bar(
     POS + 0.2 * 0,
     [x["ip"] for x in DATA_RPREC_A.values()],
     width=BARHEIGHT, label="IP",
-    color="tab:blue", hatch="",
+    color="tab:red", hatch="",
+    edgecolor="black",
 )
 ax.bar(
     POS + 0.2 * 1,
     [x["ip_fast"] for x in DATA_RPREC_A.values()],
     width=BARHEIGHT, label="IP fast",
-    color="lightskyblue", hatch="...",
+    color="pink", hatch="...",
+    edgecolor="black",
 )
 ax.bar(
     POS + 0.2 * 2,
     [x["l2"] for x in DATA_RPREC_A.values()],
     width=BARHEIGHT, label="L2",
-    color="tab:red", hatch="",
+    color="tab:blue", hatch="",
+    edgecolor="black",
 )
 ax.bar(
     POS + 0.2 * 3,
     [x["l2_fast"] for x in DATA_RPREC_A.values()],
     width=BARHEIGHT, label="L2 fast",
-    color="lightcoral", hatch="...",
+    color="lightblue", hatch="...",
+    edgecolor="black",
 )
 ax.set_xticks(POS + 0.15 * 2)
 ax.set_xticklabels(DATA_RPREC_A.keys())
