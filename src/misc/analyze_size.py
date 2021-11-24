@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys; sys.path.append("src")
-from misc.load_utils import read_pickle, read_json
+from misc.load_utils import read_pickle
 import argparse
 from pympler.asizeof import asizeof
 import numpy as np

@@ -2,7 +2,8 @@
 -|-|-|-
 ||||running
 ||||
-12 nov|pca base_big `dpr-c` `--data-small pruned` tbd|-|to run
+24 nov|pca base_big `dpr-c` `--data-small pruned` *tupperware*|13|running
+25 nov|analyze size `dpr-c` live|14|running
 ||||
 ||||finished
 ||||
