@@ -94,10 +94,9 @@ def safe_inv_transform(model, array):
     return [model.inverse_transform([x])[0] for x in array]
 
 def pca_performance_d(components):
-    model = IncrementalPCA(
+    model = PCA(
         n_components=components,
         random_state=args.seed,
-        batch_size=1024,
     ).fit(data_small["docs"])
     safe_print("Ed")
     dataReduced = {
@@ -116,12 +115,10 @@ def pca_performance_d(components):
         dataReconstructed
     )
 
-
 def pca_performance_q(components):
-    model = IncrementalPCA(
+    model = PCA(
         n_components=components,
         random_state=args.seed,
-        batch_size=1024,
     ).fit(data_small["queries"])
     safe_print("Eq")
     dataReduced = {
@@ -140,12 +137,10 @@ def pca_performance_q(components):
         dataReconstructed
     )
 
-
 def pca_performance_dq(components):
-    model = IncrementalPCA(
+    model = PCA(
         n_components=components,
         random_state=args.seed,
-        batch_size=1024,
         copy=False,
     ).fit(np.concatenate((data_small["queries"], data_small["docs"])))
     safe_print("Edq")
@@ -165,7 +160,6 @@ def pca_performance_dq(components):
         dataReconstructed
     )
 
-
 if args.dims == "custom":
     DIMS = [32, 64, 96, 128, 160, 192, 224, 256, 320, 384, 448, 512, 640, 768]
 elif args.dims == "linspace":
@@ -174,7 +168,7 @@ else:
     raise Exception(f"Unknown --dims {args.dims} scheme")
 
 # traverse from large to small
-DIMS.reverse()
+# DIMS.reverse()
 
 logdata = []
 for dim in DIMS:
@@ -185,18 +179,22 @@ for dim in DIMS:
         "loss_q": loss_q, "loss_d": loss_d,
         "type": "dq"
     })
+    safe_print("-")
     val_ip, val_l2, loss_q, loss_d = pca_performance_d(dim)
     logdata.append({
         "val_ip": val_ip, "val_l2": val_l2,
         "loss_q": loss_q, "loss_d": loss_d,
         "type": "d"
     })
+    safe_print("-")
     val_ip, val_l2, loss_q, loss_d = pca_performance_q(dim)
     logdata.append({
         "val_ip": val_ip, "val_l2": val_l2,
         "loss_q": loss_q, "loss_d": loss_d,
         "type": "q"
     })
+    safe_print("-")
+
     # continuously override the file
     with open(args.logfile, "w") as f:
         f.write(str(logdata))
