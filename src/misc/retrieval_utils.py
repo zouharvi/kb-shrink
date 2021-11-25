@@ -1,16 +1,12 @@
 import numpy as np
 from scipy.spatial.distance import minkowski
-import argparse
 import torch
 
 if torch.cuda.is_available():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu', default="0")
-    args,_ = parser.parse_known_args()
-    DEVICE = torch.device("cuda:" + args.gpu)
-    print(args.gpu, DEVICE)
+    DEVICE = torch.device("cuda:0")
 else:
     DEVICE = torch.device("cpu")
+
 
 def l2_sim(x, y):
     return -minkowski(x, y)
@@ -58,7 +54,7 @@ def order_l2(data_queries, data_docs, retrieve_counts, fast):
         for i, (d, n) in enumerate(zip(data_queries, retrieve_counts)):
             batch.append(d)
             batch_n.append(n)
-            if len(batch) >= BATCH_LIMIT or i == len(data_queries)-1:
+            if len(batch) >= BATCH_LIMIT or i == len(data_queries) - 1:
                 out = index.search(np.array(batch), max(batch_n))[1]
                 for el in out:
                     yield el
@@ -96,7 +92,7 @@ def order_ip(data_queries, data_docs, retrieve_counts, fast):
         for i, (d, n) in enumerate(zip(data_queries, retrieve_counts)):
             batch.append(d)
             batch_n.append(n)
-            if len(batch) >= BATCH_LIMIT or i == len(data_queries)-1:
+            if len(batch) >= BATCH_LIMIT or i == len(data_queries) - 1:
                 out = index.search(np.array(batch), max(batch_n))[1]
                 for el in out:
                     yield el
@@ -111,7 +107,8 @@ def acc_l2(
     data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
     n=20, fast=True, report=False
 ):
-    n_new_gen = order_l2(data_queries, data_docs, [n]*len(data_queries), fast)
+    n_new_gen = order_l2(data_queries, data_docs, [
+                         n] * len(data_queries), fast)
     return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
 
 
@@ -119,7 +116,8 @@ def acc_ip(
     data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
     n=20, fast=True, report=False
 ):
-    n_new_gen = order_ip(data_queries, data_docs, [n]*len(data_queries), fast)
+    n_new_gen = order_ip(data_queries, data_docs, [
+                         n] * len(data_queries), fast)
     return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
 
 
@@ -134,6 +132,7 @@ def rprec_l2(
     )
     return rprec_from_relevancy(data_relevancy, n_new_gen, report)
 
+
 def rprec_ip(
     data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
     n=20, fast=True, report=False
@@ -144,6 +143,7 @@ def rprec_ip(
         fast
     )
     return rprec_from_relevancy(data_relevancy, n_new_gen, report)
+
 
 def rprec_a_ip(
     data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
@@ -158,6 +158,7 @@ def rprec_a_ip(
         data_relevancy, n_new_gen, data_relevancy_articles, data_docs_articles, report
     )
 
+
 def rprec_a_l2(
     data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
     n=20, fast=True, report=False
@@ -170,6 +171,7 @@ def rprec_a_l2(
     return rprec_a_from_relevancy(
         data_relevancy, n_new_gen, data_relevancy_articles, data_docs_articles, report
     )
+
 
 def acc_from_relevancy(relevancy, n_new, n, report=False):
     def acc_local(doc_true, doc_hyp):
@@ -193,7 +195,7 @@ def rprec_from_relevancy(relevancy, n_new, report=False):
         """
         R-Precision for one query
         """
-        return len(set(doc_hyp[:len(doc_true)]) & set(doc_true))/len(doc_true)
+        return len(set(doc_hyp[:len(doc_true)]) & set(doc_true)) / len(doc_true)
 
     rprec_val = np.average([
         rprec_local(x, y)
@@ -210,9 +212,9 @@ def rprec_a_from_relevancy(relevancy, n_new, relevancy_articles, docs_articles, 
         """
         R-Precision for one query
         """
-        
+
         articles_hyp = {docs_articles[doc] for doc in doc_hyp[:len(doc_true)]}
-        return len(articles_hyp & articles_true)/len(articles_true)
+        return len(articles_hyp & articles_true) / len(articles_true)
 
     rprec_val = np.average([
         rprec_local(*x)

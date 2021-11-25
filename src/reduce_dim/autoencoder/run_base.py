@@ -1,20 +1,16 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
-
 import sys; sys.path.append("src")
 from misc.retrieval_utils import DEVICE
-from misc.load_utils import read_pickle, save_pickle
-from reduce_dim.autoencoder.model import AutoencoderModel, report
+from misc.load_utils import read_pickle, sub_data
+from reduce_dim.autoencoder.model import AutoencoderModel
 import torch.nn as nn
 import torch
 import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    '--data', default="/data/kilt-hp/dpr-c.embd_cn")
-parser.add_argument(
-    '--data-out', default="/data/kilt-hp/tmp.embd")
+    '--data', default="/data/big-hp/dpr-c.embd_cn")
 parser.add_argument('--model', default=1, type=int)
 parser.add_argument('--bottleneck-width', default=128, type=int)
 parser.add_argument('--post-cn', action="store_true")
@@ -26,8 +22,7 @@ args = parser.parse_args()
 
 torch.manual_seed(args.seed)
 data = read_pickle(args.data)
-data["queries"] = torch.Tensor(data["queries"]).to(DEVICE)
-data["docs"] = torch.Tensor(data["docs"]).to(DEVICE)
+data = sub_data(data, train=False, in_place=True)
 model = AutoencoderModel(args.model, args.bottleneck_width)
 print(model)
 

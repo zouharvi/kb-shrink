@@ -2,12 +2,6 @@ import pickle
 import json
 import numpy as np
 from sklearn import preprocessing
-import torch
-
-if torch.cuda.is_available():
-    DEVICE = torch.device("cuda:0")
-else:
-    DEVICE = torch.device("cpu")
 
 
 def read_json(path):
@@ -59,17 +53,24 @@ def small_data(data, n_queries):
         "docs_articles": data["docs_articles"][:docs_crop],
     }
 
+
 def sub_data(data, train=False, in_place=True):
     assert in_place
     if train:
+        # train queries
         data["queries"] = data["queries"][:data["boundaries"]["train"]]
         data["relevancy"] = data["relevancy"][:data["boundaries"]["train"]]
         data["relevancy_articles"] = data["relevancy_articles"][:data["boundaries"]["train"]]
     else:
-        data["queries"] = data["queries"][data["boundaries"]["train"]:data["boundaries"]["dev"]]
-        data["relevancy"] = data["relevancy"][data["boundaries"]["train"]:data["boundaries"]["dev"]]
-        data["relevancy_articles"] = data["relevancy_articles"][data["boundaries"]["train"]:data["boundaries"]["dev"]]
+        # dev queries
+        data["queries"] = data["queries"][data["boundaries"]
+                                          ["train"]:data["boundaries"]["dev"]]
+        data["relevancy"] = data["relevancy"][data["boundaries"]
+                                              ["train"]:data["boundaries"]["dev"]]
+        data["relevancy_articles"] = data["relevancy_articles"][data["boundaries"]
+                                                                ["train"]:data["boundaries"]["dev"]]
     return data
+
 
 def center_data(data):
     data["docs"] = np.array(data["docs"])
@@ -78,12 +79,14 @@ def center_data(data):
     data["queries"] -= data["queries"].mean(axis=0)
     return data
 
+
 def norm_data(data):
     data["docs"] = np.array(data["docs"])
     data["queries"] = np.array(data["queries"])
     data["docs"] /= np.linalg.norm(data["docs"], axis=1)[:, np.newaxis]
     data["queries"] /= np.linalg.norm(data["queries"], axis=1)[:, np.newaxis]
     return data
+
 
 def zscore_data(data, center=True):
     preprocessing.StandardScaler(

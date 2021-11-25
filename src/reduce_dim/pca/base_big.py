@@ -175,6 +175,7 @@ for dim in DIMS:
     dim = int(dim)
     val_ip, val_l2, loss_q, loss_d = pca_performance_dq(dim)
     logdata.append({
+        "dim": dim,
         "val_ip": val_ip, "val_l2": val_l2,
         "loss_q": loss_q, "loss_d": loss_d,
         "type": "dq"
@@ -182,6 +183,7 @@ for dim in DIMS:
     safe_print("-")
     val_ip, val_l2, loss_q, loss_d = pca_performance_d(dim)
     logdata.append({
+        "dim": dim,
         "val_ip": val_ip, "val_l2": val_l2,
         "loss_q": loss_q, "loss_d": loss_d,
         "type": "d"
@@ -189,6 +191,7 @@ for dim in DIMS:
     safe_print("-")
     val_ip, val_l2, loss_q, loss_d = pca_performance_q(dim)
     logdata.append({
+        "dim": dim,
         "val_ip": val_ip, "val_l2": val_l2,
         "loss_q": loss_q, "loss_d": loss_d,
         "type": "q"
