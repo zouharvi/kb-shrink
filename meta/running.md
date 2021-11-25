@@ -3,10 +3,11 @@
 ||||running
 ||||
 24 nov|pca base_big `dpr-c` `--data-small pruned` *tupperware*|13|running
-25 nov|analyze size `dpr-c` live|14|running
+25 nov|autoencoder base `dpr-c_cn` `--post-cn` *yellowneuron*|14|running
 ||||
 ||||finished
 ||||
+25 nov|analyze size `dpr-c` live|14|ok
 12 nov|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry_3* (continue partial), `base_big.out`|13|5*failed,ok
 19 nov|rproj incremental greedy `dpr-c_cn` `--post-cn` *recentyarn* (continue partial, 4)|14|ok 
 12 nov|pca base_big `dpr-c` `--data-small pruned` *tupperwear*|14|4*failed
