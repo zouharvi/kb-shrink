@@ -11,8 +11,6 @@ from sklearn.metrics import mean_squared_error as mse
 import numpy as np
 
 def report(prefix, encoded, data, post_cn):
-    loss = np.average([mse([orig], [new]) for orig, new in zip(data["docs"], encoded["docs"])])
-
     if post_cn:
         encoded = center_data(encoded)
         encoded = norm_data(encoded)
@@ -35,8 +33,8 @@ def report(prefix, encoded, data, post_cn):
             data["docs_articles"],
             fast=True, report=False
         )
-    print(f'{prefix} rprec_ip: {val_ip:.3f}, rprec_l2: {val_l2:.3f}, loss: {loss:.5f}')
-    return val_ip, val_l2, loss
+    print(f'{prefix} rprec_ip: {val_ip:.3f}, rprec_l2: {val_l2:.3f}')
+    return val_ip, val_l2
 
 
 class AutoencoderModel(nn.Module):
@@ -147,7 +145,14 @@ class AutoencoderModel(nn.Module):
         return self.encoder(x)
 
     def encode_safe(self, data):
-        return [self.encode(torch.tensor(sample).to(DEVICE)).cpu().numpy() for sample in data]
+        out = []
+        loss = 0
+        for sample in data:
+            sample_enc = self.encoder(torch.tensor(sample).to(DEVICE))
+            sample_rec = self.decoder(sample_enc)
+            loss += mse([sample_rec.cpu().numpy()], [sample])
+            out.append(sample_enc.cpu().numpy())
+        return out, loss/len(out)
 
     def decode(self, x):
         return self.decoder(x)
@@ -190,14 +195,17 @@ class AutoencoderModel(nn.Module):
     def eval_routine(self, data, post_cn, prefix=""):
         self.train(False)
         with torch.no_grad():
+            queries_data, queries_loss = self.encode_safe(data["queries"])
+            docs_data, docs_loss = self.encode_safe(data["docs"])
             encoded = {
-                "queries": self.encode_safe(data["queries"]),
-                "docs": self.encode_safe(data["docs"]),
+                "queries": queries_data,
+                "docs": docs_data,
             }
 
-        return report(
+        val_ip, val_l2 = report(
             prefix=prefix,
             encoded=encoded,
             data=data,
             post_cn=post_cn
         )
+        return val_ip, val_l2, queries_loss, docs_loss
