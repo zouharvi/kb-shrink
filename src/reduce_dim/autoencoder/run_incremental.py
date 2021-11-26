@@ -44,7 +44,7 @@ for bottleneck_width in [32, 64, 128, 256]:
     print(f"Running {bottleneck_width}")
     model = Autoencoder(args.model, bottleneck_width)
     print(model)
-    model.trainModel(data, args.epochs, bottleneck_index=-1, loglevel=1)
+    model.train_routine(data, args.epochs, bottleneck_index=-1, loglevel=1)
     for bottleneck_index in range(13):
         print(f"Bottleneck index {bottleneck_index}")
         model.train(False)

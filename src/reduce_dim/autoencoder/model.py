@@ -7,8 +7,12 @@ from misc.load_utils import center_data, norm_data
 import torch
 import torch.nn as nn
 from tqdm import tqdm
+from sklearn.metrics import mean_squared_error as mse
+import numpy as np
 
 def report(prefix, encoded, data, post_cn):
+    loss = np.average([mse([orig], [new]) for orig, new in zip(data["docs"], encoded["docs"])])
+
     if post_cn:
         encoded = center_data(encoded)
         encoded = norm_data(encoded)
@@ -31,8 +35,8 @@ def report(prefix, encoded, data, post_cn):
             data["docs_articles"],
             fast=True, report=False
         )
-    print(f'{prefix} rprec_ip: {val_ip:.3f}, rprec_l2: {val_l2:.3f}')
-    return val_ip, val_l2
+    print(f'{prefix} rprec_ip: {val_ip:.3f}, rprec_l2: {val_l2:.3f}, loss: {loss:.5f}')
+    return val_ip, val_l2, loss
 
 
 class AutoencoderModel(nn.Module):
@@ -148,7 +152,7 @@ class AutoencoderModel(nn.Module):
     def decode(self, x):
         return self.decoder(x)
 
-    def trainModel(self, data, epochs, post_cn, regularize, skip_eval=False, train_crop_n=None):
+    def train_routine(self, data, epochs, post_cn, regularize, skip_eval=False, train_crop_n=None):
         self.dataLoader = torch.utils.data.DataLoader(
             dataset=data["docs"][:train_crop_n], batch_size=self.batchSize, shuffle=True
         )
@@ -174,22 +178,26 @@ class AutoencoderModel(nn.Module):
                     loss += regularization_loss
                 loss.backward()
                 self.optimizer.step()
-
-            # if (epoch + 1) % 5 == 0:
+    
             if not skip_eval:
-                print("evaling")
-                self.train(False)
-                with torch.no_grad():
-                    encoded = {
-                        "queries": self.encode_safe(data["queries"]),
-                        "docs": self.encode_safe(data["docs"]),
-                    }
+                # in some cases do not eval after every epoch
+                self.eval_routine(
+                    data,
+                    prefix=f"epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f},",
+                    post_cn=post_cn)
 
-                report(
-                    f"epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f},",
-                    encoded, data, post_cn
-                )
-            else:
-                print(
-                    f"epoch [{epoch+1}/{epochs}]",
-                )
+
+    def eval_routine(self, data, post_cn, prefix=""):
+        self.train(False)
+        with torch.no_grad():
+            encoded = {
+                "queries": self.encode_safe(data["queries"]),
+                "docs": self.encode_safe(data["docs"]),
+            }
+
+        return report(
+            prefix=prefix,
+            encoded=encoded,
+            data=data,
+            post_cn=post_cn
+        )
