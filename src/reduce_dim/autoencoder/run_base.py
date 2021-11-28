@@ -45,8 +45,8 @@ for dim in DIMS:
         skip_eval=True,
     )
 
-    val_ip, val_l2, loss = model.eval_routine(data, post_cn=args.post_cn)
-    logdata.append({"dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss": loss})
+    val_ip, val_l2, queries_loss, docs_loss = model.eval_routine(data, post_cn=args.post_cn)
+    logdata.append({"dim": dim, "val_ip": val_ip, "val_l2": val_l2, "queries_loss": queries_loss, "docs_loss": docs_loss})
 
     # continuously override the file
     with open(args.logfile, "w") as f:
