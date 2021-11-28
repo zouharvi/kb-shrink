@@ -96,3 +96,13 @@ def zscore_data(data, center=True):
         copy=False, with_std=True, with_mean=center
     ).fit_transform(data["queries"])
     return data
+
+def process_dims(dims):
+    if dims == "custom":
+        return [32, 64, 96, 128, 160, 192, 224, 256, 320, 384, 448, 512, 640, 768]
+    elif dims == "linspace":
+        return np.linspace(32, 768, num=768 // 32, endpoint=True)
+    elif dims.isdigit():
+        return [int(dims)]
+    else:
+        raise Exception(f"Unknown --dims {dims} scheme")
