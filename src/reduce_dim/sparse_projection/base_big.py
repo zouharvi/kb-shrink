@@ -148,6 +148,8 @@ if args.dims == "custom":
     DIMS = [32, 64, 96, 128, 160, 192, 224, 256, 320, 384, 448, 512, 640, 768]
 elif args.dims == "linspace":
     DIMS = np.linspace(32, 768, num=768 // 32, endpoint=True)
+elif args.dims.isdigit():
+    DIMS = [int(args.dims)]
 else:
     raise Exception(f"Unknown --dims {args.dims} scheme")
 

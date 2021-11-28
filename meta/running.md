@@ -3,17 +3,18 @@
 ||||running
 ||||
 24 nov|pca base_big `dpr-c` `--data-small pruned` *tupperware*|13|running
-26 nov|autoencoder base (test with loss and multiple dims) `dpr-c-pruned_cn` `--post-cn` *pleasingkeep*|14|running
+26 nov|autoencoder base (test with loss and multiple dims) `dpr-c-pruned_cn` `--post-cn` *pleasingkeep*|14|3 failed, running
+28 nov|sparse projection base `dpr-c_cn` `--dims 128` *unequalapparel*, `base_big.out`|15|running
 ||||
 ||||finished
 ||||
 25 nov|autoencoder base `dpr-c_cn` `--post-cn` *yellowneuron*|14|ok
 25 nov|analyze size `dpr-c` live|14|ok
-12 nov|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry_3* (continue partial), `base_big.out`|13|5*failed,ok
+12 nov|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry_3* (continue partial), `base_big.out`|13|5 failed,ok
 19 nov|rproj incremental greedy `dpr-c_cn` `--post-cn` *recentyarn* (continue partial, 4)|14|ok 
-12 nov|pca base_big `dpr-c` `--data-small pruned` *tupperwear*|14|4*failed
-18 nov|rproj incremental greedy `dpr-c_cn` `--post-cn` *recentyarn* (continue partial)|15|4*failed, partial 
-12 nov|rproj incremental greedy `dpr-c_cn` `--post-cn` *recentyarn*|15|3*failed, running
+12 nov|pca base_big `dpr-c` `--data-small pruned` *tupperwear*|14|4 failed
+18 nov|rproj incremental greedy `dpr-c_cn` `--post-cn` *recentyarn* (continue partial)|15|4 failed, partial 
+12 nov|rproj incremental greedy `dpr-c_cn` `--post-cn` *recentyarn*|15|3 failed, running
 28 oct|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry_3* (continue partial)|13|killed
 22 oct|dimension single `dpr-c-pruned_cn` `--post-cn` *dimsingle_unusedoven*|14|finished
 23 oct|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry_2*|13|partial fail
