@@ -37,7 +37,7 @@ class CropRandomProjection():
 
     def fit(self, _data):
         self.indicies = self.random.sample(
-            range(_data["queries"][0].shape[0]),
+            range(_data[0].shape[0]),
             k=self.n_components
         )
 
@@ -48,7 +48,7 @@ def safe_print(msg):
 data_log = [] 
 
 def safe_transform(model, array):
-    return [model.transform([x])[0] for x in array]
+    return [model.transform(np.array([x]))[0] for x in array]
 
 def random_projection_performance(components, model_name, runs=3):
     if model_name == "gauss":

@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("src")
-from misc.load_utils import read_pickle, center_data, norm_data, sub_data
+from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
 from misc.retrieval_utils import rprec_a_ip, rprec_a_l2
 import argparse
 from sklearn.random_projection import SparseRandomProjection, GaussianRandomProjection
@@ -125,13 +125,7 @@ def random_projection_performance(components, model_name, runs=3):
         max(vals_l2), np.average(vals_l2)
     )
 
-
-if args.dims == "custom":
-    DIMS = [32, 64, 96, 128, 160, 192, 224, 256, 320, 384, 448, 512, 640, 768]
-elif args.dims == "linspace":
-    DIMS = np.linspace(32, 768, num=768 // 32, endpoint=True)
-else:
-    raise Exception(f"Unknown --dims {args.dims} scheme")
+DIMS = process_dims(args.dims)
 
 for model in ["crop", "sparse", "gauss"]:
     for dim in DIMS:

@@ -4,8 +4,7 @@ import sys
 
 import numpy as np
 sys.path.append("src")
-from misc.retrieval_utils import DEVICE
-from misc.load_utils import read_pickle, sub_data
+from misc.load_utils import process_dims, read_pickle, sub_data
 from reduce_dim.autoencoder.model import AutoencoderModel
 import torch
 import argparse
@@ -25,14 +24,8 @@ args = parser.parse_args()
 torch.manual_seed(args.seed)
 data = read_pickle(args.data)
 data = sub_data(data, train=False, in_place=True)
-if args.dims.isdigit():
-    args.dims = [int(args.dims)]
-elif args.dims == "custom":
-    DIMS = [32, 64, 96, 128, 160, 192, 224, 256, 320, 384, 448, 512, 640, 768]
-elif args.dims == "linspace":
-    DIMS = np.linspace(32, 768, num=768 // 32, endpoint=True)
-else:
-    raise Exception(f"Unknown --dims {args.dims} scheme")
+
+DIMS = process_dims(args.dims)
 
 logdata = []
 for dim in DIMS:

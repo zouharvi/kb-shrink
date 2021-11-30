@@ -3,11 +3,12 @@
 ||||running
 ||||
 24 nov|pca base_big `dpr-c` `--data-small pruned` *tupperware*|13|running
-26 nov|autoencoder base (test with loss and multiple dims) `dpr-c-pruned_cn` `--post-cn` *pleasingkeep*|14|3 failed, running
+30 nov|autoencoder base `dpr-c-pruned_cn` `--post-cn` *merequinoa*|14|to run
 28 nov|sparse projection base `dpr-c_cn` `--dims 128` *unequalapparel*, `base_big_rproj.out`|15|stopped, running
 ||||
 ||||finished
 ||||
+26 nov|autoencoder base (test with loss and multiple dims) `dpr-c-pruned_cn` `--post-cn` *pleasingkeep*|14|3 failed, ok
 25 nov|autoencoder base `dpr-c_cn` `--post-cn` *yellowneuron*|14|ok
 25 nov|analyze size `dpr-c` live|14|ok
 12 nov|sparse projection base `dpr-c_cn` `--post-cn` max of 3 *kindlysherry_3* (continue partial), `base_big.out`|13|5 failed,ok
