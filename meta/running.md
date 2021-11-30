@@ -4,7 +4,7 @@
 ||||
 24 nov|pca base_big `dpr-c` `--data-small pruned` *tupperware*|13|running
 30 nov|autoencoder base `dpr-c-pruned_cn` `--post-cn` *merequinoa*|14|to run
-28 nov|sparse projection base `dpr-c_cn` `--dims 128` *unequalapparel*, `base_big_rproj.out`|15|stopped, running
+28 nov|sparse projection base `dpr-c_cn` `--dims 128` *unequalapparel*, `base_big_rproj.out`|15|4 failed, running
 ||||
 ||||finished
 ||||
