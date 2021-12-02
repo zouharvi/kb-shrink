@@ -21,7 +21,6 @@ model_labels = {
 }
 colors = list(mcolors.TABLEAU_COLORS.values())
 
-
 parser = argparse.ArgumentParser(description='Plot incremental embedding results')
 parser.add_argument('logfile')
 parser.add_argument(

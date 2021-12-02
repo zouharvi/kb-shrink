@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys; sys.path.append("src")
-from misc.load_utils import read_pickle, center_data, norm_data, sub_data
+from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
 from misc.retrieval_utils import rprec_a_ip, rprec_a_l2
 import numpy as np
 import argparse
@@ -82,14 +82,7 @@ def random_projection_performance(dim):
 
     print(f"Delete {dim} dims: {val_l2:<8.5f}")
 
-if args.dims == "custom":
-    DIMS = [32, 64, 96, 128, 160, 192, 224, 256, 320, 384, 448, 512, 640, 768]
-elif args.dims == "linspace":
-    DIMS = np.linspace(32, 768, num=768 // 32, endpoint=True)
-elif args.dims.isdigit():
-    DIMS = [int(args.dims)]
-else:
-    raise Exception(f"Unknown --dims {args.dims} scheme")
+DIMS = process_dims(args.dims)
 
 for dim in DIMS:
     dim = 768 - int(dim)
