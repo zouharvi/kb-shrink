@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--uncompressed', type=float, default=0.430)
+parser.add_argument('--uncompressed', type=float, default=0.635)
 parser.add_argument('--logfile', default="computed/tmp.log")
 args = parser.parse_args()
 
@@ -35,12 +35,12 @@ ax2.set_ylabel("Reconstruction loss")
 h1, l1 = ax.get_legend_handles_labels()
 h2, l2 = ax2.get_legend_handles_labels()
 
-plt.title("Centered")
+plt.title("Autoencoder (smaller data!)")
 # plt.legend(
 #     h1+h2,
 #     l1+l2,
 #     bbox_to_anchor=(1.5, 0.5, 0.25, 0.25),
 #     ncol=1
 # )
-# plt.tight_layout()
+plt.tight_layout()
 plt.show()

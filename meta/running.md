@@ -4,6 +4,7 @@
 ||||
 24 nov|pca base_big `dpr-c` `--data-small pruned` *tupperware*|13|running
 30 nov|autoencoder base `dpr-c-pruned_cn` `--post-cn` *merequinoa*|14|running
+24 nov|pca scaled `dpr-c_cn-pruned` `--data-small pruned` *measlygratitude*|15|to run
 ||||
 ||||finished
 ||||

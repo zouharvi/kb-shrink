@@ -85,7 +85,7 @@ def summary_performance(name, dataReduced, dataReconstructed):
     )
     name = name.replace("float", "f")
     print(f"{name:<21} {loss_d:>7.5f} {loss_q:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
-    return val_ip, val_l2, loss_q.item(), loss_d.item()
+    return val_ip, val_l2, loss_q, loss_d
 
 def safe_transform(model, array):
     return [model.transform([x])[0] for x in array]
