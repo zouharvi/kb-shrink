@@ -16,6 +16,7 @@ parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--post-cn', action="store_true")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
+parser.add_argument('--skip-loss', action="store_true")
 parser.add_argument('--dims', default="custom")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
@@ -67,18 +68,24 @@ def summary_performance(name, dataReduced, dataReconstructed):
             data["docs_articles"],
             fast=True, report=False
         )
-    loss_q = sklearn.metrics.mean_squared_error(
-        data["queries"],
-        dataReconstructed["queries"]
-    )
-    # loss of only the first 10k documents because it has to get copied
-    loss_d = sklearn.metrics.mean_squared_error(
-        data["docs"][:10000],
-        dataReconstructed["docs"][:10000]
-    )
+ 
     name = name.replace("float", "f")
-    print(f"{name:<21} {loss_d:>7.5f} {loss_q:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
-    return val_ip, val_l2, loss_q.item(), loss_d.item()
+ 
+    if not args.skip_loss:
+        loss_q = sklearn.metrics.mean_squared_error(
+            data["queries"],
+            dataReconstructed["queries"]
+        )
+        # loss of only the first 10k documents because it has to get copied
+        loss_d = sklearn.metrics.mean_squared_error(
+            data["docs"][:10000],
+            dataReconstructed["docs"][:10000]
+        )
+        print(f"{name:<21} {loss_d:>7.5f} {loss_q:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
+        return val_ip, val_l2, loss_q.item(), loss_d.item()
+    else:
+        print(f"{name:<21} {-1:>7.5f} {-1:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
+        return val_ip, val_l2, None, None
 
 def safe_transform(model, array):
     return [model.transform([x])[0] for x in array]
@@ -112,10 +119,13 @@ def pca_performance_d(components):
         "queries": safe_transform(model, data["queries"]),
         "docs": safe_transform(model, data["docs"])
     }
-    dataReconstructed = {
-        "queries": safe_inv_transform(model, dataReduced["queries"]),
-        "docs": safe_inv_transform(model, dataReduced["docs"])
-    }
+    if not args.skip_loss:
+        dataReconstructed = {
+            "queries": safe_inv_transform(model, dataReduced["queries"]),
+            "docs": safe_inv_transform(model, dataReduced["docs"])
+        }
+    else:
+        dataReconstructed = None
     return summary_performance(
         f"PCA-D ({components})",
         dataReduced,
