@@ -4,7 +4,7 @@ import sys
 
 import numpy as np
 sys.path.append("src")
-from misc.load_utils import process_dims, read_pickle, sub_data
+from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
 from reduce_dim.autoencoder.model import AutoencoderModel
 import torch
 import argparse
@@ -14,6 +14,8 @@ parser.add_argument('--data', default="/data/big-hp/dpr-c.embd_cn")
 parser.add_argument('--model', default=1, type=int)
 parser.add_argument('--dims', default="custom")
 parser.add_argument('--post-cn', action="store_true")
+parser.add_argument('--center', action="store_true")
+parser.add_argument('--norm', action="store_true")
 parser.add_argument('--train-crop-n', type=int, default=None)
 parser.add_argument('--regularize', action="store_true")
 parser.add_argument('--epochs', default=1000, type=int)
@@ -24,6 +26,11 @@ args = parser.parse_args()
 torch.manual_seed(args.seed)
 data = read_pickle(args.data)
 data = sub_data(data, train=False, in_place=True)
+
+if args.center:
+    data = center_data(data)
+if args.norm:
+    data = norm_data(data)
 
 DIMS = process_dims(args.dims)
 
