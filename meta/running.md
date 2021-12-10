@@ -4,6 +4,7 @@
 ||||
 09 dec|pca base_big `dpr-c-pruned` `--data-small dpr-c-pruned` `--center` *keyrespite_2*|12|running
 10 dec|autoencoder base `dpr-c-pruned cn` `--post-cn` *merequinoa*|14|running
+10 dec|autoencoder base `dpr-c-pruned cn` `--post-cn` *blueintersect*|14|running
 ||||
 ||||finished
 ||||

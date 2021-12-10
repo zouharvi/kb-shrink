@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys; sys.path.append("src")
-from misc.load_utils import read_pickle, center_data, norm_data, sub_data
+from misc.load_utils import read_pickle, center_data, norm_data, sub_data, zscore_data
 from misc.retrieval_utils import acc_ip, acc_l2, rprec_l2, rprec_ip, rprec_a_l2, rprec_a_ip
 import argparse
 
@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser(description='Performance on uncompressed data')
 parser.add_argument('--data', default="/data/big-hp/dpr-c-pruned.embd")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
+parser.add_argument('--std', action="store_true")
 parser.add_argument('--all', action="store_true")
 parser.add_argument('--metric', default="rprec_a")
 parser.add_argument('--train', action="store_true")
@@ -74,6 +75,8 @@ if args.all:
 else:
     if args.center:
         data = center_data(data)
+    if args.std:
+        data = zscore_data(data, center=False)
     if args.norm:
         data = norm_data(data)
 
