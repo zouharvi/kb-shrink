@@ -41,10 +41,6 @@ class CropRandomProjection():
             k=self.n_components
         )
 
-def safe_print(msg):
-    with open("base_big_rproj.out", "a") as f:
-        f.write(msg+"\n")
-
 data_log = [] 
 
 def safe_transform(model, array):
@@ -64,38 +60,29 @@ def random_projection_performance(components, model_name, runs=3):
     vals_ip = []
     vals_l2 = []
     for i in range(runs):
-        safe_print(" ")
-        safe_print("A")
         data = read_pickle(args.data)
         # take only dev queries
         data = sub_data(data, train=False, in_place=True)
-        safe_print("B")
         # make sure the vectors are np arrays
         data["queries"] = np.array(data["queries"])
-        safe_print("C")
         data["docs"] = np.array(data["docs"])
-        safe_print("D")
 
         model = Model(
             n_components=components,
             random_state=random.randint(0, 2**8 - 1)
         )
         model.fit(data["docs"])
-        safe_print("E")
 
         dataReduced = {
             "queries": safe_transform(model, data["queries"]),
             "docs": safe_transform(model, data["docs"])
         }
-        safe_print("F")
         del data["queries"]
         del data["docs"]
-        safe_print("G")
 
         if args.post_cn:
             dataReduced = center_data(dataReduced)
             dataReduced = norm_data(dataReduced)
-        safe_print("H")
 
         # copy to make it C-continuous
         # (skipped)
@@ -109,7 +96,6 @@ def random_projection_performance(components, model_name, runs=3):
             fast=True,
         )
         vals_l2.append(val_l2)
-        safe_print("I")
 
         # skip IP computation because the vectors are normalized
         if not args.post_cn:
