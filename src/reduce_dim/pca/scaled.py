@@ -132,13 +132,112 @@ def pca_performance_d(components):
         dataReconstructed
     )
 
+
+def pca_performance_q(components):
+    model = PCA(
+        n_components=components,
+        random_state=args.seed
+    ).fit(data_small["queries"])
+    # model.components_ = model.components_[1:]
+    eigenvalues = model.explained_variance_
+    scaling = np.ones(components)
+    # IP optimized
+    # scaling[0] = 0.5
+    # scaling[1] = 0.8
+    # scaling[2] = 0.8
+    # scaling[3] = 0.9
+    # scaling[4] = 0.8
+    # L2 optimized
+    scaling[0] = 0.5
+    scaling[1] = 0.8
+    scaling[2] = 0.7
+    scaling[3] = 0.9
+    scaling[4] = 0.6
+    model.components_ *= scaling[:, np.newaxis]
+    
+    dataReduced = {
+        "queries": safe_transform(model, data["queries"]),
+        "docs": safe_transform(model, data["docs"])
+    }
+    if not args.skip_loss:
+        dataReconstructed = {
+            "queries": safe_inv_transform(model, dataReduced["queries"]),
+            "docs": safe_inv_transform(model, dataReduced["docs"])
+        }
+    else:
+        dataReconstructed = None
+    return summary_performance(
+        f"PCA-D ({components})",
+        dataReduced,
+        dataReconstructed
+    )
+
+
+def pca_performance_dq(components):
+    model = PCA(
+        n_components=components,
+        random_state=args.seed
+    ).fit(np.concatenate((data_small["queries"], data_small["docs"])))
+    # model.components_ = model.components_[1:]
+    eigenvalues = model.explained_variance_
+    scaling = np.ones(components)
+    # IP optimized
+    # scaling[0] = 0.5
+    # scaling[1] = 0.8
+    # scaling[2] = 0.8
+    # scaling[3] = 0.9
+    # scaling[4] = 0.8
+    # L2 optimized
+    scaling[0] = 0.5
+    scaling[1] = 0.8
+    scaling[2] = 0.7
+    scaling[3] = 0.9
+    scaling[4] = 0.6
+    model.components_ *= scaling[:, np.newaxis]
+    
+    dataReduced = {
+        "queries": safe_transform(model, data["queries"]),
+        "docs": safe_transform(model, data["docs"])
+    }
+    if not args.skip_loss:
+        dataReconstructed = {
+            "queries": safe_inv_transform(model, dataReduced["queries"]),
+            "docs": safe_inv_transform(model, dataReduced["docs"])
+        }
+    else:
+        dataReconstructed = None
+    return summary_performance(
+        f"PCA-D ({components})",
+        dataReduced,
+        dataReconstructed
+    )
+
 DIMS = process_dims(args.dims)
 
+logdata = []
 for dim in DIMS:
     dim = int(dim)
-    data_log = []
+    val_ip, val_l2, loss_q, loss_d = pca_performance_q(dim)
+    logdata.append({
+        "dim": dim,
+        "val_ip": val_ip, "val_l2": val_l2,
+        "loss_q": loss_q, "loss_d": loss_d,
+        "type": "q"
+    })
     val_ip, val_l2, loss_q, loss_d = pca_performance_d(dim)
-    data_log.append({"type": "d", "dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
+    logdata.append({
+        "dim": dim,
+        "val_ip": val_ip, "val_l2": val_l2,
+        "loss_q": loss_q, "loss_d": loss_d,
+        "type": "d"
+    })
+    val_ip, val_l2, loss_q, loss_d = pca_performance_dq(dim)
+    logdata.append({
+        "dim": dim,
+        "val_ip": val_ip, "val_l2": val_l2,
+        "loss_q": loss_q, "loss_d": loss_d,
+        "type": "dq"
+    })
     # continuously override the file
     with open(args.logfile, "w") as f:
-        f.write(str(data_log))
+        f.write(str(logdata))

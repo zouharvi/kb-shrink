@@ -2,12 +2,17 @@
 -|-|-|-
 ||||running
 ||||
-09 dec|pca base_big `dpr-c-pruned` `--data-small dpr-c-pruned` `--center` *keyrespite_2*|12|running
-10 dec|autoencoder base `dpr-c-pruned cn` `--post-cn` *merequinoa*|14|running
-10 dec|autoencoder base `dpr-c-pruned cn` `--post-cn` *blueintersect*|14|running
+11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|running
+11 dec|rproj `--dims 128` `dpr-c-pruned_cn` *yearlyquiz* (0, 1: `--post-cn`)|14|running
+11 dec|pca `--dims 128` `dpr-c-pruned_cn` *loathsomewrapper* (0, 1: `--post-cn`)|13|running
 ||||
 ||||finished
 ||||
+11 dec|pca scaled `--dims 128` `dpr-c-pruned_cn` *neatwasting* (0, 1: `--post-cn`)|12|ok
+10 dec|rproj `dpr-c-pruned_cn` `--post-cn` *informedimmunity*|15|running
+10 dec|autoencoder base `dpr-c-pruned cn` `--post-cn` *merequinoa*|14|ok
+09 dec|pca base_big `dpr-c-pruned` `--data-small dpr-c-pruned` `--center` *keyrespite_2*|12|ok
+10 dec|uncompressed `dpr-c-pruned` `--post-cn` *blueintersect*|15|ok
 08 dec|pca base_big `dpr-c-pruned` `--data-small dpr-c-pruned` `--center --norm` *keyrespite_3*|15|ok
 04 dec|pca base_big `dpr-c_cn` `--data-small pruned` `--post-cn` `--dims 128` *highuser*|12|test ok,2 failed
 24 nov|pca base_big `dpr-c` `--data-small pruned` *tupperware*|13|killed
