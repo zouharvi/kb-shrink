@@ -168,14 +168,14 @@ if __name__ == "__main__":
     # compute query embedding
     for i, _ in enumerate(data["queries"]):
         output = model.query_embd(data["queries"][i], args.type_out)
-        if i % 500 == 0:
+        if i % 5000 == 0:
             print(i, data["queries"][i], output.shape)
         data["queries"][i] = output
 
     # compute doc embedding
     for i, _ in enumerate(data["docs"]):
         output = model.doc_embd(data["docs"][i], args.type_out)
-        if i % 500 == 0:
+        if i % 5000 == 0:
             print(i, data["docs"][i], output.shape)
         data["docs"][i] = output
 
