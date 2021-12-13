@@ -1,63 +1,64 @@
+# pruned
 DATA = {
     "DPR\n(Avg)": """
-acc_ip: 0.179
-acc_l2: 0.165
-acc_ip (norm): 0.180
-acc_l2 (norm): 0.179
-acc_ip (center): 0.196
-acc_l2 (center): 0.177
-acc_ip (center, norm): 0.198
-acc_l2 (center, norm): 0.197
+rprec_a_ip: 0.4081
+rprec_a_l2: 0.3346
+rprec_a_ip (norm): 0.4113
+rprec_a_l2 (norm): 0.4161
+rprec_a_ip (center): 0.5613
+rprec_a_l2 (center): 0.4365
+rprec_a_ip (center, norm): 0.5433
+rprec_a_l2 (center, norm): 0.5375
     """,
     "Sentence\nBERT\n(Avg)": """
-acc_ip: 0.118
-acc_l2: 0.176
-acc_ip (norm): 0.123
-acc_l2 (norm): 0.132
-acc_ip (center): 0.123
-acc_l2 (center): 0.180
-acc_ip (center, norm): 0.185
-acc_l2 (center, norm): 0.186
+rprec_a_ip: 0.3075
+rprec_a_l2: 0.3665
+rprec_a_ip (norm): 0.3879
+rprec_a_l2 (norm): 0.3880
+rprec_a_ip (center): 0.3845
+rprec_a_l2 (center): 0.3653
+rprec_a_ip (center, norm): 0.4146
+rprec_a_l2 (center, norm): 0.4110
     """,
     "BERT\n(Avg)": """
-acc_ip: 0.044
-acc_l2: 0.053
-acc_ip (norm): 0.049
-acc_l2 (norm): 0.049
-acc_ip (center): 0.057
-acc_l2 (center): 0.063
-acc_ip (center, norm): 0.073
-acc_l2 (center, norm): 0.070
+rprec_a_ip: 0.1565
+rprec_a_l2: 0.2521
+rprec_a_ip (norm): 0.2524
+rprec_a_l2 (norm): 0.2512
+rprec_a_ip (center): 0.3962
+rprec_a_l2 (center): 0.3227
+rprec_a_ip (center, norm): 0.4472
+rprec_a_l2 (center, norm): 0.4297
     """,
     "DPR\n[CLS]": """
-acc_ip: 0.403
-acc_l2: 0.175
-acc_ip (norm): 0.271
-acc_l2 (norm): 0.269
-acc_ip (center): 0.414
-acc_l2 (center): 0.201
-acc_ip (center, norm): 0.430
-acc_l2 (center, norm): 0.431
+rprec_a_ip: 0.6090
+rprec_a_l2: 0.2397
+rprec_a_ip (norm): 0.4629
+rprec_a_l2 (norm): 0.4629
+rprec_a_ip (center): 0.6317
+rprec_a_l2 (center): 0.5342
+rprec_a_ip (center, norm): 0.6168
+rprec_a_l2 (center, norm): 0.6146
     """,
     "Sentence\nBERT\n[CLS]": """
-acc_ip: 0.141
-acc_l2: 0.140
-acc_ip (norm): 0.142
-acc_l2 (norm): 0.144
-acc_ip (center): 0.139
-acc_l2 (center): 0.141
-acc_ip (center, norm): 0.150
-acc_l2 (center, norm): 0.150
+rprec_a_ip: 0.3245
+rprec_a_l2: 0.3046
+rprec_a_ip (norm): 0.3154
+rprec_a_l2 (norm): 0.3140
+rprec_a_ip (center): 0.3121
+rprec_a_l2 (center): 0.3031
+rprec_a_ip (center, norm): 0.3369
+rprec_a_l2 (center, norm): 0.3337
     """,
     "BERT\n[CLS]": """
-acc_ip: 0.000
-acc_l2: 0.003
-acc_ip (norm): 0.003
-acc_l2 (norm): 0.004
-acc_ip (center): 0.006
-acc_l2 (center): 0.007
-acc_ip (center, norm): 0.010
-acc_l2 (center, norm): 0.011
+rprec_a_ip: 0.0066
+rprec_a_l2: 0.0278
+rprec_a_ip (norm): 0.0276
+rprec_a_l2 (norm): 0.0271
+rprec_a_ip (center): 0.0882
+rprec_a_l2 (center): 0.0799
+rprec_a_ip (center, norm): 0.1324
+rprec_a_l2 (center, norm): 0.1309
     """
 }
 
@@ -78,4 +79,3 @@ for name, value in DATA.items():
         "l2": value[5],
     }
     DATA_NC[name] = value[6]
-

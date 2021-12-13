@@ -2,11 +2,15 @@
 -|-|-|-
 ||||running
 ||||
-11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, restart
-11 dec|embd pruned `bert-c bert-t sbert-c sbert-t`|14|running
+11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
 ||||
 ||||finished
 ||||
+13 dec|uncompressed `--all` `bert-c bert-t`|14|ok
+13 dec|uncompressed `--without-faiss` bert-t`|14|ok
+13 dec|uncompressed `--all` `sbert-c sbert-t`|13|ok
+13 dec|uncompressed `--all` `dpr-c dpr-t`|12|ok
+11 dec|embd pruned `bert-c bert-t sbert-c sbert-t`|14|ok
 11 dec|rproj `--dims 128` `dpr-c-pruned_cn` *yearlyquiz* (0, 1: `--post-cn`)|14|ok
 11 dec|pca scaled `--dims 128` `dpr-c-pruned_cn` *neatwasting* (0, 1: `--post-cn`)|12|ok, ok
 11 dec|pca `--dims 128` `dpr-c-pruned_cn` *loathsomewrapper* (0, 1: `--post-cn`)|13|ok

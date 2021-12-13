@@ -3,9 +3,11 @@
 import matplotlib.pyplot as plt
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--uncompressed-ip', type=float, default=0.3229)
-parser.add_argument('--uncompressed-l2', type=float, default=None)
+parser.add_argument('-uip', '--uncompressed-ip', type=float, default=0.3229)
+parser.add_argument('-ul2', '--uncompressed-l2', type=float, default=None)
+parser.add_argument('--legend', action="store_true")
 parser.add_argument('--logfile', default="computed/tmp.log")
+parser.add_argument('--key', default=0, type=int)
 args = parser.parse_args()
 
 with open(args.logfile, "r") as f:
@@ -43,19 +45,26 @@ ax2 = ax.twinx()
 legend_loss_doc = ax2.plot(DIMS, [(x["loss_d"]+x["loss_q"])/2 for x in DATA if x["type"] == "d"], label="Loss Docs", color="tab:blue", alpha=0.2)
 legend_loss_query = ax2.plot(DIMS, [(x["loss_d"]+x["loss_q"])/2 for x in DATA if x["type"] == "q"], label="Loss Queries", color="tab:red", alpha=0.2)
 legend_loss_both = ax2.plot(DIMS, [(x["loss_d"]+x["loss_q"])/2 for x in DATA if x["type"] == "dq"], label="Loss Both", color="tab:purple", alpha=0.2)
-ax2.set_ylim(-0.001, 0.065)
+if args.key in {0, 2}:
+    ax2.set_ylim(-0.001, 0.065)
+elif args.key == 1:
+    ax2.set_ylim(-0.0001, 0.001)
+elif args.key == 3:
+    ax2.set_ylim(-0.0001, 0.001)
+
 ax2.set_ylabel("Reconstruction loss")
 
 
 h1, l1 = ax.get_legend_handles_labels()
 h2, l2 = ax2.get_legend_handles_labels()
 
-plt.title("Centered")
-# plt.legend(
-#     h1+h2,
-#     l1+l2,
-#     bbox_to_anchor=(1.5, 0.5, 0.25, 0.25),
-#     ncol=1
-# )
-# plt.tight_layout()
+plt.title(["No pre-processing", "Normalized", "Centered", "Centered, Normalized"][args.key])
+if args.legend:
+    plt.legend(
+        h1+h2,
+        l1+l2,
+        bbox_to_anchor=(1.5, 0.5, 0.25, 0.25),
+        ncol=1
+    )
+plt.tight_layout()
 plt.show()
