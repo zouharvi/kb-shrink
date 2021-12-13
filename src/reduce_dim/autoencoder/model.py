@@ -37,6 +37,16 @@ def report(prefix, encoded, data, post_cn):
     return val_ip, val_l2
 
 
+def get_train_data(data, train_key, train_crop_n):
+    if train_key == "q":
+        return data["queries"][:train_crop_n]
+    elif train_key == "d":
+        return data["docs"][:train_crop_n]
+    elif train_key == "dq":
+        return np.concatenate((data["docs"],data["queries"]))[:train_crop_n]
+    else:
+        raise Exception("Unknown train key")
+
 class AutoencoderModel(nn.Module):
     # prev learningRate 0.001
     def __init__(self, model, bottleneck_width, batchSize=128, learningRate=0.001):
@@ -157,9 +167,10 @@ class AutoencoderModel(nn.Module):
     def decode(self, x):
         return self.decoder(x)
 
-    def train_routine(self, data, epochs, post_cn, regularize, skip_eval=False, train_crop_n=None):
+
+    def train_routine(self, data, epochs, post_cn, regularize, train_key="docs", skip_eval=False, train_crop_n=None):
         self.dataLoader = torch.utils.data.DataLoader(
-            dataset=data["docs"][:train_crop_n], batch_size=self.batchSize, shuffle=True
+            dataset=get_train_data(data, train_key, train_crop_n), batch_size=self.batchSize, shuffle=True
         )
 
         for epoch in range(epochs):

@@ -35,19 +35,22 @@ if args.norm:
 DIMS = process_dims(args.dims)
 
 logdata = []
-for dim in DIMS:
-    dim = int(dim)
-    model = AutoencoderModel(model=args.model, bottleneck_width=dim)
-    model.train_routine(
-        data, args.epochs,
-        post_cn=args.post_cn, regularize=args.regularize,
-        train_crop_n=args.train_crop_n,
-        skip_eval=True,
-    )
+# fail first
+for train_key in ["dq", "d", "q"]:
+    for dim in DIMS:
+        dim = int(dim)
+        model = AutoencoderModel(model=args.model, bottleneck_width=dim)
+        model.train_routine(
+            data, args.epochs,
+            post_cn=args.post_cn, regularize=args.regularize,
+            train_crop_n=args.train_crop_n,
+            train_key=train_key,
+            skip_eval=True,
+        )
 
-    val_ip, val_l2, queries_loss, docs_loss = model.eval_routine(data, post_cn=args.post_cn)
-    logdata.append({"dim": dim, "val_ip": val_ip, "val_l2": val_l2, "queries_loss": queries_loss, "docs_loss": docs_loss})
+        val_ip, val_l2, queries_loss, docs_loss = model.eval_routine(data, post_cn=args.post_cn)
+        logdata.append({"dim": dim, "val_ip": val_ip, "val_l2": val_l2, "queries_loss": queries_loss, "docs_loss": docs_loss, "type": train_key})
 
-    # continuously override the file
-    with open(args.logfile, "w") as f:
-        f.write(str(logdata))
+        # continuously override the file
+        with open(args.logfile, "w") as f:
+            f.write(str(logdata))
