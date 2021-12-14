@@ -3,9 +3,20 @@
 ||||running
 ||||
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
+14 dec|autoencoder base `dpr-c-pruned cn` `--model 1` `--dims 128` *merequinoa_model_1*|13|bad code, running
+14 dec|autoencoder base `dpr-c-pruned_cn` `--model 2` `--dims 128` *merequinoa_model_2*|13|bad code, running
+14 dec|autoencoder base `dpr-c-pruned_cn` `--model 3` `--dims 128` *merequinoa_model_3*|13|bad code, running
+14 dec|autoencoder base `dpr-c-pruned_cn` `--model 1` `--dims 128` `--post-cn` *merequinoa_model_1_cn*|14|bad code, running
+14 dec|autoencoder base `dpr-c-pruned_cn` `--model 2` `--dims 128` `--post-cn` *merequinoa_model_2_cn*|14|bad code, running
+14 dec|autoencoder base `dpr-c-pruned_cn` `--model 3` `--dims 128` `--post-cn` *merequinoa_model_3_cn*|14|bad code, running
+14 dec|autoencoder base `dpr-c-pruned` `--model 1` *merequinoa_0*|15|bad code, running
+14 dec|autoencoder base `dpr-c-pruned` `--model 1` `--norm` *merequinoa_1*|15|bad code, running
+14 dec|autoencoder base `dpr-c-pruned` `--model 1` `--center` *merequinoa_2*|14|bad code, running
+14 dec|autoencoder base `dpr-c-pruned` `--model 1` `--center --norm` *merequinoa_3*|14|bad code, running
 ||||
 ||||finished
 ||||
+14 dec|autoencoder base `dpr-c-pruned cn` `--post-cn` `--model 1` `--epochs 2` *merequinoa_model_1_e2*|13|ok
 13 dec|uncompressed `--all` `bert-c bert-t`|14|ok
 13 dec|uncompressed `--without-faiss` bert-t`|14|ok
 13 dec|uncompressed `--all` `sbert-c sbert-t`|13|ok
@@ -15,7 +26,6 @@
 11 dec|pca scaled `--dims 128` `dpr-c-pruned_cn` *neatwasting* (0, 1: `--post-cn`)|12|ok, ok
 11 dec|pca `--dims 128` `dpr-c-pruned_cn` *loathsomewrapper* (0, 1: `--post-cn`)|13|ok
 10 dec|rproj `dpr-c-pruned_cn` `--post-cn` *informedimmunity*|15|running
-10 dec|autoencoder base `dpr-c-pruned cn` `--post-cn` *merequinoa*|14|ok
 09 dec|pca base_big `dpr-c-pruned` `--data-small dpr-c-pruned` `--center` *keyrespite_2*|12|ok
 10 dec|uncompressed `dpr-c-pruned` `--post-cn` *blueintersect*|15|ok
 08 dec|pca base_big `dpr-c-pruned` `--data-small dpr-c-pruned` `--center --norm` *keyrespite_3*|15|ok

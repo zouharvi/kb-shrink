@@ -18,7 +18,7 @@ parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
 parser.add_argument('--train-crop-n', type=int, default=None)
 parser.add_argument('--regularize', action="store_true")
-parser.add_argument('--epochs', default=1000, type=int)
+parser.add_argument('--epochs', default=1, type=int)
 parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
@@ -36,8 +36,8 @@ DIMS = process_dims(args.dims)
 
 logdata = []
 # fail first
-for train_key in ["dq", "d", "q"]:
-    for dim in DIMS:
+for dim in DIMS:
+    for train_key in ["dq", "d", "q"]:
         dim = int(dim)
         model = AutoencoderModel(model=args.model, bottleneck_width=dim)
         model.train_routine(
