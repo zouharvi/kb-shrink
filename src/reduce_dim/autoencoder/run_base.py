@@ -25,12 +25,16 @@ args = parser.parse_args()
 
 torch.manual_seed(args.seed)
 data = read_pickle(args.data)
-data = sub_data(data, train=False, in_place=True)
 
 if args.center:
     data = center_data(data)
 if args.norm:
     data = norm_data(data)
+print("Because args.data_small is not provided, I'm copying the whole structure")
+data_train = dict(data)
+
+data = sub_data(data, train=False, in_place=True)
+data_train = sub_data(data_train, train=True, in_place=True)
 
 DIMS = process_dims(args.dims)
 
@@ -41,7 +45,8 @@ for dim in DIMS:
         dim = int(dim)
         model = AutoencoderModel(model=args.model, bottleneck_width=dim)
         model.train_routine(
-            data, args.epochs,
+            data, data_train,
+            args.epochs,
             post_cn=args.post_cn, regularize=args.regularize,
             train_crop_n=args.train_crop_n,
             train_key=train_key,

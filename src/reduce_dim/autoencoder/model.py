@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
+import numpy as np
+from sklearn.metrics import mean_squared_error as mse
+from tqdm import tqdm
+import torch.nn as nn
+import torch
+from misc.load_utils import center_data, norm_data
+from misc.retrieval_utils import DEVICE, rprec_a_ip, rprec_a_l2
 import sys
 sys.path.append("src")
-from misc.retrieval_utils import DEVICE, rprec_a_ip, rprec_a_l2
-from misc.load_utils import center_data, norm_data
-import torch
-import torch.nn as nn
-from tqdm import tqdm
-from sklearn.metrics import mean_squared_error as mse
-import numpy as np
+
 
 def report(prefix, encoded, data, post_cn):
     if post_cn:
@@ -43,9 +44,10 @@ def get_train_data(data, train_key, train_crop_n):
     elif train_key == "d":
         return data["docs"][:train_crop_n]
     elif train_key == "dq":
-        return np.concatenate((data["docs"],data["queries"]))[:train_crop_n]
+        return np.concatenate((data["docs"], data["queries"]))[:train_crop_n]
     else:
         raise Exception("Unknown train key")
+
 
 class AutoencoderModel(nn.Module):
     # prev learningRate 0.001
@@ -167,10 +169,9 @@ class AutoencoderModel(nn.Module):
     def decode(self, x):
         return self.decoder(x)
 
-
-    def train_routine(self, data, epochs, post_cn, regularize, train_key="docs", skip_eval=False, train_crop_n=None):
+    def train_routine(self, data, data_train, epochs, post_cn, regularize, train_key="docs", skip_eval=False, train_crop_n=None):
         self.dataLoader = torch.utils.data.DataLoader(
-            dataset=get_train_data(data, train_key, train_crop_n), batch_size=self.batchSize, shuffle=True
+            dataset=get_train_data(data_train, train_key, train_crop_n), batch_size=self.batchSize, shuffle=True
         )
 
         for epoch in range(epochs):
@@ -194,14 +195,13 @@ class AutoencoderModel(nn.Module):
                     loss += regularization_loss
                 loss.backward()
                 self.optimizer.step()
-    
+
             if not skip_eval:
                 # in some cases do not eval after every epoch
                 self.eval_routine(
                     data,
                     prefix=f"epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f},",
                     post_cn=post_cn)
-
 
     def eval_routine(self, data, post_cn, prefix=""):
         self.train(False)
