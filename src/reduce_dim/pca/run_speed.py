@@ -59,6 +59,7 @@ def pca_performance_dq(components):
         "docs": safe_transform(model, data["docs"])
     }
     encode_time = encode_time - time.time()
+    return train_time, encode_time
 
 DIMS = process_dims(args.dims)
 
