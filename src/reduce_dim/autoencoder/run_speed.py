@@ -2,7 +2,6 @@
 
 import sys
 
-import numpy as np
 sys.path.append("src")
 from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
 from reduce_dim.autoencoder.model import AutoencoderModel

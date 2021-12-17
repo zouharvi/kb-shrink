@@ -3,7 +3,10 @@
 ||||running
 ||||
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
+17 dec|autoencoder speed `dpr-c-pruned_cn` `--model 3` *puffyemery_gpu*|14|running
 17 dec|autoencoder speed `dpr-c-pruned_cn` `--model 3` *puffyemery*|14|running
+17 dec|pca base `dpr-c-pruned`|??|TODO
+
 ||||
 ||||finished
 ||||
