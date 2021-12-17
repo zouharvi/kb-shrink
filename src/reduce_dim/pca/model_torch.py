@@ -8,14 +8,11 @@ class TorchPCA:
 		self.n_components = n_components
 
 	def fit(self, X):
-		X = torch.tensor(X).to(DEVICE)
+		X = torch.tensor(X)
 		U,S,V = torch.svd(X)
-		eigvecs=U.t()[:,:self.n_components] # the first k vectors will be kept
-		y=torch.mm(U,eigvecs)
+		self.matrix = U.t()[:,:self.n_components].to(DEVICE)
 
-		# save variables to the class object, the eigenpair and the centered data
-		self.eigenpair = (eigvecs, S)
-		self.matrix = y
+		return self
 
 	def transform(self, sample):
 		return torch.mm(torch.tensor(sample).to(DEVICE), self.matrix)

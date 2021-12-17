@@ -3,9 +3,11 @@
 ||||running
 ||||
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
-17 dec|autoencoder speed `dpr-c-pruned_cn` `--model 3` *puffyemery_gpu*|14|ok (but maybe redo because of collision)
-17 dec|autoencoder speed `dpr-c-pruned_cn` `--model 3` *puffyemery*|14|running (but redo because of collision)
-17 dec|pca speed `dpr-c-pruned_cn` `--model scikit` *puffyemery*|13|running
+17 dec|autoencoder speed `dpr-c-pruned_cn` `--model 3` *puffyemery_gpu*|14|ok
+17 dec|autoencoder speed `dpr-c-pruned_cn` `--model 3` *puffyemery*|14|ok
+17 dec|pca speed `dpr-c-pruned_cn` `--model scikit` *puffyemery*|13|ok, to redo
+17 dec|pca speed `dpr-c-pruned_cn` `--model torch gpu` *puffyemery*|13|ok
+17 dec|pca speed `dpr-c-pruned_cn` `--model torch` *puffyemery*|13|running
 17 dec|pca base_big `dpr-c-pruned` *keyrespite_0*|12|bad code, running
 17 dec|pca base_big `dpr-c-pruned` `--norm` *keyrespite_1*|12|bad code, running
 17 dec|pca base_big `dpr-c-pruned` `--center` *keyrespite_2*|13|bad code, running
