@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.append("src")
-from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
-import numpy as np
-import argparse
-from sklearn.decomposition import PCA
-from reduce_dim.pca.model_torch import TorchPCA
 import time
+import torch
+from model_torch import TorchPCA
+from sklearn.decomposition import PCA
+import argparse
+import numpy as np
+import sys; sys.path.append("src")
+from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
 parser.add_argument('--data')
@@ -31,35 +31,41 @@ data_train = dict(data)
 data = sub_data(data, train=False, in_place=True)
 data_train = sub_data(data_train, train=True, in_place=True)
 
-if args.pca_model == "scikit":
-    ModelClass = PCA
-elif args.pca_model == "torch":
-    ModelClass = TorchPCA
-else:
-    raise Exception("Unknown PCA model selected")
-
 def safe_transform(model, array):
-    return [model.transform([x])[0] for x in array]
+    dataLoader = torch.utils.data.DataLoader(
+        dataset=array, batch_size=1024*128, shuffle=False
+    )
 
-def safe_inv_transform(model, array):
-    return [model.inverse_transform([x])[0] for x in array]
+    out = []
+    for sample in dataLoader:
+        out.append(model.transform(sample))
+    return out
 
 def pca_performance_dq(components):
     train_time = time.time()
-    model = ModelClass(
-        n_components=components,
-        random_state=args.seed,
-        copy=False,
-    ).fit(np.concatenate((data_train["queries"], data_train["docs"])))
-    train_time = train_time - time.time()
+    if args.pca_model == "scikit":
+        model = PCA(
+            n_components=components,
+            random_state=args.seed,
+            copy=False,
+        ).fit(np.concatenate((data_train["queries"], data_train["docs"])))
+    elif args.pca_model == "torch":
+        model = TorchPCA(
+            n_components=components,
+        ).fit(np.concatenate((data_train["queries"], data_train["docs"])))
+    else:
+        raise Exception("Unknown PCA model selected")
+    
+    train_time = time.time()-train_time
 
     encode_time = time.time()
     dataReduced = {
         "queries": safe_transform(model, data["queries"]),
         "docs": safe_transform(model, data["docs"])
     }
-    encode_time = encode_time - time.time()
+    encode_time = time.time()-encode_time
     return train_time, encode_time
+
 
 DIMS = process_dims(args.dims)
 
@@ -67,7 +73,10 @@ logdata = []
 for dim in DIMS:
     dim = int(dim)
     train_time, encode_time = pca_performance_dq(dim)
-    logdata.append({"dim": dim, "train_time": train_time, "encode_time": encode_time, "type": "dq"})
+    logdata.append({
+        "dim": dim, "train_time": train_time,
+        "encode_time": encode_time, "type": "dq"}
+    )
 
     # continuously override the file
     with open(args.logfile, "w") as f:

@@ -165,10 +165,14 @@ class AutoencoderModel(nn.Module):
         return out, loss/len(out)
 
     def encode_safe_without_loss(self, data):
+        dataLoader = torch.utils.data.DataLoader(
+            dataset=data, batch_size=1024*128, shuffle=False
+        )
+
         out = []
-        for sample in data:
-            sample_enc = self.encoder(torch.tensor(sample).to(DEVICE))
-        return out
+        for sample in dataLoader:
+            out.append(self.encoder(torch.tensor(sample).to(DEVICE)).cpu())
+        
 
     def decode(self, x):
         return self.decoder(x)

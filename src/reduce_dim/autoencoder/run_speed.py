@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-import sys
-
-sys.path.append("src")
+import sys; sys.path.append("src")
+from misc.retrieval_utils import DEVICE
 from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
-from reduce_dim.autoencoder.model import AutoencoderModel
-import torch
-import argparse
+from model import AutoencoderModel
 import time
+import argparse
+import torch
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data', default="/data/big-hp/dpr-c.embd_cn")
@@ -55,7 +54,7 @@ for dim in DIMS:
             train_key=train_key,
             skip_eval=True,
         )
-        train_time = train_time - time.time()
+        train_time = time.time()-train_time
 
         # encoding
         encode_time = time.time()
@@ -63,10 +62,12 @@ for dim in DIMS:
         with torch.no_grad():
             model.encode_safe_without_loss(data["queries"])
             model.encode_safe_without_loss(data["docs"])
-        encode_time = encode_time - time.time()
+        encode_time = time.time()-encode_time
 
-        val_ip, val_l2, queries_loss, docs_loss = model.eval_routine(data, post_cn=args.post_cn)
-        logdata.append({"dim": dim, "train_time": train_time, "encode_time": encode_time, "type": train_key})
+        logdata.append({
+            "dim": dim, "train_time": train_time,
+            "encode_time": encode_time, "type": train_key
+        })
 
         # continuously override the file
         with open(args.logfile, "w") as f:
