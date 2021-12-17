@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('-uip', '--uncompressed-ip', type=float, default=0.3229)
+parser.add_argument('-uip', '--uncompressed-ip', type=float, default=0.609)
 parser.add_argument('-ul2', '--uncompressed-l2', type=float, default=None)
 parser.add_argument('--legend', action="store_true")
 parser.add_argument('--logfile', default="computed/tmp.log")
@@ -17,8 +17,17 @@ DISPLAY_DIMS = [32, 256, 512, 768]
 
 plt.figure(figsize=(4.6, 3.5))
 ax = plt.gca() 
-legend_ip_doc = ax.plot(DIMS, [x["val_ip"] for x in DATA], label="IP, Docs", color="tab:blue", linestyle="-")
-legend_l2_doc = ax.plot(DIMS, [x["val_l2"] for x in DATA], label="L2, Docs", color="tab:red", linestyle="-")
+legend_ip_doc = ax.plot(DIMS, [x["val_ip"] for x in DATA if x["type"] == "d"], label="IP, Docs", color="tab:blue", linestyle="-")
+legend_l2_doc = ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "d"], label="L2, Docs", color="tab:red", linestyle="-")
+
+print(DIMS)
+print([x["dim"] for x in DATA if x["type"] == "q"])
+print(DATA[0].keys())
+legend_ip_query = ax.plot(DIMS, [x["val_ip"] for x in DATA if x["type"] == "q"], label="IP, Queries", color="tab:blue", linestyle=":")
+legend_l2_query = ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "q"], label="L2, Queries", color="tab:red", linestyle=":")
+
+legend_ip_both = ax.plot(DIMS, [x["val_ip"] for x in DATA if x["type"] == "dq"], label="IP, Both", color="tab:blue", linestyle="-.")
+legend_l2_both = ax.plot(DIMS, [x["val_l2"] for x in DATA if x["type"] == "dq"], label="L2, Both", color="tab:red", linestyle="-.")
 plt.gcf().subplots_adjust(left=0.14, right=0.86, top=0.93, bottom=0.13)
 
 # uncompressed
@@ -33,18 +42,18 @@ ax.set_xticks(DISPLAY_DIMS)
 ax.set_xticklabels(DISPLAY_DIMS)
 ax.set_ylabel("R-Precision")
 ax.set_xlabel("Dimension")
-ax.set_ylim(0.015, 0.66)
+ax.set_ylim(0.005, 0.66)
 
 ax2 = ax.twinx()
-# legend_loss_doc = ax2.plot(DIMS, [(x["loss_d"]+x["loss_q"])/2 for x in DATA], label="Loss Docs", color="tab:blue", alpha=0.2)
-# legend_loss_query = ax2.plot(DIMS, [(x["loss_d"]+x["loss_q"])/2 for x in DATA], label="Loss Queries", color="tab:red", alpha=0.2)
-# legend_loss_both = ax2.plot(DIMS, [(x["loss_d"]+x["loss_q"])/2 for x in DATA], label="Loss Both", color="tab:purple", alpha=0.2)
+legend_loss_doc = ax2.plot(DIMS, [(x["docs_loss"]+x["queries_loss"])/2 for x in DATA if x["type"] == "d"], label="Loss Docs", color="tab:blue", alpha=0.2)
+legend_loss_query = ax2.plot(DIMS, [(x["docs_loss"]+x["queries_loss"])/2 for x in DATA if x["type"] == "q"], label="Loss Queries", color="tab:red", alpha=0.2)
+legend_loss_both = ax2.plot(DIMS, [(x["docs_loss"]+x["queries_loss"])/2 for x in DATA if x["type"] == "dq"], label="Loss Both", color="tab:purple", alpha=0.2)
 if args.key in {0, 2}:
-    ax2.set_ylim(-0.001, 0.065)
+    ax2.set_ylim(-0.003, 0.15)
 elif args.key == 1:
-    ax2.set_ylim(-0.0001, 0.001)
+    ax2.set_ylim(-0.0002, 0.003)
 elif args.key == 3:
-    ax2.set_ylim(-0.0001, 0.001)
+    ax2.set_ylim(-0.0002, 0.003)
 
 ax2.set_ylabel("Reconstruction loss")
 

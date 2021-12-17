@@ -3,13 +3,13 @@
 ||||running
 ||||
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
-16 dec|autoencoder base `dpr-c-pruned` `--model 1` *merequinoa_0*|14|2 bad code, running
-16 dec|autoencoder base `dpr-c-pruned` `--model 1` `--norm` *merequinoa_1*|14|2 bad code, running
-16 dec|autoencoder base `dpr-c-pruned` `--model 1` `--center` *merequinoa_2*|13|2 bad code, running
-16 dec|autoencoder base `dpr-c-pruned` `--model 1` `--center --norm` *merequinoa_3*|13|2 bad code, running
 ||||
 ||||finished
 ||||
+16 dec|autoencoder base `dpr-c-pruned` `--model 1` *merequinoa_0*|14|2 bad code, ok
+16 dec|autoencoder base `dpr-c-pruned` `--model 1` `--norm` *merequinoa_1*|14|2 bad code, ok
+16 dec|autoencoder base `dpr-c-pruned` `--model 1` `--center` *merequinoa_2*|13|2 bad code, ok
+16 dec|autoencoder base `dpr-c-pruned` `--model 1` `--center --norm` *merequinoa_3*|13|2 bad code, ok
 16 dec|autoencoder base `dpr-c-pruned cn` `--model 1` `--dims 128` *merequinoa_model_1*|13|2 bad code, ok
 16 dec|autoencoder base `dpr-c-pruned_cn` `--model 2` `--dims 128` *merequinoa_model_2*|13|2 bad code, ok
 16 dec|autoencoder base `dpr-c-pruned_cn` `--model 3` `--dims 128` *merequinoa_model_3*|13|2 bad code, ok

@@ -48,17 +48,6 @@ ax1.set_ylabel("R-Prec")
 ax1.set_xlabel("Training data")
 ax2.set_ylabel("Training time (s)")
 
-# handle2p, = ax1.plot(
-#     SIZES_ASHALLOW, [x["val_ip"] for x in DATA_ASHALLOW],
-#     label="Autoencoder (shallow) R-Prec", color="tab:green", linestyle="-"
-# )
-# handle2t, = ax2.plot(
-#     SIZES_ASHALLOW, [x["train_time"] for x in DATA_ASHALLOW],
-#     label="Autoencoder (single) time", color="tab:green", linestyle=":"
-# )
-
-# uncompressed
-# ax.axhline(y=0.454, alpha=0.5, linestyle="--", color="black")
 
 # plt.legend(bbox_to_anchor=(-0.1, 1, 1.2, 0), loc="center", ncol=2)
 handleAll = [handle1p, handle1t, handle2p, handle2t]
@@ -69,8 +58,6 @@ plt.legend(
 
 ax1.set_xticks(DISPLAY_DIMS)
 ax1.set_xticklabels([f"{x//1000}k" for x in DISPLAY_DIMS])
-# ax.set_ylabel("R-Precision")
-# ax.set_xlabel("Dimension")
 
 plt.tight_layout(rect=(-0.02, -0.04, 1.02, 1.03))
 plt.show()

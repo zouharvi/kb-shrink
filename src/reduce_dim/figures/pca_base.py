@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('-uip', '--uncompressed-ip', type=float, default=0.3229)
+parser.add_argument('-uip', '--uncompressed-ip', type=float, default=0.609)
 parser.add_argument('-ul2', '--uncompressed-l2', type=float, default=None)
 parser.add_argument('--legend', action="store_true")
 parser.add_argument('--logfile', default="computed/tmp.log")
