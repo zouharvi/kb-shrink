@@ -7,8 +7,6 @@ import torch.nn as nn
 import torch
 from misc.load_utils import center_data, norm_data
 from misc.retrieval_utils import DEVICE, rprec_a_ip, rprec_a_l2
-import sys
-sys.path.append("src")
 
 
 def report(prefix, encoded, data, post_cn):

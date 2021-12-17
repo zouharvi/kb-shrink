@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import sys
-
 sys.path.append("src")
 from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
 import numpy as np
@@ -12,7 +11,6 @@ import time
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
 parser.add_argument('--data')
-parser.add_argument('--data-small', default=None)
 parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--pca-model', default="scikit")
 parser.add_argument('--center', action="store_true")
