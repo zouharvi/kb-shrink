@@ -166,6 +166,12 @@ class AutoencoderModel(nn.Module):
             out.append(sample_enc.cpu().numpy())
         return out, loss/len(out)
 
+    def encode_safe_without_loss(self, data):
+        out = []
+        for sample in data:
+            sample_enc = self.encoder(torch.tensor(sample).to(DEVICE))
+        return out
+
     def decode(self, x):
         return self.decoder(x)
 

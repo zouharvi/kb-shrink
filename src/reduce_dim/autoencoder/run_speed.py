@@ -60,8 +60,10 @@ for dim in DIMS:
 
         # encoding
         encode_time = time.time()
-        model.encode_safe(data["queries"])
-        model.encode_safe(data["docs"])
+        model.train(False)
+        with torch.no_grad():
+            model.encode_safe_without_loss(data["queries"])
+            model.encode_safe_without_loss(data["docs"])
         encode_time = encode_time - time.time()
 
         val_ip, val_l2, queries_loss, docs_loss = model.eval_routine(data, post_cn=args.post_cn)
