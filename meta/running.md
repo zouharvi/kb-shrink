@@ -3,6 +3,7 @@
 ||||running
 ||||
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
+17 dec|autoencoder speed `dpr-c-pruned_cn` `--model 1` *puffyemery*|14|to run
 ||||
 ||||finished
 ||||
