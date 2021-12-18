@@ -14,14 +14,16 @@ with open(args.logfile_pca, "r") as f:
 # with open(args.logfile_auto, "r") as f:
 #     data_auto = eval(f.read())
 
-DIMS = [np.log10(x["num_samples"]) for x in data_pca]
-DISPLAY_DIMS = ['$10^{' + f'{np.log10(x["num_samples"]):.1f}' + '}$' for x in data_pca]
+DIMS = [np.log10(x["num_samples"]) for x in data_pca if x["type"] == "train_data"]
+DIMS_NEXT = [np.log10(x["num_samples"]) for x in data_pca if x["type"] == "eval_data"]
+DISPLAY_DIMS = ['$10^{' + f'{np.log10(x["num_samples"]):.1f}' + '}$' for x in data_pca if x["type"] == "train_data"]
 # DISPLAY_DIMS = [32, 256, 512, 768]
 
 plt.figure(figsize=(4.8, 4.7))
 ax = plt.gca() 
 
-ax.plot(DIMS, [x["val_ip"] for x in data_pca], label="PCA", color="tab:blue", linestyle="-")
+ax.plot(DIMS, [x["val_ip"] for x in data_pca if x["type"] == "train_data"], label="PCA", color="tab:blue", linestyle="-")
+ax.plot(DIMS_NEXT, [x["val_ip"] for x in data_pca if x["type"] == "eval_data"], label="PCA", color="tab:blue", linestyle=":")
 
 ax.set_xticks(DIMS)
 ax.set_xticklabels(DISPLAY_DIMS)

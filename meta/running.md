@@ -4,12 +4,13 @@
 ||||
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
 18 dec|pca irrelevant `dpr-c-pruned_cn` `dpr-c_cn` `--post-cn` *uneasiness*|13|running
-18 dec|autoencoder base `dpr-c-pruned cn` `--model 1` `--dims 128` `--post-cn` *merequinoa_model_1_cn_l1*|14|running
-18 dec|autoencoder base `dpr-c-pruned_cn` `--model 2` `--dims 128` `--post-cn` *merequinoa_model_2_cn_l1*|14|running
-18 dec|autoencoder base `dpr-c-pruned_cn` `--model 3` `--dims 128` `--post-cn` *merequinoa_model_3_cn_l1*|14|running
+18 dec|autoencoder irrelevant `dpr-c-pruned_cn` `dpr-c-pruned_cn` `--post-cn` *uneasiness* (test)|14|running
 ||||
 ||||finished
 ||||
+18 dec|autoencoder base `dpr-c-pruned cn` `--model 1` `--dims 128` `--post-cn` (and without) *merequinoa_model_1_{cn,}_l1*|14|ok, ok
+18 dec|autoencoder base `dpr-c-pruned_cn` `--model 2` `--dims 128` `--post-cn` (and without) *merequinoa_model_2_{cn,}_l1*|14|ok, ok
+18 dec|autoencoder base `dpr-c-pruned_cn` `--model 3` `--dims 128` `--post-cn` (and without) *merequinoa_model_3_{cn,}_l1*|14|ok, ok
 17 dec|pca base_big `dpr-c-pruned` *keyrespite_0*|12|bad code, ok
 17 dec|pca base_big `dpr-c-pruned` `--norm` *keyrespite_1*|12|bad code, ok
 17 dec|pca base_big `dpr-c-pruned` `--center` *keyrespite_2*|13|bad code, ok
