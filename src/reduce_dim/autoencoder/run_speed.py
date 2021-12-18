@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import copy
 import sys; sys.path.append("src")
 from misc.retrieval_utils import DEVICE
 from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
@@ -30,7 +31,7 @@ if args.center:
 if args.norm:
     data = norm_data(data)
 print("Because args.data_small is not provided, I'm copying the whole structure")
-data_train = dict(data)
+data_train = copy.deepcopy(data)
 
 data = sub_data(data, train=False, in_place=True)
 data_train = sub_data(data_train, train=True, in_place=True)

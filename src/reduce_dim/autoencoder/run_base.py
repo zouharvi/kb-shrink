@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import copy
 import sys
 
 import numpy as np
@@ -31,7 +32,7 @@ if args.center:
 if args.norm:
     data = norm_data(data)
 print("Because args.data_small is not provided, I'm copying the whole structure")
-data_train = dict(data)
+data_train = copy.deepcopy(data)
 
 data = sub_data(data, train=False, in_place=True)
 data_train = sub_data(data_train, train=True, in_place=True)

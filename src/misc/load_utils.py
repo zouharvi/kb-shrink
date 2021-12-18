@@ -71,7 +71,6 @@ def sub_data(data, train=False, in_place=True):
                                                                 ["train"]:data["boundaries"]["dev"]]
     return data
 
-
 def center_data(data):
     data["docs"] = np.array(data["docs"])
     data["queries"] = np.array(data["queries"])

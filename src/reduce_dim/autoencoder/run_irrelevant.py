@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import copy
 import random
 import sys
 sys.path.append("src")
@@ -21,20 +22,20 @@ data_big = read_pickle(args.data_big)
 
 
 
-data_train = dict(data)
-data = sub_data(data, train=False, in_place=True)
+data_train = copy.deepcopy(data)
 data_train = sub_data(data_train, train=True, in_place=True)
+data = sub_data(data, train=False, in_place=True)
 
-# print(len(data["docs"]), len(data["queries"]))
-# print(len(data_train["docs"]), len(data_train["queries"]))
-# print(len(data_big["docs"]), len(data_big["queries"]))
+# print({k:len(v) for k,v in data.items()})
+# print({k:len(v) for k,v in data_train.items()})
+# print(data["queries"][0][:5], data_train["queries"][0][:5])
 
 logdata = []
 for num_samples in [10**3, (10**3) * 3, (10**4), (10**4) * 3, 10**5, (10**5) * 3, 10**6, len(data_train["docs"]), (10**6) * 3, 10**7, (10**7) * 3]:
 # for num_samples in [(10**6) * 3, 10**7, (10**7) * 3]:
     # increase test size
     if num_samples > len(data["docs"]):
-        new_data = dict(data)
+        new_data = copy.deepcopy(data)
         new_data["docs"] += random.sample(
             data_big["docs"],
             num_samples - len(data["docs"])
@@ -59,7 +60,7 @@ for num_samples in [10**3, (10**3) * 3, (10**4), (10**4) * 3, 10**5, (10**5) * 3
         })
 
     # increase train size
-    new_data = dict(data_train)
+    new_data = copy.deepcopy(data_train)
     if num_samples < len(new_data["docs"]):
         new_data["docs"] = random.sample(new_data["docs"], num_samples)
     else:

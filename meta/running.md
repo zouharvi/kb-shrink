@@ -4,7 +4,8 @@
 ||||
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
 18 dec|pca irrelevant `dpr-c-pruned_cn` `dpr-c_cn` `--post-cn` *uneasiness*|13|running
-18 dec|autoencoder irrelevant `dpr-c-pruned_cn` `dpr-c-pruned_cn` `--post-cn` *uneasiness* (test)|14|running
+18 dec|pca irrelevant `dpr-c-pruned_cn` `dpr-c_cn` `--post-cn` *uneasiness* (test pt 2)|13|ok
+18 dec|autoencoder irrelevant `dpr-c-pruned_cn` `dpr-c-pruned_cn` `--post-cn` *uneasiness* (test pt 2)|14|running
 ||||
 ||||finished
 ||||

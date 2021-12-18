@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import copy
 import sys; sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data, process_dims, sub_data
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
@@ -28,7 +29,7 @@ if args.data_small is None:
     if args.norm:
         data = norm_data(data)
     print("Because args.data_small is not provided, I'm copying the whole structure")
-    data_small = dict(data)
+    data_small = copy.deepcopy(data)
 
     data = sub_data(data, train=False, in_place=True)
     data_small = sub_data(data_small, train=True, in_place=True)

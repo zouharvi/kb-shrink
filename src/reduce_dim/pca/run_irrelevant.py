@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import copy
 import random
 import sys
 sys.path.append("src")
@@ -75,7 +76,7 @@ def pca_performance_q(components, data, data_train):
     return summary_performance(dataReduced)
 
 
-data_train = dict(data)
+data_train = copy.deepcopy(data)
 data = sub_data(data, train=False, in_place=True)
 data_train = sub_data(data_train, train=True, in_place=True)
 
@@ -84,11 +85,11 @@ data_train = sub_data(data_train, train=True, in_place=True)
 # print(len(data_big["docs"]), len(data_big["queries"]))
 
 logdata = []
-# for num_samples in [10**3, (10**3) * 3, (10**4), (10**4) * 3, 10**5, (10**5) * 3, 10**6, len(data_train["docs"]), (10**6) * 3, 10**7, (10**7) * 3]:
-for num_samples in [(10**6) * 3, 10**7, (10**7) * 3]:
+for num_samples in [10**3, (10**3) * 3, (10**4), (10**4) * 3, 10**5, (10**5) * 3, 10**6, len(data_train["docs"]), (10**6) * 3, 10**7, (10**7) * 3]:
+# for num_samples in [(10**6) * 3, 10**7, (10**7) * 3]:
     # increase test size
     if num_samples > len(data["docs"]):
-        new_data = dict(data)
+        new_data = copy.deepcopy(data)
         new_data["docs"] += random.sample(
             data_big["docs"],
             num_samples - len(data["docs"])
@@ -101,7 +102,7 @@ for num_samples in [(10**6) * 3, 10**7, (10**7) * 3]:
         })
 
     # increase train size
-    new_data = dict(data_train)
+    new_data = copy.deepcopy(data_train)
     if num_samples < len(new_data["docs"]):
         new_data["docs"] = random.sample(new_data["docs"], num_samples)
     else:
