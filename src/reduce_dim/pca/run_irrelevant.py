@@ -60,9 +60,7 @@ def pca_performance_d(components, data, data_train):
         "queries": safe_transform(model, data["queries"]),
         "docs": safe_transform(model, data["docs"])
     }
-    return summary_performance(
-        dataReduced,
-    )
+    return summary_performance(dataReduced)
 
 
 def pca_performance_q(components, data, data_train):
@@ -74,21 +72,39 @@ def pca_performance_q(components, data, data_train):
         "queries": safe_transform(model, data["queries"]),
         "docs": safe_transform(model, data["docs"])
     }
-    return summary_performance(
-        dataReduced
-    )
+    return summary_performance(dataReduced)
 
 
 data_train = dict(data)
 data = sub_data(data, train=False, in_place=True)
 data_train = sub_data(data_train, train=True, in_place=True)
 
-print(len(data["docs"]), len(data["queries"]))
-print(len(data_train["docs"]), len(data_train["queries"]))
-print(len(data_big["docs"]), len(data_big["queries"]))
+# print(len(data["docs"]), len(data["queries"]))
+# print(len(data_train["docs"]), len(data_train["queries"]))
+# print(len(data_big["docs"]), len(data_big["queries"]))
 
 logdata = []
-for num_samples in [10**3, (10**3) * 5, (10**4) * 5, 10**5, (10**5) * 5, 10**6, len(data_train["docs"]), (10**6) * 5, 10**7, (10**7) * 5]:
+# for num_samples in [10**3, (10**3) * 3, (10**4), (10**4) * 3, 10**5, (10**5) * 3, 10**6, len(data_train["docs"]), (10**6) * 3, 10**7, (10**7) * 3]:
+for num_samples in [(10**6) * 3, 10**7, (10**7) * 3]:
+    # increase test size
+    if num_samples > len(data["docs"]):
+        new_data = dict(data)
+        new_data["docs"] += random.sample(
+            data_big["docs"],
+            num_samples - len(data["docs"])
+        )
+        new_data["docs_articles"] += [[-1]*(num_samples - len(data["docs"]))]
+        print(len(new_data["docs"]))
+        print(len(new_data["docs_articles"]))
+        print(len(new_data["queries"]))
+        val_ip, val_l2 = pca_performance_d(args.dim, new_data, data_train)
+        logdata.append({
+            "val_ip": val_ip, "val_l2": val_l2,
+            "num_samples": num_samples,
+            "type": "eval_data",
+        })
+
+    # increase train size
     new_data = dict(data_train)
     if num_samples < len(new_data["docs"]):
         new_data["docs"] = random.sample(new_data["docs"], num_samples)
@@ -105,19 +121,6 @@ for num_samples in [10**3, (10**3) * 5, (10**4) * 5, 10**5, (10**5) * 5, 10**6, 
         "num_samples": num_samples,
         "type": "train_data",
     })
-
-    if num_samples > len(data_train["docs"]):
-        new_data = dict(data)
-        new_data["docs"] += random.sample(
-            data_big["docs"],
-            num_samples - len(data["docs"])
-        )
-        val_ip, val_l2 = pca_performance_d(args.dim, new_data, data_train)
-        logdata.append({
-            "val_ip": val_ip, "val_l2": val_l2,
-            "num_samples": num_samples,
-            "type": "eval_data",
-        })
 
     # continuously override the file
     with open(args.logfile, "w") as f:
