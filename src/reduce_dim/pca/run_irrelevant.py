@@ -10,23 +10,13 @@ from sklearn.decomposition import PCA
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
 parser.add_argument('--data')
+parser.add_argument('--data-big')
 parser.add_argument('--logfile', default="computed/tmp.log")
-parser.add_argument('--center', action="store_true")
-parser.add_argument('--norm', action="store_true")
-parser.add_argument('--post-cn', action="store_true")
 parser.add_argument('--dim', type=int, default=128)
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 data = read_pickle(args.data)
-if args.center:
-    data = center_data(data)
-if args.norm:
-    data = norm_data(data)
-print("Because args.data_small is not provided, I'm copying the whole structure")
-data_train = dict(data)
-
-data = sub_data(data, train=False, in_place=True)
-data_train = sub_data(data_train, train=True, in_place=True)
+data_big = read_pickle(args.data_big)
 
 print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
 
@@ -64,7 +54,7 @@ def summary_performance(name, dataReduced, dataReconstructed):
     return val_ip, val_l2, loss_q.item(), loss_d.item()
 
 
-def pca_performance_d(components):
+def pca_performance_d(components, data, data_train):
     model = PCA(
         n_components=components,
         random_state=args.seed
@@ -84,7 +74,7 @@ def pca_performance_d(components):
     )
 
 
-def pca_performance_q(components):
+def pca_performance_q(components, data, data_train):
     model = PCA(
         n_components=components,
         random_state=args.seed
@@ -103,32 +93,17 @@ def pca_performance_q(components):
         dataReconstructed
     )
 
+data_train = dict(data)
+data = sub_data(data, train=False, in_place=True)
+data_train = sub_data(data, train=True, in_place=True)
+# data_big = sub_data(data_big, train=True, in_place=True)
 
-def pca_performance_dq(components):
-    model = PCA(
-        n_components=components,
-        random_state=args.seed
-    ).fit(np.concatenate((data_train["queries"], data_train["docs"])))
-    dataReduced = {
-        "queries": model.transform(data["queries"]),
-        "docs": model.transform(data["docs"])
-    }
-    dataReconstructed = {
-        "queries": model.inverse_transform(dataReduced["queries"]),
-        "docs": model.inverse_transform(dataReduced["docs"])
-    }
-    return summary_performance(
-        f"PCA-DQ ({components})",
-        dataReduced,
-        dataReconstructed
-    )
+print(len(data["docs"]), len(data["queries"]))
+print(len(data_train["docs"]), len(data_train["queries"]))
+print(len(data_big["docs"]), len(data_big["queries"]))
 
-val_ip, val_l2, loss_q, loss_d = pca_performance_dq(args.dim)
-print({
-    "val_ip": val_ip, "val_l2": val_l2,
-    "loss_q": loss_q, "loss_d": loss_d,
-    "type": "dq"
-})
+exit()
+
 val_ip, val_l2, loss_q, loss_d = pca_performance_d(args.dim)
 print({
     "val_ip": val_ip, "val_l2": val_l2,
