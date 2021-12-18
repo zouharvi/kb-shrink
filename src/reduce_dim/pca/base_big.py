@@ -43,9 +43,6 @@ else:
     data = sub_data(data, train=False, in_place=True)
     data_small = sub_data(data_small, train=True, in_place=True)
 
-print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
-
-
 def safe_print(msg):
     with open("base_big_pca.out", "a") as f:
         f.write(msg+"\n")
@@ -84,7 +81,6 @@ def summary_performance(name, dataReduced, dataReconstructed):
         dataReconstructed["docs"][:10000]
     )
     name = name.replace("float", "f")
-    print(f"{name:<21} {loss_d:>7.5f} {loss_q:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
     return val_ip, val_l2, loss_q, loss_d
 
 def safe_transform(model, array):

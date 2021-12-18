@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import random
 import sys; sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data, sub_data
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
@@ -18,9 +19,7 @@ args = parser.parse_args()
 data = read_pickle(args.data)
 data_big = read_pickle(args.data_big)
 
-print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
-
-def summary_performance(name, dataReduced, dataReconstructed):
+def summary_performance(name, dataReduced):
     if args.post_cn:
         dataReduced = center_data(dataReduced)
         dataReduced = norm_data(dataReduced)
@@ -33,25 +32,18 @@ def summary_performance(name, dataReduced, dataReconstructed):
         data["docs_articles"],
         fast=True,
     )
-    val_ip = rprec_a_ip(
-        dataReduced["queries"],
-        dataReduced["docs"],
-        data["relevancy"],
-        data["relevancy_articles"],
-        data["docs_articles"],
-        fast=True,
-    )
-    loss_q = torch.nn.MSELoss()(
-        torch.Tensor(data["queries"]),
-        torch.Tensor(dataReconstructed["queries"])
-    )
-    loss_d = torch.nn.MSELoss()(
-        torch.Tensor(data["docs"]),
-        torch.Tensor(dataReconstructed["docs"])
-    )
-    name = name.replace("float", "f")
-    print(f"{name:<21} {loss_d:>7.5f} {loss_q:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
-    return val_ip, val_l2, loss_q.item(), loss_d.item()
+    if args.post_cn:
+        val_ip = val_l2
+    else:
+        val_ip = rprec_a_ip(
+            dataReduced["queries"],
+            dataReduced["docs"],
+            data["relevancy"],
+            data["relevancy_articles"],
+            data["docs_articles"],
+            fast=True,
+        )
+    return val_ip, val_l2
 
 
 def pca_performance_d(components, data, data_train):
@@ -83,36 +75,45 @@ def pca_performance_q(components, data, data_train):
         "queries": model.transform(data["queries"]),
         "docs": model.transform(data["docs"])
     }
-    dataReconstructed = {
-        "queries": model.inverse_transform(dataReduced["queries"]),
-        "docs": model.inverse_transform(dataReduced["docs"])
-    }
     return summary_performance(
         f"PCA-Q ({components})",
-        dataReduced,
-        dataReconstructed
+        dataReduced
     )
 
 data_train = dict(data)
 data = sub_data(data, train=False, in_place=True)
-data_train = sub_data(data, train=True, in_place=True)
+data_train = sub_data(data_train, train=True, in_place=True)
 # data_big = sub_data(data_big, train=True, in_place=True)
 
 print(len(data["docs"]), len(data["queries"]))
 print(len(data_train["docs"]), len(data_train["queries"]))
 print(len(data_big["docs"]), len(data_big["queries"]))
 
-exit()
+logdata = []
 
-val_ip, val_l2, loss_q, loss_d = pca_performance_d(args.dim)
-print({
-    "val_ip": val_ip, "val_l2": val_l2,
-    "loss_q": loss_q, "loss_d": loss_d,
-    "type": "d"
-})
-val_ip, val_l2, loss_q, loss_d = pca_performance_q(args.dim)
-print({
-    "val_ip": val_ip, "val_l2": val_l2,
-    "loss_q": loss_q, "loss_d": loss_d,
-    "type": "q"
-})
+for num_samples in [10**3, (10**3)*5, (10**4)*5, 10**5, (10**5)*5, 10**6, (10**6)*5, 10**7, (10**7)*5]:
+
+    new_data = dict(data)
+    if num_samples < len(new_data["docs"]):
+        new_data["docs"] = random.sample(new_data["docs"], num_samples)
+    else:
+        new_data["docs"] += random.sample(data_big["docs"], num_samples-len(new_data["docs"]))
+
+    val_ip, val_l2 = pca_performance_d(args.dim, data, data_train)
+
+    logdata.append({
+        "val_ip": val_ip, "val_l2": val_l2,
+        "type": "q", 
+    })
+
+    # continuously override the file
+    with open(args.logfile, "w") as f:
+        f.write(str(logdata))
+
+
+# val_ip, val_l2, loss_q, loss_d = pca_performance_d(args.dim)
+# print({
+#     "val_ip": val_ip, "val_l2": val_l2,
+#     "loss_q": loss_q, "loss_d": loss_d,
+#     "type": "d"
+# })
