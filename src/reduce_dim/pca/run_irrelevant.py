@@ -11,6 +11,7 @@ from sklearn.decomposition import PCA
 parser = argparse.ArgumentParser(description='PCA performance summary')
 parser.add_argument('--data')
 parser.add_argument('--data-big')
+parser.add_argument('--post-cn', action="store_true")
 parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--dim', type=int, default=128)
 parser.add_argument('--seed', type=int, default=0)
