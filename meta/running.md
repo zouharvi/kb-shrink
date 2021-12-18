@@ -4,6 +4,9 @@
 ||||
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
 18 dec|pca irrelevant `dpr-c-pruned_cn` `dpr-c_cn` `--post-cn` *uneasiness*|13|running
+18 dec|autoencoder base `dpr-c-pruned cn` `--model 1` `--dims 128` `--post-cn` *merequinoa_model_1_cn_l1*|14|running
+18 dec|autoencoder base `dpr-c-pruned_cn` `--model 2` `--dims 128` `--post-cn` *merequinoa_model_2_cn_l1*|14|running
+18 dec|autoencoder base `dpr-c-pruned_cn` `--model 3` `--dims 128` `--post-cn` *merequinoa_model_3_cn_l1*|14|running
 ||||
 ||||finished
 ||||

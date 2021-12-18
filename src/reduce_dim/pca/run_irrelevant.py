@@ -93,10 +93,6 @@ for num_samples in [(10**6) * 3, 10**7, (10**7) * 3]:
             data_big["docs"],
             num_samples - len(data["docs"])
         )
-        new_data["docs_articles"] += [[-1]*(num_samples - len(data["docs"]))]
-        print(len(new_data["docs"]))
-        print(len(new_data["docs_articles"]))
-        print(len(new_data["queries"]))
         val_ip, val_l2 = pca_performance_d(args.dim, new_data, data_train)
         logdata.append({
             "val_ip": val_ip, "val_l2": val_l2,
