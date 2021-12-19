@@ -85,8 +85,12 @@ data_train = sub_data(data_train, train=True, in_place=True)
 # print(len(data_big["docs"]), len(data_big["queries"]))
 
 logdata = []
-for num_samples in [10**3, (10**3) * 3, (10**4), (10**4) * 3, 10**5, (10**5) * 3, 10**6, len(data_train["docs"]), (10**6) * 3, 10**7, (10**7) * 3]:
-# for num_samples in [(10**6) * 3, 10**7, (10**7) * 3]:
+for num_samples in [128, (10**2) *3]:
+# for num_samples in [
+#     128, (10**2) * 3, 10**3, (10**3) * 3,
+#     (10**4), (10**4) * 3, 10**5, (10**5) * 3, 10**6,
+#     len(data_train["docs"]), (10**6) * 3, 10**7, (10**7) * 3
+# ]:
     # increase test size
     if num_samples > len(data["docs"]):
         new_data = copy.deepcopy(data)

@@ -3,12 +3,13 @@
 ||||running
 ||||
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
-18 dec|pca irrelevant `dpr-c-pruned_cn` `dpr-c_cn` `--post-cn` *uneasiness*|13|running
-18 dec|pca irrelevant `dpr-c-pruned_cn` `dpr-c_cn` `--post-cn` *uneasiness* (test pt 2)|13|ok
-18 dec|autoencoder irrelevant `dpr-c-pruned_cn` `dpr-c-pruned_cn` `--post-cn` *uneasiness* (test pt 2)|14|running
+18 dec|pca irrelevant `dpr-c-pruned_cn` `dpr-c_cn` `--post-cn` *uneasiness* {,2: pre}|13|ok, running pre
+18 dec|autoencoder irrelevant `dpr-c-pruned_cn` `dpr-c_cn` `--post-cn` *uneasiness* {,2: pre on 13}|14|running
 ||||
 ||||finished
 ||||
+18 dec|pca irrelevant `dpr-c-pruned_cn` `dpr-c-pruned_cn` `--post-cn` *uneasiness* (test pt 2)|13|ok
+18 dec|autoencoder irrelevant `dpr-c-pruned_cn` `dpr-c-pruned_cn` `--post-cn` *uneasiness* (test pt 2)|14|stopped
 18 dec|autoencoder base `dpr-c-pruned cn` `--model 1` `--dims 128` `--post-cn` (and without) *merequinoa_model_1_{cn,}_l1*|14|ok, ok
 18 dec|autoencoder base `dpr-c-pruned_cn` `--model 2` `--dims 128` `--post-cn` (and without) *merequinoa_model_2_{cn,}_l1*|14|ok, ok
 18 dec|autoencoder base `dpr-c-pruned_cn` `--model 3` `--dims 128` `--post-cn` (and without) *merequinoa_model_3_{cn,}_l1*|14|ok, ok

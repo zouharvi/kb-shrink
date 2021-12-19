@@ -4,32 +4,62 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--logfile-pca', default="computed/pca_irrelevant_uneasiness.log")
-parser.add_argument('--logfile-auto', default="computed/auto_irrelevant_uneasiness.log")
+parser.add_argument(
+    '--logfile-pca', default="computed/pca_irrelevant_uneasiness.log")
+parser.add_argument(
+    '--logfile-auto', default="computed/auto_irrelevant_uneasiness.log")
 parser.add_argument('--key', default=0, type=int)
 args = parser.parse_args()
 
 with open(args.logfile_pca, "r") as f:
     data_pca = eval(f.read())
-# with open(args.logfile_auto, "r") as f:
-#     data_auto = eval(f.read())
+with open(args.logfile_auto, "r") as f:
+    data_auto = eval(f.read())
 
-DIMS = [np.log10(x["num_samples"]) for x in data_pca if x["type"] == "train_data"]
-DIMS_NEXT = [np.log10(x["num_samples"]) for x in data_pca if x["type"] == "eval_data"]
-DISPLAY_DIMS = ['$10^{' + f'{np.log10(x["num_samples"]):.1f}' + '}$' for x in data_pca if x["type"] == "train_data"]
-# DISPLAY_DIMS = [32, 256, 512, 768]
+DIMS = [
+    np.log10(x["num_samples"])
+    for x in data_pca if x["type"] == "train_data"
+]
+DIMS_NEXT = [
+    np.log10(x["num_samples"])
+    for x in data_pca if x["type"] == "eval_data"
+]
+DISPLAY_DIMS = [10**3, (10**4), 10**5, 10**6, 10**7, (10**7) * 3]
+THRESHOLD = 2114151
 
 plt.figure(figsize=(4.8, 4.7))
-ax = plt.gca() 
+ax = plt.gca()
 
-ax.plot(DIMS, [x["val_ip"] for x in data_pca if x["type"] == "train_data"], label="PCA", color="tab:blue", linestyle="-")
-ax.plot(DIMS_NEXT, [x["val_ip"] for x in data_pca if x["type"] == "eval_data"], label="PCA", color="tab:blue", linestyle=":")
+ax.plot(
+    DIMS,
+    [x["val_ip"] for x in data_pca if x["type"] == "train_data"],
+    label="PCA (training docs)", color="tab:blue", linestyle="-")
+ax.plot(
+    DIMS_NEXT,
+    [x["val_ip"] for x in data_pca if x["type"] == "eval_data"],
+    label="PCA (eval docs)", color="tab:blue", linestyle=":")
+ax.plot(
+    DIMS[:8],
+    [x["val_ip"] for x in data_auto if x["type"] == "train_data"],
+    label="Auto. (training docs)", color="tab:red", linestyle="-")
 
-ax.set_xticks(DIMS)
-ax.set_xticklabels(DISPLAY_DIMS)
+ax.set_xticks([np.log10(x) for x in DISPLAY_DIMS])
+ax.set_xticklabels(
+    ['$10^{' + f'{np.log10(x):.1f}' + '}$' for x in DISPLAY_DIMS]
+)
 ax.set_ylabel("R-Prec")
-ax.set_xlabel("Sample size")
+ax.set_xlabel("Docs count")
 # ax.set_ylim(0.015, 0.66)
+
+plt.scatter(
+    np.log10(THRESHOLD),
+    [
+        x["val_ip"]
+        for x in data_pca
+        if x["type"] == "train_data" and x["num_samples"] == THRESHOLD
+    ],
+    marker="x", color="black", zorder=10,
+)
 
 h1, l1 = ax.get_legend_handles_labels()
 
