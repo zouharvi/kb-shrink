@@ -24,10 +24,10 @@ DIMS_NEXT = [
     np.log10(x["num_samples"])
     for x in data_pca if x["type"] == "eval_data"
 ]
-DISPLAY_DIMS = [10**3, (10**4), 10**5, 10**6, 10**7, (10**7) * 3]
+DISPLAY_DIMS = [128, 10**3, (10**4), 10**5, 10**6, 10**7, (10**7) * 3]
 THRESHOLD = 2114151
 
-plt.figure(figsize=(4.8, 4.7))
+plt.figure(figsize=(4.8, 4.5))
 ax = plt.gca()
 
 ax.plot(
@@ -39,17 +39,20 @@ ax.plot(
     [x["val_ip"] for x in data_pca if x["type"] == "eval_data"],
     label="PCA (eval docs)", color="tab:blue", linestyle=":")
 ax.plot(
-    DIMS[:8],
+    DIMS[:10],
     [x["val_ip"] for x in data_auto if x["type"] == "train_data"],
     label="Auto. (training docs)", color="tab:red", linestyle="-")
 
 ax.set_xticks([np.log10(x) for x in DISPLAY_DIMS])
-ax.set_xticklabels(
-    ['$10^{' + f'{np.log10(x):.1f}' + '}$' for x in DISPLAY_DIMS]
-)
+ax.set_xticklabels([
+    x if x == 128 else '$10^{' + f'{np.log10(x):.1f}' + '}$'
+    for x in DISPLAY_DIMS
+])
 ax.set_ylabel("R-Prec")
-ax.set_xlabel("Docs count")
-# ax.set_ylim(0.015, 0.66)
+ax.set_xlabel("Docs count (log scale)")
+ax.set_ylim(0.015, 0.66)
+ax.set_xlim(2, 7.6)
+# , 8)
 
 plt.scatter(
     np.log10(THRESHOLD),
@@ -67,8 +70,8 @@ h1, l1 = ax.get_legend_handles_labels()
 plt.legend(
     h1, l1,
     loc="center",
-    bbox_to_anchor=(-0.05, 1.12, 1, 0.2),
+    bbox_to_anchor=(-0.05, 0.97, 1, 0.28),
     ncol=2
 )
-plt.tight_layout(rect=(0, 0, 1, 1.05))
+plt.tight_layout(rect=(0, 0, 1, 1.03))
 plt.show()
