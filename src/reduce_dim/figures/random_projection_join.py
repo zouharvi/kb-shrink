@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--logfile', default="computed/rproj.py")
+parser.add_argument('--logfile', default="computed/rproj.log")
 args = parser.parse_args()
 
 with open(args.logfile, "r") as f:
@@ -66,7 +66,7 @@ ax.plot(
 )
 
 # uncompressed
-ax.axhline(y=0.431, alpha=0.5, linestyle="--", color="black")
+ax.axhline(y=0.618, alpha=0.5, linestyle="--", color="black")
 
 # plt.legend(bbox_to_anchor=(-0.1, 1, 1.2, 0), loc="center", ncol=2)
 plt.legend(ncol=2)

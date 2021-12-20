@@ -27,7 +27,7 @@ DIMS_NEXT = [
 DISPLAY_DIMS = [128, 10**3, (10**4), 10**5, 10**6, 10**7, (10**7) * 3]
 THRESHOLD = 2114151
 
-plt.figure(figsize=(4.8, 4.5))
+plt.figure(figsize=(4.8, 3.6))
 ax = plt.gca()
 
 ax.plot(
@@ -39,9 +39,13 @@ ax.plot(
     [x["val_ip"] for x in data_pca if x["type"] == "eval_data"],
     label="PCA (eval docs)", color="tab:blue", linestyle=":")
 ax.plot(
-    DIMS[:10],
+    DIMS,
     [x["val_ip"] for x in data_auto if x["type"] == "train_data"],
     label="Auto. (training docs)", color="tab:red", linestyle="-")
+ax.plot(
+    DIMS_NEXT,
+    [x["val_ip"] for x in data_auto if x["type"] == "eval_data"],
+    label="Auto. (eval docs)", color="tab:red", linestyle=":")
 
 ax.set_xticks([np.log10(x) for x in DISPLAY_DIMS])
 ax.set_xticklabels([
@@ -50,7 +54,7 @@ ax.set_xticklabels([
 ])
 ax.set_ylabel("R-Prec")
 ax.set_xlabel("Docs count (log scale)")
-ax.set_ylim(0.015, 0.66)
+ax.set_ylim(0.2, 0.66)
 ax.set_xlim(2, 7.6)
 # , 8)
 
@@ -61,7 +65,16 @@ plt.scatter(
         for x in data_pca
         if x["type"] == "train_data" and x["num_samples"] == THRESHOLD
     ],
-    marker="x", color="black", zorder=10,
+    marker="x", color="black", zorder=10, s=17,
+)
+plt.scatter(
+    np.log10(THRESHOLD),
+    [
+        x["val_ip"]
+        for x in data_auto
+        if x["type"] == "train_data" and x["num_samples"] == THRESHOLD
+    ],
+    marker="x", color="black", zorder=10, s=17
 )
 
 h1, l1 = ax.get_legend_handles_labels()
@@ -70,7 +83,7 @@ h1, l1 = ax.get_legend_handles_labels()
 plt.legend(
     h1, l1,
     loc="center",
-    bbox_to_anchor=(-0.05, 0.97, 1, 0.28),
+    bbox_to_anchor=(0, 0.99, 1, 0.28),
     ncol=2
 )
 plt.tight_layout(rect=(0, 0, 1, 1.03))
