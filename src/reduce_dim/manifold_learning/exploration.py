@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+raise NotImplementedError(
+    "Not adapted to new data orgnization (docs and queries as tuples)")
 
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.load_utils import read_keys_pickle
 from misc.retrieval_utils import acc_ip, acc_l2
 import argparse
@@ -25,7 +27,7 @@ data_new = model.fit_transform(data)
 # data_new = model.fit_transform(data)
 # data_new = data_new.copy() # is not C-continuous
 
-# spectral embedding 
+# spectral embedding
 # model = SpectralEmbedding(n_components=64)
 # data_new = model.fit_transform(data)
 # data_new = data_new.copy() # is not C-continuous

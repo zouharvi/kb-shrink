@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+raise NotImplementedError(
+    "Not adapted to new data orgnization (docs and queries as tuples)")
 
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data
 from misc.retrieval_utils import rprec_l2, rprec_ip
 import numpy as np
@@ -25,6 +27,7 @@ if args.norm:
     data = norm_data(data)
 
 print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
+
 
 def summary_performance(name, dataReduced, dataReconstructed):
     if args.post_cn:
@@ -133,15 +136,18 @@ def precision_performance(newType):
 # precision_performance("float16")
 
 data_log = []
-for dim in np.linspace(32, 768, num=768//32, endpoint=True):
+for dim in np.linspace(32, 768, num=768 // 32, endpoint=True):
     # dim = 64
     dim = int(dim)
     val_ip, val_l2, loss_q, loss_d = pca_performance_d(dim)
-    data_log.append({"type": "train_doc", "dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
+    data_log.append({"type": "train_doc", "dim": dim, "val_ip": val_ip,
+                    "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
     val_ip, val_l2, loss_q, loss_d = pca_performance_q(dim)
-    data_log.append({"type": "train_query", "dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
+    data_log.append({"type": "train_query", "dim": dim, "val_ip": val_ip,
+                    "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
     val_ip, val_l2, loss_q, loss_d = pca_performance_dq(dim)
-    data_log.append({"type": "train_both", "dim": dim, "val_ip": val_ip, "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
+    data_log.append({"type": "train_both", "dim": dim, "val_ip": val_ip,
+                    "val_l2": val_l2, "loss_q": loss_q, "loss_d": loss_d})
     # continuously override the file
     with open(args.logfile, "w") as f:
         f.write(str(data_log))

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-import copy
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.retrieval_utils import DEVICE
 from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
 from model import AutoencoderModel
+import copy
 import time
 import argparse
 import torch
@@ -55,7 +56,7 @@ for dim in DIMS:
             train_key=train_key,
             skip_eval=True,
         )
-        train_time = time.time()-train_time
+        train_time = time.time() - train_time
 
         # encoding
         encode_time = time.time()
@@ -63,7 +64,7 @@ for dim in DIMS:
         with torch.no_grad():
             model.encode_safe_without_loss(data["queries"])
             model.encode_safe_without_loss(data["docs"])
-        encode_time = time.time()-encode_time
+        encode_time = time.time() - encode_time
 
         logdata.append({
             "dim": dim, "train_time": train_time,

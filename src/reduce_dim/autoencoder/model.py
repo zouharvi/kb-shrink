@@ -2,7 +2,6 @@
 
 import numpy as np
 from sklearn.metrics import mean_squared_error as mse
-from tqdm import tqdm
 import torch.nn as nn
 import torch
 from misc.load_utils import center_data, norm_data
@@ -162,17 +161,16 @@ class AutoencoderModel(nn.Module):
             sample_rec = self.decoder(sample_enc)
             loss += mse([sample_rec.cpu().numpy()], [sample])
             out.append(sample_enc.cpu().numpy())
-        return out, loss/len(out)
+        return out, loss / len(out)
 
     def encode_safe_without_loss(self, data):
         dataLoader = torch.utils.data.DataLoader(
-            dataset=data, batch_size=1024*128, shuffle=False
+            dataset=data, batch_size=1024 * 128, shuffle=False
         )
 
         out = []
         for sample in dataLoader:
             out.append(self.encoder(torch.tensor(sample).to(DEVICE)).cpu())
-        
 
     def decode(self, x):
         return self.decoder(x)
@@ -184,7 +182,6 @@ class AutoencoderModel(nn.Module):
 
         for epoch in range(epochs):
             self.train(True)
-            # for sample in tqdm(self.dataLoader):
             for sample in self.dataLoader:
                 # Predictions
                 sample = sample.to(DEVICE)

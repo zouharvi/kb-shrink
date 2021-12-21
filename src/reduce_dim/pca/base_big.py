@@ -7,7 +7,7 @@ from misc.load_utils import process_dims, read_pickle, center_data, norm_data, s
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 import numpy as np
 import argparse
-from sklearn.decomposition import PCA, IncrementalPCA
+from sklearn.decomposition import PCA
 import sklearn.metrics
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
@@ -44,9 +44,11 @@ else:
     data = sub_data(data, train=False, in_place=True)
     data_small = sub_data(data_small, train=True, in_place=True)
 
+
 def safe_print(msg):
     with open("base_big_pca.out", "a") as f:
-        f.write(msg+"\n")
+        f.write(msg + "\n")
+
 
 def summary_performance(name, dataReduced, dataReconstructed):
     if args.post_cn:
@@ -84,11 +86,14 @@ def summary_performance(name, dataReduced, dataReconstructed):
     name = name.replace("float", "f")
     return val_ip, val_l2, loss_q, loss_d
 
+
 def safe_transform(model, array):
     return [model.transform([x])[0] for x in array]
 
+
 def safe_inv_transform(model, array):
     return [model.inverse_transform([x])[0] for x in array]
+
 
 def pca_performance_d(components):
     model = PCA(
@@ -112,6 +117,7 @@ def pca_performance_d(components):
         dataReconstructed
     )
 
+
 def pca_performance_q(components):
     model = PCA(
         n_components=components,
@@ -133,6 +139,7 @@ def pca_performance_q(components):
         dataReduced,
         dataReconstructed
     )
+
 
 def pca_performance_dq(components):
     model = PCA(
@@ -156,6 +163,7 @@ def pca_performance_dq(components):
         dataReduced,
         dataReconstructed
     )
+
 
 DIMS = process_dims(args.dims)
 

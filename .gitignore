@@ -12,3 +12,4 @@ computed/*.log
 nohup*.out
 .empty
 runs/*
+.nfs00*

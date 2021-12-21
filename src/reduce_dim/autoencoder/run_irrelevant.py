@@ -4,8 +4,7 @@ import copy
 import random
 import sys
 sys.path.append("src")
-from misc.load_utils import read_pickle, center_data, norm_data, sub_data
-from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
+from misc.load_utils import read_pickle, sub_data
 import argparse
 from reduce_dim.autoencoder.model import AutoencoderModel
 
@@ -21,7 +20,6 @@ data = read_pickle(args.data)
 data_big = read_pickle(args.data_big)
 
 
-
 data_train = copy.deepcopy(data)
 data_train = sub_data(data_train, train=True, in_place=True)
 data = sub_data(data, train=False, in_place=True)
@@ -31,14 +29,10 @@ data = sub_data(data, train=False, in_place=True)
 # print(data["queries"][0][:5], data_train["queries"][0][:5])
 
 logdata = []
-# for num_samples in [128, (10**2) *3]:
-# for num_samples in [
-#     128, (10**2) * 3, 10**3, (10**3) * 3,
-#     (10**4), (10**4) * 3, 10**5, (10**5) * 3, 10**6,
-#     len(data_train["docs"]), (10**6) * 3, 10**7, (10**7) * 3
-# ]:
 for num_samples in [
-    (10**3) * 3, (10**4),
+    128, (10**2) * 3, 10**3, (10**3) * 3,
+    (10**4), (10**4) * 3, 10**5, (10**5) * 3, 10**6,
+    len(data_train["docs"]), (10**6) * 3, 10**7, (10**7) * 3
 ]:
     # increase test size
     if num_samples > len(data["docs"]):
@@ -58,7 +52,8 @@ for num_samples in [
             train_key="d",
             skip_eval=True,
         )
-        val_ip, val_l2, queries_loss, docs_loss = model.eval_routine(new_data, post_cn=args.post_cn)
+        val_ip, val_l2, queries_loss, docs_loss = model.eval_routine(
+            new_data, post_cn=args.post_cn)
 
         logdata.append({
             "val_ip": val_ip, "val_l2": val_l2,
@@ -86,7 +81,8 @@ for num_samples in [
         train_key="d",
         skip_eval=True,
     )
-    val_ip, val_l2, queries_loss, docs_loss = model.eval_routine(data, post_cn=args.post_cn)
+    val_ip, val_l2, queries_loss, docs_loss = model.eval_routine(
+        data, post_cn=args.post_cn)
 
     logdata.append({
         "val_ip": val_ip, "val_l2": val_l2,

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+raise NotImplementedError(
+    "Not adapted to new data orgnization (docs and queries as tuples)")
 
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.load_utils import read_keys_pickle, save_keys_pickle
 import torch
 import argparse
@@ -28,21 +30,24 @@ for components in [1, 2, 5, 10, 25, 50, 75, 100, 150, 200, 250, 300, 400, 500, 6
     dataDenoised = model.inverse_transform(dataReduced)
 
     loss = torch.nn.MSELoss()(torch.Tensor(data), torch.Tensor(dataDenoised))
-    
+
     print(components, loss)
     reconstructionLosses.append((components, loss))
 
 plt.figure(figsize=(6, 3.5))
-plt.plot([x[0] for x in reconstructionLosses], [x[1] for x in reconstructionLosses], marker="o")
-plt.title(f"Average L2 PCA reconstruction loss for {len(data)} keys/embeddings")
+plt.plot([x[0] for x in reconstructionLosses], [x[1]
+         for x in reconstructionLosses], marker="o")
+plt.title(
+    f"Average L2 PCA reconstruction loss for {len(data)} keys/embeddings")
 plt.xlabel("PCA components")
 plt.ylabel("Average L2 reconstruction loss")
 plt.tight_layout()
 plt.show()
 
 # Original dimensions
-plt.figure(figsize=(6,3.5))
-plt.scatter(list(range(len(data[0])))*len(data), np.array(data).flatten(), alpha=0.2, marker='.', s=2)
+plt.figure(figsize=(6, 3.5))
+plt.scatter(list(range(len(data[0]))) * len(data),
+            np.array(data).flatten(), alpha=0.2, marker='.', s=2)
 plt.xlabel("Dimension")
 plt.ylabel("Value")
 plt.title(f"Dimensions of {len(data)} keys/embeddings")
@@ -54,7 +59,8 @@ model = PCA(n_components=256).fit(data)
 dataReduced = model.transform(data)
 save_keys_pickle(dataReduced, args.keys_out_pca)
 plt.figure(figsize=(6, 3.5))
-plt.scatter(list(range(len(dataReduced[0])))*len(dataReduced), np.array(dataReduced).flatten(), alpha=0.2, marker='.', s=2)
+plt.scatter(list(range(len(dataReduced[0]))) * len(dataReduced),
+            np.array(dataReduced).flatten(), alpha=0.2, marker='.', s=2)
 plt.xlabel("Dimension")
 plt.ylabel("Value")
 plt.title(f"Dimensions of {len(dataReduced)} keys/embeddings PCA (256)")
@@ -65,10 +71,12 @@ plt.show()
 model = PCA(n_components=256).fit(data)
 dataReconstructed = model.inverse_transform(model.transform(data))
 plt.figure(figsize=(6, 3.5))
-plt.scatter(list(range(len(dataReconstructed[0])))*len(dataReconstructed), np.array(dataReconstructed).flatten(), alpha=0.2, marker='.', s=2)
+plt.scatter(list(range(len(dataReconstructed[0]))) * len(dataReconstructed), np.array(
+    dataReconstructed).flatten(), alpha=0.2, marker='.', s=2)
 plt.xlabel("Dimension")
 plt.ylabel("Value")
-plt.title(f"Dimensions of reconstructed {len(dataReconstructed)} keys/embeddings PCA (256)")
+plt.title(
+    f"Dimensions of reconstructed {len(dataReconstructed)} keys/embeddings PCA (256)")
 plt.tight_layout()
 plt.show()
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.load_utils import read_pickle
 from misc.retrieval_utils import rprec_a_ip, rprec_a_l2
 import numpy as np
@@ -16,11 +17,14 @@ data = read_pickle(args.data)
 data["queries"] = np.array(data["queries"])
 data["docs"] = np.array(data["docs"])
 
+
 class DropRandomProjection():
     def transform(self, data, dim):
         return np.delete(data, dim, axis=1)
 
-data_log = []
+
+logdata = []
+
 
 def random_projection_performance(dim):
     if dim == False:
@@ -43,13 +47,14 @@ def random_projection_performance(dim):
         fast=True,
     )
 
-    data_log.append({"dim": dim, "val_l2": val_l2})
-    
+    logdata.append({"dim": dim, "val_l2": val_l2})
+
     # continuously override the file
     with open(args.logfile, "w") as f:
-        f.write(str(data_log))
+        f.write(str(logdata))
 
     print(f"Dim {dim}: {val_l2:<8.5f}")
+
 
 print(f"{'Method':<12} {'(IP)':<8} {'(L2)':<8}")
 random_projection_performance(False)

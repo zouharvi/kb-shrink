@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 import argparse
@@ -23,6 +24,7 @@ if args.norm:
 
 print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
 
+
 def summary_performance(name, dataReduced, dataReconstructed):
     if args.post_cn:
         dataReduced = center_data(dataReduced)
@@ -38,11 +40,12 @@ def summary_performance(name, dataReduced, dataReconstructed):
     print(f"{name:<21} {val_ip:>5.3f} {val_l2:>5.3f}")
     return val_ip, val_l2
 
+
 def lda_performance_d(components):
     model = LinearDiscriminantAnalysis(
         n_components=components,
     )
-    doc_relevancy = [None]*len(data["docs"])
+    doc_relevancy = [None] * len(data["docs"])
     for query_i, docs in enumerate(data["relevancy"][:len(data["queries"])]):
         for doc in docs:
             doc_relevancy[doc] = query_i
@@ -56,5 +59,6 @@ def lda_performance_d(components):
         dataReduced,
         data
     )
+
 
 lda_performance_d(args.dim)

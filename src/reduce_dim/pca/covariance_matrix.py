@@ -16,4 +16,7 @@ matrix_docs = np.cov(np.array(data["docs"]).T, bias=True)
 matrix_queries = np.cov(np.array(data["queries"]).T, bias=True)
 
 with open(args.logfile, "w") as f:
-    f.write(str({"docs": matrix_docs.tolist(), "queries": matrix_queries.tolist()}))
+    f.write(str({
+        "docs": matrix_docs.tolist(),
+        "queries": matrix_queries.tolist()
+    }))

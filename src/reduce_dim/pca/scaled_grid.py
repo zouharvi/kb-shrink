@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+raise NotImplementedError(
+    "Not adapted to new data orgnization (docs and queries as tuples)")
 
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data
 from misc.retrieval_utils import rprec_l2, rprec_ip
 import numpy as np
@@ -17,6 +19,7 @@ parser.add_argument('--post-cn', action="store_true")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 data = read_pickle(args.data)
+
 
 def summary_performance(name, dataReduced, dataReconstructed):
     if args.post_cn:
@@ -39,17 +42,18 @@ def summary_performance(name, dataReduced, dataReconstructed):
     )
     return val_ip, val_l2, loss_q.item(), loss_d.item()
 
+
 def pca_performance_d(params, components):
     model = PCA(
         n_components=components,
         random_state=args.seed
     ).fit(data["docs"])
-    
+
     scaling = np.ones(components)
-    for k,v in params.items():
+    for k, v in params.items():
         scaling[k] = v
     model.components_ *= scaling[:, np.newaxis]
-    
+
     dataReduced = {
         "queries": model.transform(data["queries"]),
         "docs": model.transform(data["docs"])
@@ -67,11 +71,13 @@ def pca_performance_d(params, components):
 
 param_grid = {}
 for i in range(5):
-    param_grid[i] = np.linspace(0.5,1,num=6,endpoint=True)
+    param_grid[i] = np.linspace(0.5, 1, num=6, endpoint=True)
 param_grid = ParameterGrid(param_grid)
+
 
 def argmax(iterable, key="val_ip"):
     return max(enumerate(iterable), key=lambda x: x[1][key])[1]
+
 
 data_log = []
 for params in param_grid:

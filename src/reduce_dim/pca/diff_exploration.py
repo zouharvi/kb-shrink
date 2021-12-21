@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+raise NotImplementedError(
+    "Not adapted to new data orgnization (docs and queries as tuples)")
 
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data
 from misc.retrieval_utils import rprec_l2, rprec_ip, order_ip, order_l2
 import numpy as np
@@ -21,10 +23,10 @@ model = PCA(
 ).fit(np.concatenate((data["queries"], data["docs"])))
 
 print("Q * Q^T")
-print((np.matmul(model.components_, model.components_.T) >= 0.001)*1)
+print((np.matmul(model.components_, model.components_.T) >= 0.001) * 1)
 
 print("Q^T * Q")
-print((np.matmul(model.components_.T, model.components_) >= 0.001)*1)
+print((np.matmul(model.components_.T, model.components_) >= 0.001) * 1)
 
 dataReduced = {
     "queries": model.transform(data["queries"]),
@@ -33,8 +35,10 @@ dataReduced = {
 
 
 print("\nReduced norms")
-print(f"Queries: {np.average(np.linalg.norm(dataReduced['queries'], axis=1)[:, np.newaxis]):.8f}")
-print(f"Docs:    {np.average(np.linalg.norm(dataReduced['docs'], axis=1)[:, np.newaxis]):.8f}")
+print(
+    f"Queries: {np.average(np.linalg.norm(dataReduced['queries'], axis=1)[:, np.newaxis]):.8f}")
+print(
+    f"Docs:    {np.average(np.linalg.norm(dataReduced['docs'], axis=1)[:, np.newaxis]):.8f}")
 
 print("\nPerformance")
 val_ip_pca = rprec_ip(
@@ -69,7 +73,11 @@ val_order_ip = list(order_ip(
     [len(x) for x in data["relevancy"]],
     fast=True
 ))
-print(f"Strict equality    [x==y]:     {np.average([set(x[:len(z)]) == set(y[:len(z)]) for x,y,z in zip(val_order_l2, val_order_ip, data['relevancy'])])*100:.2f}%")
-print(f"Partial equality   [|x&y|!=0]: {np.average([len(set(x[:len(z)]) & set(y[:len(z)])) != 0 for x,y,z in zip(val_order_l2, val_order_ip,data['relevancy'])])*100:.2f}%")
-print(f"Average overlap    [|x&y|]:    {np.average([len(set(x[:len(z)]) & set(y[:len(z)])) for x,y,z in zip(val_order_l2, val_order_ip,data['relevancy'])]):.2f}")
-print(f"Average retrieved  [|x|]:      {np.average([len(x) for x in data['relevancy']]):.2f}")
+print(
+    f"Strict equality    [x==y]:     {np.average([set(x[:len(z)]) == set(y[:len(z)]) for x,y,z in zip(val_order_l2, val_order_ip, data['relevancy'])])*100:.2f}%")
+print(
+    f"Partial equality   [|x&y|!=0]: {np.average([len(set(x[:len(z)]) & set(y[:len(z)])) != 0 for x,y,z in zip(val_order_l2, val_order_ip,data['relevancy'])])*100:.2f}%")
+print(
+    f"Average overlap    [|x&y|]:    {np.average([len(set(x[:len(z)]) & set(y[:len(z)])) for x,y,z in zip(val_order_l2, val_order_ip,data['relevancy'])]):.2f}")
+print(
+    f"Average retrieved  [|x|]:      {np.average([len(x) for x in data['relevancy']]):.2f}")

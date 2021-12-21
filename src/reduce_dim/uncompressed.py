@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data, sub_data, zscore_data
 from misc.retrieval_utils import acc_ip, acc_l2, rprec_l2, rprec_ip, rprec_a_l2, rprec_a_ip
 import argparse
 
-parser = argparse.ArgumentParser(description='Performance on uncompressed data')
+parser = argparse.ArgumentParser(
+    description='Performance on uncompressed data'
+)
 parser.add_argument('--data', default="/data/big-hp/dpr-c-pruned.embd")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
@@ -28,10 +31,10 @@ data["queries"] = data["queries"][:args.queries_n]
 
 if args.metric == "rprec":
     metric_l2 = rprec_l2
-    metric_ip = rprec_ip 
+    metric_ip = rprec_ip
 elif args.metric == "rprec_a":
     metric_l2 = rprec_a_l2
-    metric_ip = rprec_a_ip 
+    metric_ip = rprec_a_ip
 elif args.metric == "acc":
     metric_l2 = acc_l2
     metric_ip = acc_ip
@@ -51,12 +54,12 @@ if args.all:
 
     data = norm_data(data_b)
     print(f"{args.metric}_ip (norm):", "{:.4f}".format(metric_ip(
-        data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"],fast=True
+        data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=True
     )))
     print(f"{args.metric}_l2 (norm):", "{:.4f}".format(metric_l2(
-        data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"],fast=True
+        data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=True
     )))
-    
+
     data = center_data(data_b)
     print(f"{args.metric}_ip (center):", "{:.4f}".format(metric_ip(
         data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=True
@@ -64,7 +67,7 @@ if args.all:
     print(f"{args.metric}_l2 (center):", "{:.4f}".format(metric_l2(
         data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=True
     )))
-    
+
     data = norm_data(center_data(data_b))
     print(f"{args.metric}_ip (center, norm):", "{:.4f}".format(metric_ip(
         data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=True

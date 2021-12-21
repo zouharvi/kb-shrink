@@ -3,6 +3,7 @@
 ||||running
 ||||
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
+21 dec|feature agglomeration `dpr-c-pruned_cn` *babyquest*|14|running
 ||||
 ||||finished
 ||||

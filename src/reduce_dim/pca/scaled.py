@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import copy
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data, process_dims, sub_data
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 import numpy as np
@@ -45,6 +46,7 @@ else:
     data_small = sub_data(data_small, train=True, in_place=True)
 print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
 
+
 def summary_performance(name, dataReduced, dataReconstructed):
     if args.post_cn:
         dataReduced = center_data(dataReduced)
@@ -69,9 +71,9 @@ def summary_performance(name, dataReduced, dataReconstructed):
             data["docs_articles"],
             fast=True, report=False
         )
- 
+
     name = name.replace("float", "f")
- 
+
     if not args.skip_loss:
         loss_q = sklearn.metrics.mean_squared_error(
             data["queries"],
@@ -88,11 +90,14 @@ def summary_performance(name, dataReduced, dataReconstructed):
         print(f"{name:<21} {-1:>7.5f} {-1:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
         return val_ip, val_l2, None, None
 
+
 def safe_transform(model, array):
     return [model.transform([x])[0] for x in array]
 
+
 def safe_inv_transform(model, array):
     return [model.inverse_transform([x])[0] for x in array]
+
 
 def pca_performance_d(components):
     model = PCA(
@@ -115,7 +120,7 @@ def pca_performance_d(components):
     scaling[3] = 0.9
     scaling[4] = 0.6
     model.components_ *= scaling[:, np.newaxis]
-    
+
     dataReduced = {
         "queries": safe_transform(model, data["queries"]),
         "docs": safe_transform(model, data["docs"])
@@ -155,7 +160,7 @@ def pca_performance_q(components):
     scaling[3] = 0.9
     scaling[4] = 0.6
     model.components_ *= scaling[:, np.newaxis]
-    
+
     dataReduced = {
         "queries": safe_transform(model, data["queries"]),
         "docs": safe_transform(model, data["docs"])
@@ -195,7 +200,7 @@ def pca_performance_dq(components):
     scaling[3] = 0.9
     scaling[4] = 0.6
     model.components_ *= scaling[:, np.newaxis]
-    
+
     dataReduced = {
         "queries": safe_transform(model, data["queries"]),
         "docs": safe_transform(model, data["docs"])
@@ -212,6 +217,7 @@ def pca_performance_dq(components):
         dataReduced,
         dataReconstructed
     )
+
 
 DIMS = process_dims(args.dims)
 

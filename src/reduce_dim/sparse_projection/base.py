@@ -50,9 +50,6 @@ class CropRandomProjection():
         )
 
 
-data_log = []
-
-
 def random_projection_performance(components, model_name, runs=3):
     if model_name == "gauss":
         Model = GaussianRandomProjection
@@ -108,7 +105,7 @@ def random_projection_performance(components, model_name, runs=3):
         else:
             vals_ip.append(val_l2)
 
-    data_log.append({
+    logdata.append({
         "dim": components,
         "vals_ip": vals_ip,
         "vals_l2": vals_l2,
@@ -117,7 +114,7 @@ def random_projection_performance(components, model_name, runs=3):
 
     # continuously override the file
     with open(args.logfile, "w") as f:
-        f.write(str(data_log))
+        f.write(str(logdata))
 
     summary_performance_custom(
         f"{model_name.capitalize()} ({components})",
@@ -125,7 +122,9 @@ def random_projection_performance(components, model_name, runs=3):
         max(vals_l2), np.average(vals_l2)
     )
 
+
 DIMS = process_dims(args.dims)
+logdata = []
 
 for model in ["crop", "sparse", "gauss"]:
     for dim in DIMS:

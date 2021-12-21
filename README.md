@@ -4,27 +4,23 @@ The 768-dimensional embedding of 2019 Wikipedia dump (split to 100 token segment
 This poses practical issues for both research and applications.
 We aim to reduce the size through two methods:
 
-Dimensionality reduction of the embedding:
-- PCA, autoencoder, random projections, manifold learning
-- Similarity distillation
+Dimensionality reduction of the embedding (article in writing):
+- PCA, autoencoder, random projections
 - Effect on IP vs L2
-- Downstream performance
+- Pre-processing
+- Training/evaluation data size dependency
 
-Document splitting & filtering:
-- TBD
-
-<!--
-- Observe distribution of keys in KB
-- Reduce embedding vector size
-- - Observe performance drop vs. size
-- - Pre-train vs. post-train reduction effects (fine-tuning)
-- Decrease knowledge base size by clustering.
-- - Observe performance vs. cluster count
-- - Cluster aggregation
-- - Pre-train vs. post-train reduction effects
-- - MIPS has to be modified to gravitate towards the averages - store cluster size. -->
+Document splitting & filtering (thesis in writing): 
+- Split on segments respecting semantic boundaries
+- Get retrievability annotations and train a filtering system
+- Decrease knowledge base size by clustering (join neighbours pointing to the same doc)
+  - Observe performance vs. cluster count
+  - Cluster aggregation
+  - Pre-train vs. post-train reduction effects
 
 ## Pipeline
+
+Dimensionality reduction:
 
 1. Process Wikipedia dump and create document segments with relevancy annotation: <br>
 `./src/misc/kilt_preprocessing.py --data-out /data/big-hp/full.pkl`
@@ -41,6 +37,5 @@ Run all scripts from the top directory of the repository.
 
 ## Acknowledgement
 
-Based on KILT research & dataset:
-- https://arxiv.org/abs/2009.02252
-- https://github.com/facebookresearch/KILT
+- Based on KILT [research](https://arxiv.org/abs/2009.02252) & [dataset](https://github.com/facebookresearch/KILT):
+- This work was funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) – Project-ID 232722074 – SFB 1102.

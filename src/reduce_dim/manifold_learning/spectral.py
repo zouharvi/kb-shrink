@@ -49,4 +49,3 @@ val_l2_pca = rprec_a_l2(
     data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=False
 )
 print(f"ip: {val_ip_pca:.4f}, l2: {val_l2_pca:.4f} (orig)")
-

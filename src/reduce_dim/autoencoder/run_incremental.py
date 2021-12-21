@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+raise NotImplementedError(
+    "Not adapted to new data orgnization (docs and queries as tuples)")
 
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.retrieval_utils import DEVICE
 from misc.load_utils import read_pickle, save_pickle
 from reduce_dim.autoencoder import Autoencoder, report
@@ -10,9 +12,8 @@ import argparse
 import torch
 from reduce_dim.autoencoder.model import AutoencoderModel, report
 
-raise NotImplementedError()
-
-parser = argparse.ArgumentParser(description='Incremental autoencoder embeddings')
+parser = argparse.ArgumentParser(
+    description='Incremental autoencoder embeddings')
 parser.add_argument(
     'logfile',
     help='File which to log to')
@@ -51,6 +52,8 @@ for bottleneck_width in [32, 64, 128, 256]:
         with torch.no_grad():
             encoded = model.encode(data, bottleneck_index).cpu()
 
-        acc_ip, acc_l2, avg_norm = report(f"Final:", encoded, data.cpu(), level=3)
+        acc_ip, acc_l2, avg_norm = report(
+            f"Final:", encoded, data.cpu(), level=3)
         with open(args.logfile, "a") as f:
-            f.write(f"{args.model}, {bottleneck_width}, {bottleneck_index}, {acc_ip}, {acc_l2}, {avg_norm}\n")
+            f.write(
+                f"{args.model}, {bottleneck_width}, {bottleneck_index}, {acc_ip}, {acc_l2}, {avg_norm}\n")

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-raise NotImplementedError("Not adapted to new data orgnization (docs and queries as tuples)")
+raise NotImplementedError(
+    "Not adapted to new data orgnization (docs and queries as tuples)")
 
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data
 from misc.retrieval_utils import rprec_l2, rprec_ip
 import torch
@@ -25,6 +27,7 @@ if args.norm:
     data = norm_data(data)
 
 print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
+
 
 def summary_performance(name, dataReduced, dataReconstructed):
     if args.post_cn:
