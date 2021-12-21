@@ -5,7 +5,7 @@
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
 21 dec|umap `dpr-c-pruned_cn` `--train-size 10000` *babyquest*|13|running
 21 dec|umap `dpr-c-pruned_cn` `--train-size 1000` *babyquest*|14|running
-21 dec|prec 8 16 `dpr-c-pruned_cn` `--post-cn` *filthysuit*|12|running
+21 dec|prec base `dpr-c-pruned_cn` {:,cn:`--post-cn`} *filthysuit*|12|running
 ||||
 ||||finished
 ||||

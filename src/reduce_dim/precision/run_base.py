@@ -29,6 +29,8 @@ def transform_to_8(x):
         dtype=np.float16
     )
 
+def transform_to_1(x):
+    return [1 if el > 0 else -1 for el in x]
 
 def summary_performance(dataReduced):
     if args.post_cn:
@@ -76,20 +78,32 @@ def pca_performance_8(data):
     }
     return summary_performance(dataReduced)
 
+def pca_performance_1(data):
+    dataReduced = {
+        "queries": safe_transform(transform_to_1, data["queries"]),
+        "docs": safe_transform(transform_to_1, data["docs"])
+    }
+    return summary_performance(dataReduced)
+
 
 data = sub_data(data, train=False, in_place=True)
 
 logdata = []
-val_ip, val_l2 = pca_performance_8(data)
+val_ip, val_l2 = pca_performance_1(data)
 logdata.append({
     "val_ip": val_ip, "val_l2": val_l2,
-    "type": "float8",
+    "type": "bit",
 })
-val_ip, val_l2 = pca_performance_16(data)
-logdata.append({
-    "val_ip": val_ip, "val_l2": val_l2,
-    "type": "float16",
-})
+# val_ip, val_l2 = pca_performance_8(data)
+# logdata.append({
+#     "val_ip": val_ip, "val_l2": val_l2,
+#     "type": "float8",
+# })
+# val_ip, val_l2 = pca_performance_16(data)
+# logdata.append({
+#     "val_ip": val_ip, "val_l2": val_l2,
+#     "type": "float16",
+# })
 
 # continuously override the file
 with open(args.logfile, "w") as f:
