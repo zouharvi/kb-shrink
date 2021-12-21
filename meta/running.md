@@ -3,10 +3,11 @@
 ||||running
 ||||
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
-21 dec|feature agglomeration `dpr-c-pruned_cn` *babyquest*|14|running
+21 dec|umap `dpr-c-pruned_cn` `--train-size 10000` *babyquest*|13|running
 ||||
 ||||finished
 ||||
+21 dec|feature agglomeration `dpr-c-pruned_cn` *babyquest*|14|ok
 19 dec|autoencoder irrelevant `dpr-c-pruned_cn` `dpr-c_cn` `--post-cn` *uneasiness* {:accidentally stopped,2: pre on 13,3: continuation,4: redo }|14|ok
 19 dec|rproj greedy `dpr-c-pruned_cn` *unusedoven* {:,cn:`--post-cn`|12|ok
 19 dec|pca irrelevant `dpr-c-pruned_cn` `dpr-c_cn` `--post-cn` *uneasiness* {,2: pre}|13|ok, ok
