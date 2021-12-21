@@ -30,7 +30,8 @@ def transform_to_8(x):
     )
 
 def transform_to_1(x):
-    return [1 if el > 0 else -1 for el in x]
+    return (np.array(x) > 0)*1 -0.5
+    # return [1 if el > 0 else -1 for el in x]
 
 def summary_performance(dataReduced):
     if args.post_cn:
