@@ -53,8 +53,9 @@ def performance_1(data):
     }
 
     # center data in between
-    dataReduced = center_data(dataReduced)
-    dataReduced = norm_data(dataReduced)
+    # actually worsesns the performance slightly
+    # dataReduced = center_data(dataReduced)
+    # dataReduced = norm_data(dataReduced)
 
     dataReduced = {
         "queries": transform_to_1(dataReduced["queries"]),
