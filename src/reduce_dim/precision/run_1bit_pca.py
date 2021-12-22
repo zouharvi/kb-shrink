@@ -52,6 +52,10 @@ def performance_1(data):
         "queries": model.transform(data["queries"]),
     }
 
+    # center data in between
+    dataReduced = center_data(dataReduced)
+    dataReduced = norm_data(dataReduced)
+
     dataReduced = {
         "queries": transform_to_1(dataReduced["queries"]),
         "docs": transform_to_1(dataReduced["docs"])
