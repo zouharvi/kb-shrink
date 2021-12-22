@@ -6,6 +6,7 @@ from misc.load_utils import read_pickle, center_data, norm_data, sub_data
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 from model import transform_to_1, transform_to_8, transform_to_16
 import argparse
+from sklearn import cluster
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--data')
@@ -43,50 +44,36 @@ def summary_performance(dataReduced):
     return val_ip, val_l2
 
 
-def safe_transform(transform, array):
-    return [transform(x) for x in array]
-
-
-def bit_performance_16(data):
-    dataReduced = {
-        "queries": transform_to_16(data["queries"]),
-        "docs": transform_to_16(data["docs"])
-    }
-    return summary_performance(dataReduced)
-
-
-def bit_performance_8(data):
-    dataReduced = {
-        "queries": transform_to_8(data["queries"]),
-        "docs": transform_to_8(data["docs"])
-    }
-    return summary_performance(dataReduced)
-
-def bit_performance_1(data):
+def performance_1(data):
     dataReduced = {
         "queries": transform_to_1(data["queries"]),
         "docs": transform_to_1(data["docs"])
     }
-    return summary_performance(dataReduced)
+
+    print("Preparing model")
+    model = cluster.FeatureAgglomeration(
+        n_clusters=384
+    )
+    print(dataReduced["docs"][0][:10])
+
+    print("Fitting model")
+    model.fit(data["docs"])
+    dataNew = {
+        "docs": model.transform(dataReduced["docs"]),
+        "queries": model.transform(dataReduced["queries"]),
+    }
+    print(dataNew["docs"][0][:10])
+
+    return summary_performance(dataNew)
 
 
 data = sub_data(data, train=False, in_place=True)
 
 logdata = []
-val_ip, val_l2 = bit_performance_1(data)
+val_ip, val_l2 = performance_1(data)
 logdata.append({
     "val_ip": val_ip, "val_l2": val_l2,
     "type": "bit",
-})
-val_ip, val_l2 = bit_performance_8(data)
-logdata.append({
-    "val_ip": val_ip, "val_l2": val_l2,
-    "type": "float8",
-})
-val_ip, val_l2 = bit_performance_16(data)
-logdata.append({
-    "val_ip": val_ip, "val_l2": val_l2,
-    "type": "float16",
 })
 
 # continuously override the file

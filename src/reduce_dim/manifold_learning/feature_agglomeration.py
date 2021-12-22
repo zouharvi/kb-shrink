@@ -19,7 +19,7 @@ model = cluster.FeatureAgglomeration(
 )
 
 print("Fitting model")
-dataNew = model.fit(data["docs"])
+model.fit(data["docs"])
 dataNew = {
     "docs": model.transform(data["docs"]),
     "queries": model.transform(data["queries"]),
