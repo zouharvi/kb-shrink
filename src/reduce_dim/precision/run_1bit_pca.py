@@ -6,7 +6,7 @@ from misc.load_utils import read_pickle, center_data, norm_data, sub_data
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 from model import transform_to_1, transform_to_8, transform_to_16
 import argparse
-from sklearn import cluster
+from sklearn.decomposition import PCA
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--data')
@@ -45,27 +45,19 @@ def summary_performance(dataReduced):
 
 
 def performance_1(data):
-    dataReduced = {
-        "queries": transform_to_1(data["queries"]),
-        "docs": transform_to_1(data["docs"])
-    }
-
-    print("Preparing model")
-    model = cluster.FeatureAgglomeration(
-        n_clusters=384
-    )
-    print(dataReduced["docs"][0][:10])
-
-    print("Fitting model")
+    model = PCA(n_components=256)
     model.fit(data["docs"])
-    dataNew = {
-        "docs": model.transform(dataReduced["docs"]),
-        "queries": model.transform(dataReduced["queries"]),
+    dataReduced = {
+        "docs": model.transform(data["docs"]),
+        "queries": model.transform(data["queries"]),
     }
-    # is not 1bit
-    print(dataNew["docs"][0][:10])
 
-    return summary_performance(dataNew)
+    dataReduced = {
+        "queries": transform_to_1(dataReduced["queries"]),
+        "docs": transform_to_1(dataReduced["docs"])
+    }
+
+    return summary_performance(dataReduced)
 
 
 data = sub_data(data, train=False, in_place=True)
