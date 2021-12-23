@@ -3,10 +3,10 @@
 ||||running
 ||||
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
-21 dec|umap `dpr-c-pruned_cn` `--train-size 1000` *babyquest*|14|running
 ||||
 ||||finished
 ||||
+21 dec|umap `dpr-c-pruned_cn` `--train-size 1000` *babyquest*|14|did not finish
 21 dec|prec 1bit pca `dpr-c-pruned_cn` *filthysuit*|12|ok
 21 dec|prec 1bit fagglo `dpr-c-pruned_cn` *filthysuit*|12|ok
 21 dec|umap `dpr-c-pruned_cn` `--train-size 10000` *babyquest* (bad post-cn)|13|killed
