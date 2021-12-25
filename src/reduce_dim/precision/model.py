@@ -15,7 +15,7 @@ def _transform_to_8(x):
     )
 
 def _transform_to_1(x, offset):
-    return (np.array(x) > 0)*1 +offset
+    return (np.array(x) > 0)*1.0 + offset
     # return [1 if el > 0 else -1 for el in x]
 
 def transform_to_16(array):

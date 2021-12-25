@@ -5,6 +5,7 @@ sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data, sub_data
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 from model import transform_to_1, transform_to_8, transform_to_16
+import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser(description='')
@@ -17,6 +18,8 @@ data = read_pickle(args.data)
 
 
 def summary_performance(dataReduced):
+    dataReduced["queries"] = np.array(dataReduced["queries"], dtype=np.float64)
+    dataReduced["docs"] = np.array(dataReduced["docs"], dtype=np.float64)
     if args.post_cn:
         dataReduced = center_data(dataReduced)
         dataReduced = norm_data(dataReduced)
@@ -64,8 +67,8 @@ def bit_performance_8(data):
 
 def bit_performance_1(data):
     dataReduced = {
-        "queries": transform_to_1(data["queries"], 0),
-        "docs": transform_to_1(data["docs"], 0)
+        "queries": transform_to_1(data["queries"], offset=0),
+        "docs": transform_to_1(data["docs"], offset=0)
     }
     return summary_performance(dataReduced)
 
