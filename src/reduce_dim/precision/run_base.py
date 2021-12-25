@@ -64,8 +64,8 @@ def bit_performance_8(data):
 
 def bit_performance_1(data):
     dataReduced = {
-        "queries": transform_to_1(data["queries"]),
-        "docs": transform_to_1(data["docs"])
+        "queries": transform_to_1(data["queries"], 0),
+        "docs": transform_to_1(data["docs"], 0)
     }
     return summary_performance(dataReduced)
 
@@ -78,16 +78,16 @@ logdata.append({
     "val_ip": val_ip, "val_l2": val_l2,
     "type": "bit",
 })
-val_ip, val_l2 = bit_performance_8(data)
-logdata.append({
-    "val_ip": val_ip, "val_l2": val_l2,
-    "type": "float8",
-})
-val_ip, val_l2 = bit_performance_16(data)
-logdata.append({
-    "val_ip": val_ip, "val_l2": val_l2,
-    "type": "float16",
-})
+# val_ip, val_l2 = bit_performance_8(data)
+# logdata.append({
+#     "val_ip": val_ip, "val_l2": val_l2,
+#     "type": "float8",
+# })
+# val_ip, val_l2 = bit_performance_16(data)
+# logdata.append({
+#     "val_ip": val_ip, "val_l2": val_l2,
+#     "type": "float16",
+# })
 
 # continuously override the file
 with open(args.logfile, "w") as f:
