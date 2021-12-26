@@ -1,21 +1,28 @@
 import math
 
+
 class FixedWidthSplitter:
-    def __init__(self, token_count):
-        self.token_count = token_count
-    
+    def __init__(self, width):
+        self.width = width
+
     def split(self, line):
         line = line.rstrip("\n").split(" ")
-        for i in range(0, math.ceil(len(line) / self.token_count)):
-            if len(line[i * self.token_count:(i + 1) * self.token_count]) == 0:
-                raise Exception("Empty chunk")
-            yield " ".join(line[i * self.token_count:(i + 1) * self.token_count])
+        for i in range(0, math.ceil(len(line) / self.width)):
+            yield " ".join(line[i * self.width:(i + 1) * self.width])
 
+class OverlapSplitter:
+    def __init__(self, width, ):
+        self.width = width
+
+    def split(self, line):
+        line = line.rstrip("\n").split(" ")
+        for i in range(0, math.ceil(len(line) / self.width)):
+            yield " ".join(line[i * self.width:(i + 1) * self.width])
 
 _SPLITTERS = {
-    "fixed": FixedWidthSplitter
+    "fixed": FixedWidthSplitter,
+    "overlap": OverlapSplitter,
 }
-
 
 def get_splitter(name, args):
     if name in _SPLITTERS:

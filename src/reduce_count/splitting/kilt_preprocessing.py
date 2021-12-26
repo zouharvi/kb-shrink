@@ -10,7 +10,7 @@ import argparse
 import numpy as np
 from collections import defaultdict
 from itertools import chain
-
+from tqdm import tqdm
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -24,8 +24,7 @@ if __name__ == "__main__":
     splitter = get_splitter(args.splitter, args)
 
     # get the knowledge source
-    ks = KnowledgeSource(database="kilt")
-    # ks = KnowledgeSource(mongo_connection_string="kiltuser@localhost", collection="knowledgesource", database="kilt-mock")
+    ks = KnowledgeSource(collection="knowledgesource", database="kilt")
 
     # count entries - 5903530
     print("Loaded", ks.get_num_pages(), "pages")
@@ -34,10 +33,8 @@ if __name__ == "__main__":
     data = defaultdict(lambda: {"relevancy": [], "spans": None})
 
     print("Processing Wikipedia spans")
-    total_pages = ks.get_num_pages()
-    for cur_page_i, cur_page in enumerate(cursor[:args.wiki_n]):
-        if cur_page_i % 10000 == 0:
-            print(f'\r{cur_page_i/total_pages:0.2%}%', end='')
+    # we know the total beforehand so we can tell tqdm
+    for cur_page in tqdm(cursor[:args.wiki_n], total=ks.get_num_pages()):
         data[cur_page["wikipedia_id"]]["spans"] = split_paragraph_list(
             cur_page["text"],
             splitter
