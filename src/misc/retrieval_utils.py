@@ -229,3 +229,53 @@ def rprec_a_from_relevancy(relevancy, n_new, relevancy_articles, docs_articles, 
         print(f"RPrec is {rprec_val:.3f} (best is 1, worst is 0)")
 
     return rprec_val
+
+
+def hits_a_from_relevancy(relevancy, n_new, relevancy_articles, docs_articles):
+    def rprec_local(doc_true, articles_true, doc_hyp):
+        """
+        R-Precision for one query
+        """
+
+        articles_hyp = {
+            docs_articles[doc]
+            if doc < len(docs_articles)
+            else -1 # hotfix for irrelevant effects (adding new docs)
+            for doc in doc_hyp[:len(doc_true)]
+        }
+        return len(articles_hyp & articles_true)
+
+    rprec_val = [
+        rprec_local(*x)
+        for x in zip(relevancy, relevancy_articles, n_new)
+    ]
+
+    return rprec_val
+
+
+def hits_a_ip(
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
+    n=20, fast=True
+):
+    n_new_gen = order_ip(
+        data_queries, data_docs,
+        [len(x) for x in data_relevancy],
+        fast
+    )
+    return hits_a_from_relevancy(
+        data_relevancy, n_new_gen, data_relevancy_articles, data_docs_articles
+    )
+
+
+def hits_a_l2(
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
+    n=20, fast=True
+):
+    n_new_gen = order_l2(
+        data_queries, data_docs,
+        [len(x) for x in data_relevancy],
+        fast
+    )
+    return hits_a_from_relevancy(
+        data_relevancy, n_new_gen, data_relevancy_articles, data_docs_articles
+    )
