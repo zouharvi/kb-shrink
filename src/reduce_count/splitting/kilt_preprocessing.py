@@ -2,6 +2,7 @@
 
 import sys
 sys.path.append("src")
+from reduce_count.splitting.splitter_models import get_splitter, split_paragraph_list
 from misc.load_utils import save_pickle
 from kilt.knowledge_source import KnowledgeSource
 from datasets import load_dataset
@@ -11,28 +12,16 @@ from collections import defaultdict
 from itertools import chain
 
 
-def split_paragraph(text):
-    text = text.rstrip("\n").split(" ")
-    return [" ".join(text[i * 100:(i + 1) * 100]) for i in range(0, len(text) // 100 + 1) if i * 100 != len(text)]
-
-
-def split_paragraph_list(text_list):
-    return [
-        span for span_list
-        in [
-            split_paragraph(text) for text in text_list
-            if not text.startswith("BULLET::::") and not text.startswith("Section::::")
-        ]
-        for span in span_list
-    ]
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--data-out', default="/data/big-hp/full.pkl")
     parser.add_argument('--wiki-n', type=int, default=None)
+    parser.add_argument('--splitter', default="fixed")
+    parser.add_argument('--splitter-fixed-width', type=int, default=100)
     parser.add_argument('--query-n', type=int, default=None)
     parser.add_argument('--prune-unused', action="store_true")
     args, _ = parser.parse_known_args()
+    splitter = get_splitter(args.splitter, args)
 
     # get the knowledge source
     ks = KnowledgeSource(database="kilt")
@@ -50,8 +39,10 @@ if __name__ == "__main__":
         if cur_page_i % 10000 == 0:
             print(f'\r{cur_page_i/total_pages:0.2%}%', end='')
         data[cur_page["wikipedia_id"]]["spans"] = split_paragraph_list(
-            cur_page["text"]
+            cur_page["text"],
+            splitter
         )
+
     print(
         np.average([len(x["spans"]) for x in data.values()]),
         "spans on average"
@@ -79,6 +70,7 @@ if __name__ == "__main__":
     query_dev_max = None
     query_test_max = None
     for sample_i, sample in enumerate(data_hotpot):
+        # early stopping
         if args.query_n is not None and sample_i >= args.query_n:
             break
 
@@ -111,8 +103,9 @@ if __name__ == "__main__":
 
     print(
         "Added queries:", len(data_query),
-        "boundaries", {"train": query_train_max,
-                       "dev": query_dev_max, "test": query_test_max}
+        "\nboundaries_train", query_train_max,
+        "\nboundaries_dev", query_dev_max,
+        "\nboundaries_test", query_test_max,
     )
 
     print("Reshaping data")
@@ -154,13 +147,3 @@ if __name__ == "__main__":
             "boundaries": {"train": query_train_max, "dev": query_dev_max, "test": query_test_max}
         }
     )
-    print("data_query[0]:")
-    print(data_query[0])
-    print("\ndata_docs[0]:")
-    print(data_docs[0])
-    print("\ndata_relevancy[0]:")
-    print(data_relevancy[0])
-    print("\ndata_relevancy_articles[0]:")
-    print(data_relevancy_articles[0])
-    print("\ndata_docs_articles[0]:")
-    print(data_docs_articles[0])
