@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.append("src")
+import misc.plot_utils
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import argparse
@@ -32,7 +35,6 @@ DIMS = sorted(list(set([x["dim"] for x in data_all[0]])), key=lambda x: int(x))
 DISPLAY_DIMS = [32, 256, 512, 768]
 
 fig = plt.figure(figsize=(10, 3))
-plt.rcParams["lines.linewidth"] = 2.2
 
 gs = gridspec.GridSpec(
     1, 4, width_ratios=[1, 1, 1, 1],
@@ -131,5 +133,10 @@ if args.legend:
         bbox_to_anchor=(1, 1.5),
         ncol=5,
     )
-    # plt.tight_layout()
+
+if is_autoencoder:
+    plt.savefig("figures/auto_main.pdf")
+else:
+    plt.savefig("figures/pca_main.pdf")
+
 plt.show()

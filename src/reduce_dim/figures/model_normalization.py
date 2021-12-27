@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.append("src")
+import misc.plot_utils
 import numpy as np
 import matplotlib.pyplot as plt
-#from reduce_dim.figures.model_normalization_data import *
 from model_normalization_data import *
 
 POS = np.arange(len(DATA_BASE))
@@ -12,6 +14,7 @@ YERRMOCK = np.random.rand(len(DATA_BASE))/10000
 
 plt.figure(figsize=(4.4, 4))
 ax = plt.gca()
+
 ax.bar(
     POS + BARSPACE * 0,
     [x["ip"] for x in DATA_BASE.values()],
@@ -56,8 +59,8 @@ ax.bar(
 )
 ax.set_xticks(POS + BARSPACE * 2.5)
 ax.set_xticklabels(DATA_BASE.keys())
-ax.set_ylabel("R-Precision")
-#ax.set_ylabel("Accuracy @ 20")
+ax.set_ylabel(r"R-Precision")
 plt.legend(bbox_to_anchor=(0, 1, 1, 0), loc="lower left", mode="expand", ncol=2)
 plt.tight_layout()
+plt.savefig("figures/model_normalization.pdf")
 plt.show()

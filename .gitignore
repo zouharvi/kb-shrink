@@ -11,5 +11,6 @@ computed/*.out
 computed/*.log
 nohup*.out
 .empty
-runs/*
+runs/
 .nfs00*
+figures/

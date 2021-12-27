@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.append("src")
+import misc.plot_utils
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
@@ -87,4 +90,5 @@ plt.legend(
     ncol=2
 )
 plt.tight_layout(rect=(0, 0, 1, 1.03))
+plt.savefig("figures/model_data.pdf")
 plt.show()

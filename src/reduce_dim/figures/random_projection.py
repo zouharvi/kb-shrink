@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.append("src")
+import misc.plot_utils
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
@@ -73,11 +76,5 @@ ax.set_ylabel("R-Precision")
 ax.set_xlabel("Dimensions")
 
 plt.tight_layout()
+plt.savefig("figures/random_projection.pdf")
 plt.show()
-
-loss_against_avg_l2 = np.average(
-    [max(x["vals_l2"]) - np.average(x["vals_l2"]) for x in DATA]
-)
-loss_against_avg_ip = np.average(
-    [max(x["vals_ip"]) - np.average(x["vals_ip"]) for x in DATA]
-)

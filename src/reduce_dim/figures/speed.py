@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.append("src")
+import misc.plot_utils
 import matplotlib.pyplot as plt
 import argparse
 parser = argparse.ArgumentParser()
@@ -61,4 +64,5 @@ plt.legend(
     columnspacing=1.4,
 )
 plt.tight_layout(rect=(0, 0, 1, 1.05))
+plt.savefig("figures/model_speed.pdf")
 plt.show()

@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.append("src")
+import misc.plot_utils
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -122,4 +125,5 @@ ax.set_xticklabels(DATA_RPREC.keys())
 ax.set_ylabel("R-Precision")
 plt.legend(bbox_to_anchor=(0, 1, 1, 0), loc="lower left", mode="expand", ncol=4)
 plt.tight_layout()
+plt.savefig("figures/model_intro.pdf")
 plt.show()

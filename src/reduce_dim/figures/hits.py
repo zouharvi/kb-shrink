@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import sys
+sys.path.append("src")
+import misc.plot_utils
 import matplotlib.pyplot as plt
 import argparse
 import numpy as np
@@ -53,4 +56,9 @@ plt.xticks(range(3))
 plt.yticks(range(3))
 plt.gca().invert_yaxis()
 plt.tight_layout()
+if args.hide_y:
+    plt.savefig("figures/hits_1bit.pdf")
+else:
+    plt.savefig("figures/hits_pca.pdf")
+
 plt.show()
