@@ -10,22 +10,22 @@ import argparse
 import numpy as np
 from collections import defaultdict
 from itertools import chain
-
+from tqdm import tqdm
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--data-out', default="/data/hp/full.pkl")
     parser.add_argument('--wiki-n', type=int, default=None)
     parser.add_argument('--splitter', default="fixed")
-    parser.add_argument('--splitter-fixed-width', type=int, default=100)
     parser.add_argument('--query-n', type=int, default=None)
-    parser.add_argument('--prune-unused', action="store_true")
-    args, _ = parser.parse_known_args()
+    parser.add_argument('--no-prune-unused', action="store_true")
+    parser.add_argument('--splitter-fixed-width', type=int, default=100)
+    parser.add_argument('--splitter-fixed-overlap', type=int, default=0)
+    args = parser.parse_args()
     splitter = get_splitter(args.splitter, args)
 
     # get the knowledge source
-    ks = KnowledgeSource(database="kilt")
-    # ks = KnowledgeSource(mongo_connection_string="kiltuser@localhost", collection="knowledgesource", database="kilt-mock")
+    ks = KnowledgeSource(collection="knowledgesource", database="kilt")
 
     # count entries - 5903530
     print("Loaded", ks.get_num_pages(), "pages")
@@ -34,10 +34,8 @@ if __name__ == "__main__":
     data = defaultdict(lambda: {"relevancy": [], "spans": None})
 
     print("Processing Wikipedia spans")
-    total_pages = ks.get_num_pages()
-    for cur_page_i, cur_page in enumerate(cursor[:args.wiki_n]):
-        if cur_page_i % 10000 == 0:
-            print(f'\r{cur_page_i/total_pages:0.2%}%', end='')
+    # we know the total beforehand so we can tell tqdm
+    for cur_page in tqdm(cursor[:args.wiki_n], total=ks.get_num_pages()):
         data[cur_page["wikipedia_id"]]["spans"] = split_paragraph_list(
             cur_page["text"],
             splitter
@@ -69,7 +67,7 @@ if __name__ == "__main__":
     query_train_max = None
     query_dev_max = None
     query_test_max = None
-    for sample_i, sample in enumerate(data_hotpot):
+    for sample_i, sample in tqdm(enumerate(data_hotpot)):
         # early stopping
         if args.query_n is not None and sample_i >= args.query_n:
             break
@@ -114,10 +112,10 @@ if __name__ == "__main__":
     data_docs_articles = []
     data_relevancy = [[] for _ in data_query]
 
-    for span_article, span_obj in data.items():
+    for span_article, span_obj in tqdm(data.items()):
         span_texts = span_obj["spans"]
         span_relevancy = span_obj["relevancy"]
-        if args.prune_unused and len(span_relevancy) == 0:
+        if not args.no_prune_unused and len(span_relevancy) == 0:
             continue
         for span_i, span in enumerate(span_texts):
             data_docs.append(span)
@@ -130,12 +128,12 @@ if __name__ == "__main__":
         len(data_query), "queries,",
         len(data_docs), "docs,",
         sum([len(x) for x in data_relevancy]),
-        "relevancies total",
-        np.average([len(x) for x in data_relevancy]),
-        "relevancies average",
+        "relevancies total,",
+        f'{np.average([len(x) for x in data_relevancy]):.2f}',
+        "relevancies average,",
         sum([len(x) for x in data_relevancy_articles]),
-        "articles total",
-        np.average([len(x) for x in data_relevancy_articles]),
+        "articles total,",
+        f'{np.average([len(x) for x in data_relevancy_articles]):.2f}',
         "articles average",
     )
     save_pickle(

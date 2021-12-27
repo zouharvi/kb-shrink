@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import sys; sys.path.append("src")
+import sys
+sys.path.append("src")
 from misc.load_utils import save_pickle, read_pickle
 from misc.retrieval_utils import DEVICE
 import torch
@@ -8,6 +9,7 @@ from transformers import AutoTokenizer, AutoModel
 from transformers import DPRQuestionEncoder, DPRQuestionEncoderTokenizer, DPRContextEncoder, DPRContextEncoderTokenizer
 from transformers import BertTokenizer, BertModel
 import argparse
+
 
 def mean_pooling(model_output, attention_mask, layer_i=0):
     # Mean Pooling - Take attention mask into account for correct averaging
@@ -74,7 +76,8 @@ class SentenceBertWrap():
             return output["pooler_output"][0].cpu().numpy()
         elif type_out == "tokens":
             sentence_embedding = mean_pooling(
-                output, encoded_input['attention_mask'])
+                output, encoded_input['attention_mask']
+            )
             return sentence_embedding.cpu().numpy()
         else:
             raise Exception("Unknown type out")
@@ -101,7 +104,7 @@ class DPRWrap():
         )
         self.model_d.to(DEVICE)
 
-    def query_embd(self,  sentence, type_out):
+    def query_embd(self, sentence, type_out):
         encoded_input = self.tokenizer_q(
             sentence, padding=True,
             truncation=True, max_length=128,
@@ -112,6 +115,8 @@ class DPRWrap():
             output = self.model_q(
                 **encoded_input, output_hidden_states=type_out in {"tokens", "cls"})
         if type_out == "cls":
+            # second index is the sentence id (first zero)
+            # second zero indexes the sequence length (CLS token)
             return output["hidden_states"][-1][0, 0].cpu().numpy()
         elif type_out == "pooler":
             return output.pooler_output[0].detach().cpu().numpy()
@@ -122,7 +127,7 @@ class DPRWrap():
         else:
             raise Exception("Unknown type out")
 
-    def doc_embd(self,  sentence, type_out):
+    def doc_embd(self, sentence, type_out):
         encoded_input = self.tokenizer_d(
             sentence, padding=True,
             truncation=True, max_length=128,
@@ -152,7 +157,7 @@ if __name__ == "__main__":
     parser.add_argument('--data-out', default="/data/hp/full.embd")
     parser.add_argument('--model', default="bert")
     parser.add_argument('--type-out', default="cls")
-    args,_ = parser.parse_known_args()
+    args, _ = parser.parse_known_args()
 
     if args.model == "bert":
         model = BertWrap()
