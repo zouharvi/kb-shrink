@@ -11,7 +11,7 @@ import torch
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data', default="/data/big-hp/dpr-c.embd_cn")
+parser.add_argument('--data', default="/data/hp/dpr-c.embd_cn")
 parser.add_argument('--model', default=1, type=int)
 parser.add_argument('--dims', default="custom")
 parser.add_argument('--post-cn', action="store_true")

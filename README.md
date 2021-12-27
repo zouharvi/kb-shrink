@@ -23,13 +23,13 @@ Document splitting & filtering (thesis in writing):
 Dimensionality reduction:
 
 1. Process Wikipedia dump and create document segments with relevancy annotation: <br>
-`./src/misc/kilt_preprocessing.py --data-out /data/big-hp/full.pkl`
+`./src/misc/kilt_preprocessing.py --data-out /data/hp/full.pkl`
 
 2. Compute embedding of segments: (may take a lot of time) <br>
-`./src/misc/embedding.py --data-in /data/big-hp/full.pkl --data-out /data/big-hp/dpr-c.pkl --model dpr --type-out cls`
+`./src/misc/embedding.py --data-in /data/hp/full.pkl --data-out /data/hp/dpr-c.pkl --model dpr --type-out cls`
 
 3. Evaluate retrieval performance: <br>
-`./src/misc/uncompressed.py --data /data/big-hp/dpr-c.pkl`
+`./src/misc/uncompressed.py --data /data/hp/dpr-c.pkl`
 
 4. Use PCA and Autoencoder for comparison.
 

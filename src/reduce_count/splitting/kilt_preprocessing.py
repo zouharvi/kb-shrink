@@ -14,7 +14,7 @@ from itertools import chain
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data-out', default="/data/big-hp/full.pkl")
+    parser.add_argument('--data-out', default="/data/hp/full.pkl")
     parser.add_argument('--wiki-n', type=int, default=None)
     parser.add_argument('--splitter', default="fixed")
     parser.add_argument('--splitter-fixed-width', type=int, default=100)

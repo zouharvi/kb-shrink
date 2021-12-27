@@ -5,42 +5,41 @@ import argparse
 import numpy as np
 from collections import Counter, defaultdict
 parser = argparse.ArgumentParser()
-parser.add_argument('--logfile', default="computed/hits_redcritter.log")
+parser.add_argument('--logfile', default="computed/hits_pca_redcritter.log")
 args = parser.parse_args()
 
 with open(args.logfile, "r") as f:
     data = eval(f.read())
 
-counts = Counter(zip(data["hits_pca"], data["hits_orig"]))
+counts = Counter(zip(data["hits_new"], data["hits_old"]))
 print(counts)
 
-img = np.zeros((3, 3))
+img = np.zeros((
+    max(x for x, y in counts.keys()) + 1,
+    max(y for x, y in counts.keys()) + 1
+))
 fig = plt.figure(figsize=(3, 2.5))
 ax = fig.get_axes()
 
 total = sum(counts.values())
-acc_pca = defaultdict(lambda: 0)
-acc_orig = defaultdict(lambda: 0)
-for ((count_pca, count_orig), count) in counts.items():
-    img[count_pca][count_orig] += count
+acc_new = defaultdict(lambda: 0)
+acc_old = defaultdict(lambda: 0)
+for ((count_new, count_old), count) in counts.items():
+    img[count_new][count_old] += count
     plt.text(
-        x=count_pca,
-        y=count_orig,
+        x=count_new,
+        y=count_old,
         s=f"{count/total:.1%}",
         ha="center",
         va="center",
         color="black" if count / total > 0.15 else "white",
     )
-    acc_pca[count_pca] += count
-    acc_orig[count_orig] += count
-
-# for ((count_pca, count_orig), count) in counts.items():
-#     img[count_pca][3] = acc_pca[count_pca]
-#     img[3][count_orig] = acc_orig[count_orig]
+    acc_new[count_new] += count
+    acc_old[count_old] += count
 
 plt.imshow(
     img,
-    aspect=0.9,
+    # aspect=0.9,
 )
 plt.xlabel("PCA retrieved")
 plt.ylabel("Original retrieved")

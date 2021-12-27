@@ -9,7 +9,7 @@ import argparse
 parser = argparse.ArgumentParser(
     description='Performance on uncompressed data'
 )
-parser.add_argument('--data', default="/data/big-hp/dpr-c-pruned.embd")
+parser.add_argument('--data', default="/data/hp/dpr-c-pruned.embd")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
 parser.add_argument('--std', action="store_true")

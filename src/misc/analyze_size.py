@@ -7,8 +7,8 @@ from pympler.asizeof import asizeof
 import numpy as np
 
 parser = argparse.ArgumentParser(description='Explore vector distribution')
-parser.add_argument('--embd', default="/data/big-hp/dpr-c.embd")
-parser.add_argument('--dataset', default="/data/big-hp/full.pkl")
+parser.add_argument('--embd', default="/data/hp/dpr-c.embd")
+parser.add_argument('--dataset', default="/data/hp/full.pkl")
 args = parser.parse_args()
 
 data = read_pickle(args.embd)

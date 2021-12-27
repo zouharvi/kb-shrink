@@ -10,7 +10,7 @@ from umap import UMAP
 import random
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data', default="/data/big-hp/dpr-c.embd_cn")
+parser.add_argument('--data', default="/data/hp/dpr-c.embd_cn")
 parser.add_argument('--train-size', type=int, default=None)
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()

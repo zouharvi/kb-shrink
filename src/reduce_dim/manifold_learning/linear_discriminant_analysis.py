@@ -8,7 +8,7 @@ import argparse
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 parser = argparse.ArgumentParser(description='LDA performance summary')
-parser.add_argument('--data', default="/data/big-hp/dpr-c.embd_cn")
+parser.add_argument('--data', default="/data/hp/dpr-c.embd_cn")
 parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")

@@ -9,8 +9,8 @@ from misc.load_utils import save_pickle, read_pickle
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data', default="/data/big-hp/dpr-c.pkl")
-parser.add_argument('--data-out', default="/data/big-hp/dpr-c_fixed.embd")
+parser.add_argument('--data', default="/data/hp/dpr-c.pkl")
+parser.add_argument('--data-out', default="/data/hp/dpr-c_fixed.embd")
 args = parser.parse_args()
 data = read_pickle(args.data)
 

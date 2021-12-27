@@ -9,7 +9,7 @@ from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data', default="/data/big-hp/dpr-c.embd")
+parser.add_argument('--data', default="/data/hp/dpr-c.embd")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--std', action="store_true")
 args = parser.parse_args()

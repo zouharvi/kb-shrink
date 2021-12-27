@@ -7,7 +7,7 @@ import argparse
 import numpy as np
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data', default="/data/big-hp/dpr-c-pruned.embd_cn")
+parser.add_argument('--data', default="/data/hp/dpr-c-pruned.embd_cn")
 parser.add_argument('--logfile', default="computed/tmp.log")
 args = parser.parse_args()
 data = read_pickle(args.data)

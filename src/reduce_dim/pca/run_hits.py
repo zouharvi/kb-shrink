@@ -44,8 +44,8 @@ hits_orig = hits_a_ip(
 )
 
 logdata = {
-    "hits_pca": hits_pca,
-    "hits_orig": hits_orig,
+    "hits_new": hits_pca,
+    "hits_old": hits_orig,
 }
 
 # continuously override the file

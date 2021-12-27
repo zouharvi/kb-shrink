@@ -10,9 +10,9 @@ from misc.load_utils import save_pickle, read_pickle
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data-1', default="/data/big-hp/full.pkl")
-parser.add_argument('--data-2', default="/data/big-hp/full.embd")
-parser.add_argument('--data-out', default="/data/big-hp/full_fixed.embd")
+parser.add_argument('--data-1', default="/data/hp/full.pkl")
+parser.add_argument('--data-2', default="/data/hp/full.embd")
+parser.add_argument('--data-out', default="/data/hp/full_fixed.embd")
 
 args = parser.parse_args()
 data1 = read_pickle(args.data_1)

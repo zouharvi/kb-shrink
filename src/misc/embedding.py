@@ -148,8 +148,8 @@ class DPRWrap():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data-in', default="/data/big-hp/full.pkl")
-    parser.add_argument('--data-out', default="/data/big-hp/full.embd")
+    parser.add_argument('--data-in', default="/data/hp/full.pkl")
+    parser.add_argument('--data-out', default="/data/hp/full.embd")
     parser.add_argument('--model', default="bert")
     parser.add_argument('--type-out', default="cls")
     args,_ = parser.parse_known_args()

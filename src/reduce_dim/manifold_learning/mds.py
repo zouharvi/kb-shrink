@@ -13,7 +13,7 @@ import argparse
 from sklearn.manifold import MDS
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data', default="/data/big-hp/dpr-c.embd_cn")
+parser.add_argument('--data', default="/data/hp/dpr-c.embd_cn")
 parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 data = read_pickle(args.data)

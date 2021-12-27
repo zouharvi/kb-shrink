@@ -25,7 +25,7 @@ def split_paragraph_list(text_list):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data-out', default="/data/big-hp/full.pkl")
+    parser.add_argument('--data-out', default="/data/hp/full.pkl")
     parser.add_argument('--wiki-n', type=int, default=None)
     parser.add_argument('--query-n', type=int, default=None)
     parser.add_argument('--prune-unused', action="store_true")
