@@ -17,10 +17,11 @@ if __name__ == "__main__":
     parser.add_argument('--data-out', default="/data/big-hp/full.pkl")
     parser.add_argument('--wiki-n', type=int, default=None)
     parser.add_argument('--splitter', default="fixed")
-    parser.add_argument('--splitter-fixed-width', type=int, default=100)
     parser.add_argument('--query-n', type=int, default=None)
-    parser.add_argument('--prune-unused', action="store_true")
-    args, _ = parser.parse_known_args()
+    parser.add_argument('--no-prune-unused', action="store_true")
+    parser.add_argument('--splitter-fixed-width', type=int, default=100)
+    parser.add_argument('--splitter-fixed-overlap', type=int, default=0)
+    args = parser.parse_args()
     splitter = get_splitter(args.splitter, args)
 
     # get the knowledge source
@@ -66,7 +67,7 @@ if __name__ == "__main__":
     query_train_max = None
     query_dev_max = None
     query_test_max = None
-    for sample_i, sample in enumerate(data_hotpot):
+    for sample_i, sample in tqdm(enumerate(data_hotpot)):
         # early stopping
         if args.query_n is not None and sample_i >= args.query_n:
             break
@@ -111,10 +112,10 @@ if __name__ == "__main__":
     data_docs_articles = []
     data_relevancy = [[] for _ in data_query]
 
-    for span_article, span_obj in data.items():
+    for span_article, span_obj in tqdm(data.items()):
         span_texts = span_obj["spans"]
         span_relevancy = span_obj["relevancy"]
-        if args.prune_unused and len(span_relevancy) == 0:
+        if not args.no_prune_unused and len(span_relevancy) == 0:
             continue
         for span_i, span in enumerate(span_texts):
             data_docs.append(span)
@@ -127,12 +128,12 @@ if __name__ == "__main__":
         len(data_query), "queries,",
         len(data_docs), "docs,",
         sum([len(x) for x in data_relevancy]),
-        "relevancies total",
-        np.average([len(x) for x in data_relevancy]),
-        "relevancies average",
+        "relevancies total,",
+        f'{np.average([len(x) for x in data_relevancy]):.2f}',
+        "relevancies average,",
         sum([len(x) for x in data_relevancy_articles]),
-        "articles total",
-        np.average([len(x) for x in data_relevancy_articles]),
+        "articles total,",
+        f'{np.average([len(x) for x in data_relevancy_articles]):.2f}',
         "articles average",
     )
     save_pickle(

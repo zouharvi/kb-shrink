@@ -2,10 +2,11 @@
 -|-|-|-
 ||||running
 ||||
-11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|failed, running
+27 dec|embedding `fixed{050,100,120}` (pruned), `dpr-c`|15|aborted
 ||||
 ||||finished
 ||||
+11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|ok
 21 dec|umap `dpr-c-pruned_cn` `--train-size 1000` *babyquest*|14|did not finish
 21 dec|prec 1bit pca `dpr-c-pruned_cn` *filthysuit*|12|ok
 21 dec|prec 1bit fagglo `dpr-c-pruned_cn` *filthysuit*|12|ok
