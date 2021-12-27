@@ -2,7 +2,9 @@
 -|-|-|-
 ||||running
 ||||
-27 dec|embedding `fixed{050,100,120}` (pruned), `dpr-c`|15|aborted
+27 dec|embedding `fixed{080,100,120}, fixed080_overlap20` (pruned), `dpr-c`|15|running
+27 dec|split fixed100 nq|15|running
+27 dec|split fixed100 hp|15|todo (check that it's equal)
 ||||
 ||||finished
 ||||

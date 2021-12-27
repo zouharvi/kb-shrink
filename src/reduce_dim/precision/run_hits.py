@@ -4,8 +4,8 @@ import sys
 sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data, sub_data
 from misc.retrieval_utils import hits_a_ip
+from model import transform_to_1
 import argparse
-from sklearn.decomposition import PCA
 
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--data')
@@ -15,11 +15,9 @@ args = parser.parse_args()
 data = read_pickle(args.data)
 data = sub_data(data, train=False, in_place=True)
 
-
-model = PCA(n_components=128).fit(data["queries"])
 dataReduced = {
-    "queries": model.transform(data["queries"]),
-    "docs": model.transform(data["docs"])
+    "queries": transform_to_1(data["queries"]),
+    "docs": transform_to_1(data["docs"])
 }
 
 dataReduced = center_data(dataReduced)

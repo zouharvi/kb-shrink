@@ -4,7 +4,7 @@ import sys
 sys.path.append("src")
 from misc.load_utils import read_pickle, center_data, norm_data, sub_data
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
-from model import transform_to_1, transform_to_8, transform_to_16
+from model import transform_to_1
 import argparse
 from sklearn.decomposition import PCA
 
