@@ -27,7 +27,8 @@ DIMS_NEXT = [
 DISPLAY_DIMS = [128, 10**3, (10**4), 10**5, 10**6, 10**7, (10**7) * 3]
 THRESHOLD = 2114151
 
-plt.figure(figsize=(4.8, 3.6))
+plt.figure(figsize=(4.6, 3.6))
+plt.rcParams["lines.linewidth"] = 2.2
 ax = plt.gca()
 
 ax.plot(
@@ -52,11 +53,10 @@ ax.set_xticklabels([
     x if x == 128 else '$10^{' + f'{np.log10(x):.1f}' + '}$'
     for x in DISPLAY_DIMS
 ])
-ax.set_ylabel("R-Prec")
+ax.set_ylabel("R-Precision")
 ax.set_xlabel("Docs count (log scale)")
-ax.set_ylim(0.2, 0.66)
+ax.set_ylim(0.37, 0.62)
 ax.set_xlim(2, 7.6)
-# , 8)
 
 plt.scatter(
     np.log10(THRESHOLD),

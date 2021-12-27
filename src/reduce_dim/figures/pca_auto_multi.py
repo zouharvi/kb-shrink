@@ -31,8 +31,8 @@ for logfile in args.logfile:
 DIMS = sorted(list(set([x["dim"] for x in data_all[0]])), key=lambda x: int(x))
 DISPLAY_DIMS = [32, 256, 512, 768]
 
-# fig, axes = plt.subplots(1, 4, sharey=True, figsize=(10,3))
 fig = plt.figure(figsize=(10, 3))
+plt.rcParams["lines.linewidth"] = 2.2
 
 gs = gridspec.GridSpec(
     1, 4, width_ratios=[1, 1, 1, 1],
@@ -63,20 +63,20 @@ for (key, data) in zip(range(4), data_all):
         [x["val_ip"] for x in data if x["type"] == "d"], label="IP, Docs", color="tab:blue", linestyle="-")
     legend_l2_doc = ax1.plot(
         DIMS,
-        [x["val_l2"] for x in data if x["type"] == "d"], label="L2, Docs", color="tab:red", linestyle="-")
+        [x["val_l2"] for x in data if x["type"] == "d"], label="$L^2$, Docs", color="tab:red", linestyle="-")
 
     legend_ip_query = ax1.plot(
         DIMS, [x["val_ip"] for x in data if x["type"] == "q"], label="IP, Queries", color="tab:blue", linestyle=":")
     legend_l2_query = ax1.plot(
         DIMS,
-        [x["val_l2"] for x in data if x["type"] == "q"], label="L2, Queries", color="tab:red", linestyle=":")
+        [x["val_l2"] for x in data if x["type"] == "q"], label="$L^2$, Queries", color="tab:red", linestyle=":")
 
     legend_ip_both = ax1.plot(
         DIMS,
         [x["val_ip"] for x in data if x["type"] == "dq"], label="IP, Both", color="tab:blue", linestyle="-.")
     legend_l2_both = ax1.plot(
         DIMS,
-        [x["val_l2"] for x in data if x["type"] == "dq"], label="L2, Both", color="tab:red", linestyle="-.")
+        [x["val_l2"] for x in data if x["type"] == "dq"], label="$L^2$, Both", color="tab:red", linestyle="-.")
 
     ax1.set_xticks(DISPLAY_DIMS)
     ax1.set_xticklabels(DISPLAY_DIMS)

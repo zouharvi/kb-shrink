@@ -25,8 +25,10 @@ with open(args.logfile_auto, "r") as f:
 DIMS = sorted(list(set([x["dim"] for x in data_pca_scikit])), key=lambda x: int(x))
 DISPLAY_DIMS = [32, 256, 512, 768]
 
-plt.figure(figsize=(4.8, 4.7))
-ax = plt.gca() 
+plt.figure(figsize=(4.6, 4.7))
+ax = plt.gca()
+
+plt.rcParams["lines.linewidth"] = 2.2
 
 ax.plot(DIMS, [x["encode_time"] for x in data_pca_scikit], label="PCA (scikit), encode", color="tab:green", linestyle="-", alpha=0.75)
 ax.plot(DIMS, [x["encode_time"] for x in data_pca_torch_gpu], label="PCA (Torch, GPU), encode", color="tab:blue", linestyle="-", alpha=0.75)
@@ -55,7 +57,8 @@ plt.legend(
     h1, l1,
     loc="center",
     bbox_to_anchor=(-0.05, 1.12, 1, 0.2),
-    ncol=2
+    ncol=2,
+    columnspacing=1.4,
 )
 plt.tight_layout(rect=(0, 0, 1, 1.05))
 plt.show()

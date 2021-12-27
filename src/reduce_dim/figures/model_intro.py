@@ -106,14 +106,14 @@ ax.bar(
 ax.bar(
     POS + 0.2 * 2,
     [x["l2"] for x in DATA_RPREC.values()],
-    width=BARHEIGHT, label="L2",
+    width=BARHEIGHT, label="$L^2$",
     color="tab:blue", hatch="",
     edgecolor="black",
 )
 ax.bar(
     POS + 0.2 * 3,
     [x["l2_fast"] for x in DATA_RPREC.values()],
-    width=BARHEIGHT, label="L2 fast",
+    width=BARHEIGHT, label="$L^2$ fast",
     color="lightblue", hatch="...",
     edgecolor="black",
 )

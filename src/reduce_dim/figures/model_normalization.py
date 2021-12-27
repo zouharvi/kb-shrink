@@ -29,28 +29,28 @@ ax.bar(
 ax.bar(
     POS + BARSPACE * 4,
     [x for x in DATA_N.values()],
-    width=BARHEIGHT, label="IP, L2 (norm)",
+    width=BARHEIGHT, label="IP, $L^2$ (norm)",
     color="silver", hatch="...",
     edgecolor="black",
 )
 ax.bar(
     POS + BARSPACE * 1,
     [x["l2"] for x in DATA_BASE.values()],
-    width=BARHEIGHT, label="L2",
+    width=BARHEIGHT, label="$L^2$",
     color="tab:blue", hatch="",
     edgecolor="black",
 )
 ax.bar(
     POS + BARSPACE * 3,
     [x["l2"] for x in DATA_C.values()],
-    width=BARHEIGHT, label="L2 (center)",
+    width=BARHEIGHT, label="$L^2$ (center)",
     color="tab:blue", hatch="\\\\\\",
     edgecolor="black",
 )
 ax.bar(
     POS + BARSPACE * 5,
     [x for x in DATA_NC.values()],
-    width=BARHEIGHT, label="IP, L2 (center, norm)",
+    width=BARHEIGHT, label="IP, $L^2$ (center, norm)",
     color="dimgray", hatch="...\\\\\\",
     edgecolor="black",
 )
