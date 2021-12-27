@@ -216,7 +216,7 @@ def rprec_a_from_relevancy(relevancy, n_new, relevancy_articles, docs_articles, 
         articles_hyp = {
             docs_articles[doc]
             if doc < len(docs_articles)
-            else -1 # hotfix for irrelevant effects (adding new docs)
+            else -1  # hotfix for irrelevant effects (adding new docs)
             for doc in doc_hyp[:len(doc_true)]
         }
         return len(articles_hyp & articles_true) / len(articles_true)
@@ -240,7 +240,7 @@ def hits_a_from_relevancy(relevancy, n_new, relevancy_articles, docs_articles):
         articles_hyp = {
             docs_articles[doc]
             if doc < len(docs_articles)
-            else -1 # hotfix for irrelevant effects (adding new docs)
+            else -1  # hotfix for irrelevant effects (adding new docs)
             for doc in doc_hyp[:len(doc_true)]
         }
         return len(articles_hyp & articles_true)

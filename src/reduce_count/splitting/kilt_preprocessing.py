@@ -17,6 +17,7 @@ if __name__ == "__main__":
     parser.add_argument('--data-out', default="/data/hp/full.pkl")
     parser.add_argument('--wiki-n', type=int, default=None)
     parser.add_argument('--splitter', default="fixed")
+    parser.add_argument('--query-dataset', default="hotpotqa")
     parser.add_argument('--query-n', type=int, default=None)
     parser.add_argument('--no-prune-unused', action="store_true")
     parser.add_argument('--splitter-width', type=int, default=100)
@@ -47,8 +48,8 @@ if __name__ == "__main__":
     )
 
     print("Processing Dataset")
-    hotpot_all = load_dataset("kilt_tasks", name="hotpotqa")
-    data_hotpot = chain(
+    hotpot_all = load_dataset("kilt_tasks", name=args.query_dataset)
+    data_query_source = chain(
         hotpot_all["train"],
         hotpot_all["validation"],
         hotpot_all["test"]
@@ -67,7 +68,7 @@ if __name__ == "__main__":
     query_train_max = None
     query_dev_max = None
     query_test_max = None
-    for sample_i, sample in tqdm(enumerate(data_hotpot)):
+    for sample_i, sample in tqdm(enumerate(data_query_source)):
         # early stopping
         if args.query_n is not None and sample_i >= args.query_n:
             break
@@ -75,9 +76,10 @@ if __name__ == "__main__":
         if len(sample["output"]) == 0:
             continue
 
-        assert len(sample["output"]) == 1
-
-        provenances = sample["output"][0]["provenance"]
+        # true only for HP
+        # assert len(sample["output"]) == 1
+        # unwrap and flatten all provenances
+        provenances = [i for x in sample["output"] for i in x["provenance"]]
 
         if len(provenances) == 0:
             continue
@@ -142,6 +144,6 @@ if __name__ == "__main__":
             "queries": data_query, "docs": data_docs,
             "relevancy": data_relevancy, "relevancy_articles": data_relevancy_articles,
             "docs_articles": data_docs_articles,
-            "boundaries": {"train": query_train_max, "dev": query_dev_max, "test": query_test_max}
+            "boundaries": {"train": query_train_max, "dev": query_dev_max, "test": query_test_max},
         }
     )

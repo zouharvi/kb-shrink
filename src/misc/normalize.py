@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 
-from numpy.core.defchararray import center; sys.path.append("src")
+sys.path.append("src")
 from misc.load_utils import read_pickle, save_pickle, norm_data, center_data, small_data, zscore_data
 import numpy as np
 import random
@@ -15,7 +15,7 @@ parser.add_argument('--norm', action="store_true")
 parser.add_argument('--std', action="store_true")
 parser.add_argument('--small', type=int)
 parser.add_argument('--docs-small-random', type=int)
-args,_ = parser.parse_known_args()
+args, _ = parser.parse_known_args()
 
 print("Loading")
 data = read_pickle(args.data_in)
@@ -31,7 +31,8 @@ if args.small:
 
 if args.docs_small_random:
     print(f"Downsizing to {args.docs_small_random} docs")
-    data = {"docs": random.sample(data["docs"], args.docs_small_random), "queries": [] }
+    data = {"docs": random.sample(
+        data["docs"], args.docs_small_random), "queries": []}
 
 if args.center:
     print("Centering")
