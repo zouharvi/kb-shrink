@@ -19,8 +19,8 @@ if __name__ == "__main__":
     parser.add_argument('--splitter', default="fixed")
     parser.add_argument('--query-n', type=int, default=None)
     parser.add_argument('--no-prune-unused', action="store_true")
-    parser.add_argument('--splitter-fixed-width', type=int, default=100)
-    parser.add_argument('--splitter-fixed-overlap', type=int, default=0)
+    parser.add_argument('--splitter-width', type=int, default=100)
+    parser.add_argument('--splitter-overlap', type=int, default=0)
     args = parser.parse_args()
     splitter = get_splitter(args.splitter, args)
 

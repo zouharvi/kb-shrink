@@ -3,7 +3,6 @@ import math
 
 class FixedWidthSplitter:
     def __init__(self, width):
-        print("Initializing splitter with", width, "width")
         self.width = width
 
     def split(self, line):
@@ -13,9 +12,9 @@ class FixedWidthSplitter:
             pos_right = (i + 1) * self.width
             yield " ".join(line[pos_left:pos_right])
 
+
 class FixedOverlapSplitter:
     def __init__(self, width, overlap):
-        print("Initializing splitter with", width, "width and", overlap, "overlap")
         self.width = width
         self.overlap = overlap
 
@@ -27,11 +26,26 @@ class FixedOverlapSplitter:
             yield " ".join(line[pos_left:pos_right])
 
 
+class SentenceSplitter:
+    def __init__(self, width):
+        self.width = width
+
+    def split(self, line):
+        # naive sentence splitting
+        line = line.rstrip("\n").split(". ")
+        for i in range(0, math.ceil(len(line) / self.width)):
+            pos_left = i * self.width
+            pos_right = (i + 1) * self.width
+            yield " ".join(line[pos_left:pos_right])
+
+
 def get_splitter(name, args):
     if name == "fixed":
-        return FixedWidthSplitter(args.splitter_fixed_width)
+        return FixedWidthSplitter(args.splitter_width)
     elif name == "overlap":
-        return FixedOverlapSplitter(args.splitter_fixed_width, args.splitter_fixed_overlap)
+        return FixedOverlapSplitter(args.splitter_width, args.splitter_overlap)
+    elif name in {"sent", "sentence"}:
+        return SentenceSplitter(args.splitter_width, args.splitter_overlap)
     else:
         raise Exception(f"Unknown splitter {name}")
 
