@@ -63,13 +63,20 @@ def sub_data(data, train=False, in_place=True):
         data["relevancy_articles"] = data["relevancy_articles"][:data["boundaries"]["train"]]
     else:
         # dev queries
-        data["queries"] = data["queries"][data["boundaries"]
-                                          ["train"]:data["boundaries"]["dev"]]
-        data["relevancy"] = data["relevancy"][data["boundaries"]
-                                              ["train"]:data["boundaries"]["dev"]]
-        data["relevancy_articles"] = data["relevancy_articles"][data["boundaries"]
-                                                                ["train"]:data["boundaries"]["dev"]]
+        data["queries"] = data["queries"][
+            data["boundaries"]
+            ["train"]:data["boundaries"]["dev"]
+        ]
+        data["relevancy"] = data["relevancy"][
+            data["boundaries"]
+            ["train"]:data["boundaries"]["dev"]
+        ]
+        data["relevancy_articles"] = data["relevancy_articles"][
+            data["boundaries"]
+            ["train"]:data["boundaries"]["dev"]
+        ]
     return data
+
 
 def center_data(data):
     data["docs"] = np.array(data["docs"])
@@ -87,6 +94,53 @@ def norm_data(data):
     return data
 
 
+class CenterScaler:
+    def transform(self, data):
+        # make sure the data is np array
+        data["docs"] = np.array(data["docs"])
+        data["queries"] = np.array(data["queries"])
+
+        self.offset_docs = data["docs"].mean(axis=0)
+        self.offset_queries = data["queries"].mean(axis=0)
+
+        data["docs"] -= self.offset_docs
+        data["queries"] -= self.offset_queries
+        return data
+
+    def inverse_transform(self, data):
+        # make sure the data is np array
+        data["docs"] = np.array(data["docs"])
+        data["queries"] = np.array(data["queries"])
+
+        data["docs"] += self.offset_docs
+        data["queries"] += self.offset_queries
+        return data
+
+
+class NormScaler:
+    def transform(self, data):
+        # make sure the data is np array
+        data["docs"] = np.array(data["docs"])
+        data["queries"] = np.array(data["queries"])
+
+        self.scale_docs = np.linalg.norm(data["docs"], axis=1)[:, np.newaxis]
+        self.scale_queries = np.linalg.norm(
+            data["queries"], axis=1)[:, np.newaxis]
+
+        data["docs"] /= self.scale_docs
+        data["queries"] /= self.scale_queries
+        return data
+
+    def inverse_transform(self, data):
+        # make sure the data is np array
+        data["docs"] = np.array(data["docs"])
+        data["queries"] = np.array(data["queries"])
+
+        data["docs"] *= self.scale_docs
+        data["queries"] *= self.scale_queries
+        return data
+
+
 def zscore_data(data, center=True):
     preprocessing.StandardScaler(
         copy=False, with_std=True, with_mean=center
@@ -95,6 +149,7 @@ def zscore_data(data, center=True):
         copy=False, with_std=True, with_mean=center
     ).fit_transform(data["queries"])
     return data
+
 
 def process_dims(dims):
     if dims == "custom":

@@ -3,16 +3,16 @@
 import copy
 import sys
 sys.path.append("src")
-from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
+from misc.load_utils import process_dims, read_pickle, sub_data, CenterScaler, NormScaler
 from misc.retrieval_utils import rprec_a_l2, rprec_a_ip
 import numpy as np
 import argparse
 from sklearn.decomposition import PCA
 import sklearn.metrics
 
-parser = argparse.ArgumentParser(description='PCA performance summary')
+parser = argparse.ArgumentParser(description='Main PCA performance experiment')
 parser.add_argument('--data')
-parser.add_argument('--data-small', default=None)
+parser.add_argument('--data-train', default=None)
 parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
@@ -22,38 +22,39 @@ parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 data = read_pickle(args.data)
 
-if args.data_small is None:
-    if args.center:
-        data = center_data(data)
-    if args.norm:
-        data = norm_data(data)
-    print("Because args.data_small is not provided, I'm copying the whole structure")
-    data_small = copy.deepcopy(data)
-
-    data = sub_data(data, train=False, in_place=True)
-    data_small = sub_data(data_small, train=True, in_place=True)
-
+if args.data_train is None:
+    print("Because args.data_train is not provided, I'm copying the whole structure")
+    data_train = copy.deepcopy(data)
 else:
-    data_small = read_pickle(args.data_small)
-    if args.center:
-        data = center_data(data)
-        data_small = center_data(data_small)
+    data_train = read_pickle(args.data_train)
+
+data = sub_data(data, train=False, in_place=True)
+data_train = sub_data(data_train, train=True, in_place=True)
+
+if args.center:
+    # only keep the dev scaler
+    center_model = CenterScaler()
+    data = center_model.transform(data)
+    data_train = CenterScaler().transform(data_train)
+    
+if args.norm:
+    # only keep the dev scaler
+    norm_model = NormScaler()
+    data = norm_model.transform(data)
+    data_train = NormScaler().transform(data_train)
+
+
+def summary_performance(dataReduced, dataReconstructed):
+    # reconstructed data is not in the original form when scaling
+    # note the reverse order
     if args.norm:
-        data = norm_data(data)
-        data_small = norm_data(data_small)
-    data = sub_data(data, train=False, in_place=True)
-    data_small = sub_data(data_small, train=True, in_place=True)
+        dataReconstructed = norm_model.inverse_transform(dataReconstructed)
+    if args.center:
+        dataReconstructed = center_model.inverse_transform(dataReconstructed)
 
-
-def safe_print(msg):
-    with open("base_big_pca.out", "a") as f:
-        f.write(msg + "\n")
-
-
-def summary_performance(name, dataReduced, dataReconstructed):
     if args.post_cn:
-        dataReduced = center_data(dataReduced)
-        dataReduced = norm_data(dataReduced)
+        dataReduced = CenterScaler().transform(dataReduced)
+        dataReduced = NormScaler().transform(dataReduced)
 
     val_l2 = rprec_a_l2(
         dataReduced["queries"],
@@ -83,36 +84,23 @@ def summary_performance(name, dataReduced, dataReconstructed):
         data["docs"][:10000],
         dataReconstructed["docs"][:10000]
     )
-    name = name.replace("float", "f")
     return val_ip, val_l2, loss_q, loss_d
-
-
-def safe_transform(model, array):
-    return [model.transform([x])[0] for x in array]
-
-
-def safe_inv_transform(model, array):
-    return [model.inverse_transform([x])[0] for x in array]
 
 
 def pca_performance_d(components):
     model = PCA(
         n_components=components,
         random_state=args.seed,
-    ).fit(data_small["docs"])
-    safe_print("Ed")
+    ).fit(data_train["docs"])
     dataReduced = {
-        "queries": safe_transform(model, data["queries"]),
-        "docs": safe_transform(model, data["docs"])
+        "queries": model.transform(data["queries"]),
+        "docs": model.transform(data["docs"])
     }
-    safe_print("Fd")
     dataReconstructed = {
-        "queries": safe_inv_transform(model, dataReduced["queries"]),
-        "docs": safe_inv_transform(model, dataReduced["docs"])
+        "queries": model.inverse_transform(dataReduced["queries"]),
+        "docs": model.inverse_transform(dataReduced["docs"])
     }
-    safe_print("Gd")
     return summary_performance(
-        f"PCA-D ({components})",
         dataReduced,
         dataReconstructed
     )
@@ -122,20 +110,16 @@ def pca_performance_q(components):
     model = PCA(
         n_components=components,
         random_state=args.seed,
-    ).fit(data_small["queries"])
-    safe_print("Eq")
+    ).fit(data_train["queries"])
     dataReduced = {
-        "queries": safe_transform(model, data["queries"]),
-        "docs": safe_transform(model, data["docs"])
+        "queries": model.transform(data["queries"]),
+        "docs": model.transform(data["docs"])
     }
-    safe_print("Fq")
     dataReconstructed = {
-        "queries": safe_inv_transform(model, dataReduced["queries"]),
-        "docs": safe_inv_transform(model, dataReduced["docs"])
+        "queries": model.inverse_transform(dataReduced["queries"]),
+        "docs": model.inverse_transform(dataReduced["docs"])
     }
-    safe_print("Gq")
     return summary_performance(
-        f"PCA-Q ({components})",
         dataReduced,
         dataReconstructed
     )
@@ -146,20 +130,16 @@ def pca_performance_dq(components):
         n_components=components,
         random_state=args.seed,
         copy=False,
-    ).fit(np.concatenate((data_small["queries"], data_small["docs"])))
-    safe_print("Edq")
+    ).fit(np.concatenate((data_train["queries"], data_train["docs"])))
     dataReduced = {
-        "queries": safe_transform(model, data["queries"]),
-        "docs": safe_transform(model, data["docs"])
+        "queries": model.transform(data["queries"]),
+        "docs": model.transform(data["docs"])
     }
-    safe_print("Fdq")
     dataReconstructed = {
-        "queries": safe_inv_transform(model, dataReduced["queries"]),
-        "docs": safe_inv_transform(model, dataReduced["docs"])
+        "queries": model.inverse_transform(dataReduced["queries"]),
+        "docs": model.inverse_transform(dataReduced["docs"])
     }
-    safe_print("Gdq")
     return summary_performance(
-        f"PCA-DQ ({components})",
         dataReduced,
         dataReconstructed
     )
@@ -180,7 +160,6 @@ for dim in DIMS:
         "loss_q": loss_q, "loss_d": loss_d,
         "type": "dq"
     })
-    safe_print("-")
     val_ip, val_l2, loss_q, loss_d = pca_performance_d(dim)
     logdata.append({
         "dim": dim,
@@ -188,7 +167,6 @@ for dim in DIMS:
         "loss_q": loss_q, "loss_d": loss_d,
         "type": "d"
     })
-    safe_print("-")
     val_ip, val_l2, loss_q, loss_d = pca_performance_q(dim)
     logdata.append({
         "dim": dim,
@@ -196,7 +174,6 @@ for dim in DIMS:
         "loss_q": loss_q, "loss_d": loss_d,
         "type": "q"
     })
-    safe_print("-")
 
     # continuously override the file
     with open(args.logfile, "w") as f:

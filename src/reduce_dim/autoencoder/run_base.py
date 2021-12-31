@@ -27,6 +27,7 @@ args = parser.parse_args()
 torch.manual_seed(args.seed)
 data = read_pickle(args.data)
 
+# see pca/run_base.py for new preprocessing scheme 
 if args.center:
     data = center_data(data)
 if args.norm:

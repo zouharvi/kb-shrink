@@ -2,10 +2,14 @@
 -|-|-|-
 ||||running
 ||||
-27 dec|splitting & embedding `sent{01,02,03,05}` (pruned), `dpr-c`|14,15|running
+31 dec|pca base `dpr-c-pruned` rescaled, `--norm` *silentheadpohnes_1*|13|running
+31 dec|pca base `dpr-c-pruned` rescaled, `--center` *silentheadpohnes_2*|12|running
+31 dec|pca base `dpr-c-pruned` rescaled, `--center --norm` *silentheadpohnes_3*|15|running
+27 dec|embedding NQ `fixed100` (pruned), `dpr-c`|15|running
 ||||
 ||||finished
 ||||
+27 dec|splitting & embedding `sent{01,02,03,05}` (pruned), `dpr-c`|14,15|ok
 27 dec|splitting & embedding `fixed{080,100,120}, fixed080_overlap20` (pruned), `dpr-c`|15|ok
 27 dec|split fixed100 nq|15|ok
 27 dec|split fixed100 hp|15|ok

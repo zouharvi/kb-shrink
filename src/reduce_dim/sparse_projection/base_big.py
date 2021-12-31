@@ -18,13 +18,6 @@ parser.add_argument('--seed', type=int, default=0)
 
 args = parser.parse_args()
 
-print(f"{'':<12} {'IP':<12} {'L2':<12}")
-print(f"{'Method':<12} {'(max)|(avg)':<12} {'(max)|(avg)':<12}")
-
-
-def summary_performance_custom(name, acc_val_ip, acc_avg_ip, acc_val_l2, acc_avg_l2):
-    print(f"{name:<12} {acc_val_ip:>5.3f}|{acc_avg_ip:>5.3f} {acc_val_l2:>5.3f}|{acc_avg_l2:>5.3f}")
-
 
 class CropRandomProjection():
     def __init__(self, n_components, random_state):
@@ -122,13 +115,6 @@ def random_projection_performance(components, model_name, runs=3):
     # continuously override the file
     with open(args.logfile, "w") as f:
         f.write(str(logdata))
-
-    summary_performance_custom(
-        f"{model_name.capitalize()} ({components})",
-        max(vals_ip), np.average(vals_ip),
-        max(vals_l2), np.average(vals_l2)
-    )
-
 
 DIMS = process_dims(args.dims)
 logdata = []

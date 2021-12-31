@@ -9,8 +9,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data')
-parser.add_argument('--logfile-single',
-                    default="computed/dimension_drop_single.log")
+parser.add_argument('--logfile-single', default="computed/tmp.log")
 parser.add_argument('--post-cn', action="store_true")
 parser.add_argument('--logfile', default="computed/tmp.log")
 parser.add_argument('--dims', default="custom")
@@ -33,8 +32,10 @@ IMPR_L2 = [
     for x in sorted(DATA_SINGLE, key=lambda x: x["val_l2"], reverse=True)
 ]
 
-print("l2_impr count", len(
-    [x for x in DATA_SINGLE if x["val_l2"] >= DATA_BASE["val_l2"]]))
+print(
+    "l2_impr count",
+    len([x for x in DATA_SINGLE if x["val_l2"] >= DATA_BASE["val_l2"]])
+)
 
 
 class DropRandomProjection():

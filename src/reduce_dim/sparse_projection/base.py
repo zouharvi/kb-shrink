@@ -26,14 +26,6 @@ data = sub_data(data, train=False, in_place=True)
 data["queries"] = np.array(data["queries"])
 data["docs"] = np.array(data["docs"])
 
-print(f"{'':<12} {'IP':<12} {'L2':<12}")
-print(f"{'Method':<12} {'(max)|(avg)':<12} {'(max)|(avg)':<12}")
-
-
-def summary_performance_custom(name, acc_val_ip, acc_avg_ip, acc_val_l2, acc_avg_l2):
-    print(f"{name:<12} {acc_val_ip:>5.3f}|{acc_avg_ip:>5.3f} {acc_val_l2:>5.3f}|{acc_avg_l2:>5.3f}")
-
-
 class CropRandomProjection():
     def __init__(self, n_components, random_state):
         self.n_components = n_components
@@ -48,7 +40,6 @@ class CropRandomProjection():
             range(data["queries"][0].shape[0]),
             k=self.n_components
         )
-
 
 def random_projection_performance(components, model_name, runs=3):
     if model_name == "gauss":
@@ -115,13 +106,6 @@ def random_projection_performance(components, model_name, runs=3):
     # continuously override the file
     with open(args.logfile, "w") as f:
         f.write(str(logdata))
-
-    summary_performance_custom(
-        f"{model_name.capitalize()} ({components})",
-        max(vals_ip), np.average(vals_ip),
-        max(vals_l2), np.average(vals_l2)
-    )
-
 
 DIMS = process_dims(args.dims)
 logdata = []

@@ -15,8 +15,9 @@ def mean_pooling(model_output, attention_mask, layer_i=0):
     # Mean Pooling - Take attention mask into account for correct averaging
     # first element of model_output contains all token embeddings
     token_embeddings = model_output[layer_i]
-    input_mask_expanded = attention_mask.unsqueeze(
-        -1).expand(token_embeddings.size()).float()
+    input_mask_expanded = attention_mask.unsqueeze(-1).expand(
+        token_embeddings.size()
+    ).float()
     sum_embeddings = torch.sum(token_embeddings * input_mask_expanded, 1)
     sum_mask = torch.clamp(input_mask_expanded.sum(1), min=1e-9)
     return (sum_embeddings / sum_mask).reshape(-1)
@@ -26,7 +27,8 @@ class BertWrap():
     def __init__(self):
         self.tokenizer = BertTokenizer.from_pretrained("bert-base-cased")
         self.model = BertModel.from_pretrained(
-            "bert-base-cased", return_dict=True, output_hidden_states=True)
+            "bert-base-cased", return_dict=True, output_hidden_states=True
+        )
         self.model.train(False)
         self.model.to(DEVICE)
 
