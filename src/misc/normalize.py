@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import sys
 
+import sys
 sys.path.append("src")
 from misc.load_utils import read_pickle, save_pickle, norm_data, center_data, small_data, zscore_data
 import numpy as np

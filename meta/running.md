@@ -2,12 +2,13 @@
 -|-|-|-
 ||||running
 ||||
-27 dec|embedding `fixed{080,100,120}, fixed080_overlap20` (pruned), `dpr-c`|15|running
-27 dec|split fixed100 nq|15|running
-27 dec|split fixed100 hp|15|todo (check that it's equal)
+27 dec|splitting & embedding `sent{01,02,03,05}` (pruned), `dpr-c`|14,15|running
 ||||
 ||||finished
 ||||
+27 dec|splitting & embedding `fixed{080,100,120}, fixed080_overlap20` (pruned), `dpr-c`|15|ok
+27 dec|split fixed100 nq|15|ok
+27 dec|split fixed100 hp|15|ok
 11 dec|rproj single `dpr-c-pruned_cn` *fretfulwill*|15|ok
 21 dec|umap `dpr-c-pruned_cn` `--train-size 1000` *babyquest*|14|did not finish
 21 dec|prec 1bit pca `dpr-c-pruned_cn` *filthysuit*|12|ok

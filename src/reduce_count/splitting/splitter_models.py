@@ -27,16 +27,18 @@ class FixedOverlapSplitter:
 
 
 class SentenceSplitter:
-    def __init__(self, width):
+    def __init__(self, width, overlap):
         self.width = width
+        self.overlap = overlap
 
     def split(self, line):
         # naive sentence splitting
         line = line.rstrip("\n").split(". ")
         for i in range(0, math.ceil(len(line) / self.width)):
             pos_left = i * self.width
-            pos_right = (i + 1) * self.width
-            yield " ".join(line[pos_left:pos_right])
+            pos_right = (i + 1) * self.width + self.overlap
+            # lengths around 20 but some are 1..5 (todo: filter those)
+            yield ". ".join(line[pos_left:pos_right])
 
 
 def get_splitter(name, args):
