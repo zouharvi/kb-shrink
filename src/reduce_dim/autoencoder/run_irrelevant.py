@@ -52,7 +52,7 @@ for num_samples in [
             train_key="d",
             skip_eval=True,
         )
-        val_ip, val_l2, queries_loss, docs_loss = model.eval_routine(
+        val_ip, val_l2 = model.eval_routine_no_loss(
             new_data, post_cn=args.post_cn)
 
         logdata.append({
@@ -81,7 +81,7 @@ for num_samples in [
         train_key="d",
         skip_eval=True,
     )
-    val_ip, val_l2, queries_loss, docs_loss = model.eval_routine(
+    val_ip, val_l2, queries_loss, docs_loss = model.eval_routine_no_loss(
         data, post_cn=args.post_cn)
 
     logdata.append({

@@ -94,6 +94,18 @@ def norm_data(data):
     return data
 
 
+class IdentityScaler:
+    """
+    Mock scaler that does nothing but has identity functions in place of actual scaling.
+    """
+
+    def transform(self, data):
+        return data
+
+    def inverse_transform(self, data):
+        return data
+
+
 class CenterScaler:
     def transform(self, data):
         # make sure the data is np array
@@ -123,10 +135,14 @@ class NormScaler:
         data["docs"] = np.array(data["docs"])
         data["queries"] = np.array(data["queries"])
 
-        self.scale_docs = np.linalg.norm(data["docs"], axis=1)[:, np.newaxis]
-        self.scale_queries = np.linalg.norm(
-            data["queries"], axis=1)[:, np.newaxis]
+        self.scale_docs = np.linalg.norm(
+            data["docs"], axis=1
+        )[:, np.newaxis]
 
+        self.scale_queries = np.linalg.norm(
+            data["queries"], axis=1
+        )[:, np.newaxis]
+        
         data["docs"] /= self.scale_docs
         data["queries"] /= self.scale_queries
         return data

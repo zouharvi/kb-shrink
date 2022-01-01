@@ -30,6 +30,7 @@ else:
 
 data = sub_data(data, train=False, in_place=True)
 data_train = sub_data(data_train, train=True, in_place=True)
+data_orig = copy.deepcopy(data)
 
 if args.center:
     # only keep the dev scaler
@@ -76,12 +77,12 @@ def summary_performance(dataReduced, dataReconstructed):
             fast=True,
         )
     loss_q = sklearn.metrics.mean_squared_error(
-        data["queries"],
+        data_orig["queries"],
         dataReconstructed["queries"]
     )
     # loss of only the first 10k documents because it has to get copied
     loss_d = sklearn.metrics.mean_squared_error(
-        data["docs"][:10000],
+        data_orig["docs"][:10000],
         dataReconstructed["docs"][:10000]
     )
     return val_ip, val_l2, loss_q, loss_d

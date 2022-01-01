@@ -8,6 +8,7 @@ from matplotlib import gridspec
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--legend', action="store_true")
+parser.add_argument('--auto', action="store_true")
 parser.add_argument('--logfile', nargs="+")
 args = parser.parse_args()
 
@@ -15,19 +16,6 @@ data_all = []
 for logfile in args.logfile:
     with open(logfile, "r") as f:
         data = eval(f.read())
-        # detect autoencoder
-        if "docs_loss" in data[0]:
-            data = [
-                {
-                    **item,
-                    "loss_d": item["docs_loss"],
-                    "loss_q": item["queries_loss"]
-                }
-                for item in data
-            ]
-            is_autoencoder = True
-        else:
-            is_autoencoder = False
         data_all.append(data)
 
 # take the first logfile as the main one
@@ -82,7 +70,7 @@ for (key, data) in zip(range(4), data_all):
 
     ax1.set_xticks(DISPLAY_DIMS)
     ax1.set_xticklabels(DISPLAY_DIMS)
-    ax1.set_ylabel("R-Precision " + ("(Autoencoder)" if is_autoencoder else "(PCA)"))
+    ax1.set_ylabel("R-Precision " + ("(Autoencoder)" if args.auto else "(PCA)"))
     # ax1.set_xlabel("Dimension")
     ax1.set_ylim(0.015, 0.66)
 
@@ -118,7 +106,7 @@ for (key, data) in zip(range(4), data_all):
     h1, l1 = ax1.get_legend_handles_labels()
     h2, l2 = ax2.get_legend_handles_labels()
 
-    if not is_autoencoder:
+    if not args.auto:
         ax_main.title.set_text(
             [
                 "No pre-processing", "Normalized",
@@ -134,7 +122,7 @@ if args.legend:
         ncol=5,
     )
 
-if is_autoencoder:
+if args.auto:
     plt.savefig("figures/auto_main.pdf")
 else:
     plt.savefig("figures/pca_main.pdf")

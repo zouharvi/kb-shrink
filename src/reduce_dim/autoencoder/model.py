@@ -8,13 +8,14 @@ from misc.load_utils import center_data, norm_data
 from misc.retrieval_utils import DEVICE, rprec_a_ip, rprec_a_l2
 
 
-def report(prefix, encoded, data, post_cn):
+def summary_performance(prefix, data_reduced, data, post_cn):
     if post_cn:
-        encoded = center_data(encoded)
-        encoded = norm_data(encoded)
+        data_reduced = center_data(data_reduced)
+        data_reduced = norm_data(data_reduced)
+
     val_l2 = rprec_a_l2(
-        encoded["queries"],
-        encoded["docs"],
+        data_reduced["queries"],
+        data_reduced["docs"],
         data["relevancy"],
         data["relevancy_articles"],
         data["docs_articles"],
@@ -24,8 +25,8 @@ def report(prefix, encoded, data, post_cn):
         val_ip = val_l2
     else:
         val_ip = rprec_a_ip(
-            encoded["queries"],
-            encoded["docs"],
+            data_reduced["queries"],
+            data_reduced["docs"],
             data["relevancy"],
             data["relevancy_articles"],
             data["docs_articles"],
@@ -154,23 +155,26 @@ class AutoencoderModel(nn.Module):
         return self.encoder(x)
 
     def encode_safe(self, data):
-        out = []
-        loss = 0
-        for sample in data:
-            sample_enc = self.encoder(torch.tensor(sample).to(DEVICE))
-            sample_rec = self.decoder(sample_enc)
-            loss += mse([sample_rec.cpu().numpy()], [sample])
-            out.append(sample_enc.cpu().numpy())
-        return out, loss / len(out)
-
-    def encode_safe_without_loss(self, data):
         dataLoader = torch.utils.data.DataLoader(
             dataset=data, batch_size=1024 * 128, shuffle=False
         )
 
         out = []
         for sample in dataLoader:
-            out.append(self.encoder(torch.tensor(sample).to(DEVICE)).cpu())
+            out += [x.cpu().numpy() for x in self.encoder(torch.tensor(sample).to(DEVICE))]
+
+        return out
+
+    def decode_safe(self, data):
+        dataLoader = torch.utils.data.DataLoader(
+            dataset=data, batch_size=1024 * 128, shuffle=False
+        )
+
+        out = []
+        for sample in dataLoader:
+            out += [x.cpu().numpy() for x in self.decoder(torch.tensor(sample).to(DEVICE))]
+
+        return out
 
     def decode(self, x):
         return self.decoder(x)
@@ -183,13 +187,13 @@ class AutoencoderModel(nn.Module):
         for epoch in range(epochs):
             self.train(True)
             for sample in self.dataLoader:
-                # Predictions
+                # predictions
                 sample = sample.to(DEVICE)
                 output = self(sample)
-                # Calculate Loss
+                # calculate Loss
                 loss = self.criterion(output, sample)
 
-                # Backpropagation
+                # backpropagation
                 self.optimizer.zero_grad()
 
                 if regularize:
@@ -208,20 +212,61 @@ class AutoencoderModel(nn.Module):
                     prefix=f"epoch [{epoch+1}/{epochs}], loss_l2: {loss.data:.7f},",
                     post_cn=post_cn)
 
-    def eval_routine(self, data, post_cn, prefix=""):
+    def eval_routine(self, data, data_orig, scaler_center, scaler_norm, post_cn, prefix=""):
         self.train(False)
         with torch.no_grad():
-            queries_data, queries_loss = self.encode_safe(data["queries"])
-            docs_data, docs_loss = self.encode_safe(data["docs"])
+            queries_data_enc = self.encode_safe(data["queries"])
+            docs_data_enc = self.encode_safe(data["docs"])
+            print(len(queries_data_enc))
+            print(len(docs_data_enc))
+            queries_data_dec = self.decode_safe(queries_data_enc)
+            docs_data_dec = self.decode_safe(docs_data_enc)
+            print(len(queries_data_dec))
+            print(len(docs_data_dec))
+            print()
+            encoded = {
+                "queries": queries_data_enc,
+                "docs": docs_data_enc,
+            }
+            decoded = {
+                "queries": queries_data_dec,
+                "docs": docs_data_dec,
+            }
+            decoded = scaler_center.inverse_transform(scaler_norm.inverse_transform(decoded))
+
+            loss_q = mse(
+                data_orig["queries"],
+                decoded["queries"]
+            )
+            # loss of only the first 10k documents because it has to get copied
+            loss_d = mse(
+                data_orig["docs"][:10000],
+                decoded["docs"][:10000]
+            )
+
+
+        val_ip, val_l2 = summary_performance(
+            prefix=prefix,
+            data_reduced=encoded,
+            data=data,
+            post_cn=post_cn
+        )
+        return val_ip, val_l2, loss_q, loss_d
+
+    def eval_routine_no_loss(self, data, post_cn, prefix=""):
+        self.train(False)
+        with torch.no_grad():
+            queries_data = self.encode_safe(data["queries"])
+            docs_data = self.encode_safe(data["docs"])
             encoded = {
                 "queries": queries_data,
                 "docs": docs_data,
             }
 
-        val_ip, val_l2 = report(
+        val_ip, val_l2 = summary_performance(
             prefix=prefix,
-            encoded=encoded,
+            data_reduced=encoded,
             data=data,
             post_cn=post_cn
         )
-        return val_ip, val_l2, queries_loss, docs_loss
+        return val_ip, val_l2

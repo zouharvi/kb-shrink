@@ -3,9 +3,8 @@
 import copy
 import sys
 
-import numpy as np
 sys.path.append("src")
-from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
+from misc.load_utils import process_dims, read_pickle, sub_data, IdentityScaler, NormScaler, CenterScaler
 from reduce_dim.autoencoder.model import AutoencoderModel
 import torch
 import argparse
@@ -27,16 +26,44 @@ args = parser.parse_args()
 torch.manual_seed(args.seed)
 data = read_pickle(args.data)
 
-# see pca/run_base.py for new preprocessing scheme 
+# see pca/run_base.py for new preprocessing scheme
 if args.center:
-    data = center_data(data)
+    scaler_center = CenterScaler()
+    data = scaler_center.transform(data)
+else:
+    scaler_center = IdentityScaler()
+
 if args.norm:
-    data = norm_data(data)
+    scaler_norm = NormScaler()
+    data = scaler_norm.transform(data)
+else:
+    scaler_norm = IdentityScaler()
+
 print("Because args.data_small is not provided, I'm copying the whole structure")
+
 data_train = copy.deepcopy(data)
 
 data = sub_data(data, train=False, in_place=True)
 data_train = sub_data(data_train, train=True, in_place=True)
+data_orig = copy.deepcopy(data)
+
+
+# see pca/run_base.py for new preprocessing scheme
+if args.center:
+    scaler_center = CenterScaler()
+    data = scaler_center.transform(data)
+    data_train = CenterScaler().transform(data_train)
+else:
+    scaler_center = IdentityScaler()
+
+if args.norm:
+    scaler_norm = NormScaler()
+    data = scaler_norm.transform(data)
+    data_train = NormScaler().transform(data_train)
+else:
+    scaler_norm = IdentityScaler()
+
+
 
 DIMS = process_dims(args.dims)
 
@@ -55,11 +82,14 @@ for dim in DIMS:
             skip_eval=True,
         )
 
-        val_ip, val_l2, queries_loss, docs_loss = model.eval_routine(
-            data, post_cn=args.post_cn)
+        val_ip, val_l2, loss_q, loss_d = model.eval_routine(
+            data=data, data_orig=data_orig,
+            scaler_center=scaler_center, scaler_norm=scaler_norm,
+            post_cn=args.post_cn
+        )
         logdata.append({
             "dim": dim, "val_ip": val_ip, "val_l2": val_l2,
-            "queries_loss": queries_loss, "docs_loss": docs_loss, "type": train_key
+            "loss_q": loss_q, "loss_d": loss_d, "type": train_key
         })
 
         # continuously override the file
