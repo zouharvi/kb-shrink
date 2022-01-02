@@ -11,7 +11,7 @@ import argparse
 import sklearn.metrics
 from sklearn.decomposition import PCA
 
-parser = argparse.ArgumentParser(description='PCA performance summary')
+parser = argparse.ArgumentParser(description='PCA with scaled eigenvalues')
 parser.add_argument('--data')
 parser.add_argument('--data-small', default=None)
 parser.add_argument('--logfile', default="computed/tmp.log")
@@ -44,10 +44,8 @@ else:
         data_small = norm_data(data_small)
     data = sub_data(data, train=False, in_place=True)
     data_small = sub_data(data_small, train=True, in_place=True)
-print(f"{'Method':<21} {'Loss-D':<7} {'Loss-Q':<7} {'IPRPR':<0} {'L2RPR':<0}")
 
-
-def summary_performance(name, dataReduced, dataReconstructed):
+def summary_performance(dataReduced, dataReconstructed):
     if args.post_cn:
         dataReduced = center_data(dataReduced)
         dataReduced = norm_data(dataReduced)
@@ -72,8 +70,6 @@ def summary_performance(name, dataReduced, dataReconstructed):
             fast=True, report=False
         )
 
-    name = name.replace("float", "f")
-
     if not args.skip_loss:
         loss_q = sklearn.metrics.mean_squared_error(
             data["queries"],
@@ -84,10 +80,8 @@ def summary_performance(name, dataReduced, dataReconstructed):
             data["docs"][:10000],
             dataReconstructed["docs"][:10000]
         )
-        print(f"{name:<21} {loss_d:>7.5f} {loss_q:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
         return val_ip, val_l2, loss_q.item(), loss_d.item()
     else:
-        print(f"{name:<21} {-1:>7.5f} {-1:>7.5f} {val_ip:>5.3f} {val_l2:>5.3f}")
         return val_ip, val_l2, None, None
 
 
@@ -133,7 +127,6 @@ def pca_performance_d(components):
     else:
         dataReconstructed = None
     return summary_performance(
-        f"PCA-D ({components})",
         dataReduced,
         dataReconstructed
     )
@@ -173,7 +166,6 @@ def pca_performance_q(components):
     else:
         dataReconstructed = None
     return summary_performance(
-        f"PCA-D ({components})",
         dataReduced,
         dataReconstructed
     )
@@ -213,7 +205,6 @@ def pca_performance_dq(components):
     else:
         dataReconstructed = None
     return summary_performance(
-        f"PCA-D ({components})",
         dataReduced,
         dataReconstructed
     )
