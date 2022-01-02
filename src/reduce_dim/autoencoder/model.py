@@ -161,7 +161,7 @@ class AutoencoderModel(nn.Module):
 
         out = []
         for sample in dataLoader:
-            out += [x.cpu().numpy() for x in self.encoder(torch.tensor(sample).to(DEVICE))]
+            out += [x.cpu().numpy() for x in self.encoder(sample.to(DEVICE))]
 
         return out
 
@@ -172,7 +172,7 @@ class AutoencoderModel(nn.Module):
 
         out = []
         for sample in dataLoader:
-            out += [x.cpu().numpy() for x in self.decoder(torch.tensor(sample).to(DEVICE))]
+            out += [x.cpu().numpy() for x in self.decoder(sample.to(DEVICE))]
 
         return out
 
@@ -217,13 +217,8 @@ class AutoencoderModel(nn.Module):
         with torch.no_grad():
             queries_data_enc = self.encode_safe(data["queries"])
             docs_data_enc = self.encode_safe(data["docs"])
-            print(len(queries_data_enc))
-            print(len(docs_data_enc))
             queries_data_dec = self.decode_safe(queries_data_enc)
             docs_data_dec = self.decode_safe(docs_data_enc)
-            print(len(queries_data_dec))
-            print(len(docs_data_dec))
-            print()
             encoded = {
                 "queries": queries_data_enc,
                 "docs": docs_data_enc,

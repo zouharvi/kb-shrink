@@ -43,22 +43,26 @@ if __name__ == "__main__":
         )
 
     print(
-        np.average([len(x["spans"]) for x in data.values()]),
+        f'{np.average([len(x["spans"]) for x in data.values()]):.2f}',
         "spans on average"
     )
 
     print("Processing Dataset")
-    hotpot_all = load_dataset("kilt_tasks", name=args.query_dataset)
+    query_all = load_dataset("kilt_tasks", name=args.query_dataset)
     data_query_source = chain(
-        hotpot_all["train"],
-        hotpot_all["validation"],
-        hotpot_all["test"]
+        query_all["train"],
+        query_all["validation"],
+        query_all["test"]
     )
+    query_all_count = \
+        len(query_all["train"]) +\
+        len(query_all["validation"]) +\
+        len(query_all["test"])
 
     print(
-        len(hotpot_all["train"]), "train queries",
-        len(hotpot_all["validation"]), "dev queries",
-        len(hotpot_all["test"]), "test queries",
+        len(query_all["train"]), "train queries",
+        len(query_all["validation"]), "dev queries",
+        len(query_all["test"]), "test queries",
     )
 
     data_query = []
@@ -68,7 +72,7 @@ if __name__ == "__main__":
     query_train_max = None
     query_dev_max = None
     query_test_max = None
-    for sample_i, sample in tqdm(enumerate(data_query_source)):
+    for sample_i, sample in tqdm(enumerate(data_query_source), total=query_all_count):
         # early stopping
         if args.query_n is not None and sample_i >= args.query_n:
             break
@@ -94,9 +98,9 @@ if __name__ == "__main__":
             query_i += 1
 
             # set boundaries
-            if sample_i < len(hotpot_all["train"]):
+            if sample_i < len(query_all["train"]):
                 query_train_max = query_i
-            elif sample_i < len(hotpot_all["train"]) + len(hotpot_all["validation"]):
+            elif sample_i < len(query_all["train"]) + len(query_all["validation"]):
                 query_dev_max = query_i
             else:
                 query_test_max = query_i

@@ -2,17 +2,17 @@
 -|-|-|-
 ||||running
 ||||
-01 jan|auto base `dpr-c-pruned` rescaled, *silentheadpohnes_0*|14|running
-01 jan|auto base `dpr-c-pruned` rescaled, `--norm` *silentheadpohnes_1*|13|running
-01 jan|auto base `dpr-c-pruned` rescaled, `--center` *silentheadpohnes_2*|12|running
-01 jan|auto base `dpr-c-pruned` rescaled, `--center --norm` *silentheadpohnes_3*|15|running
-02 jan|pca scaled `--dims 128` `nq/dpr-c-pruned` *dryrope*|14|running
-02 jan|splitting & embedding ELI5 `fixed100` (pruned), `dpr-c`|15|running
+02 jan|splitting & embedding ELI5, TriviaQA `fixed100` (pruned), `dpr-c`|15|running
 ||||
 ||||finished
 ||||
-02 jan|pca base `--dims 128` `nq/dpr-c-pruned` *dryrope*|14|running
-02 jan|uncompressed `--dims 128` `nq/dpr-c-pruned` *dryrope*|13|running
+01 jan|auto base `dpr-c-pruned` rescaled, *silentheadpohnes_0*|12|bad code, ok
+01 jan|auto base `dpr-c-pruned` rescaled, `--norm` *silentheadpohnes_1*|13|bad code, ok
+01 jan|auto base `dpr-c-pruned` rescaled, `--center` *silentheadpohnes_2*|14|bad code, ok
+01 jan|auto base `dpr-c-pruned` rescaled, `--center --norm` *silentheadpohnes_3*|15|bad code, ok
+02 jan|pca scaled `--dims 128` `nq/dpr-c-pruned` *dryrope*|14|ok
+02 jan|pca base `--dims 128` `nq/dpr-c-pruned` *dryrope*|14|ok
+02 jan|uncompressed `--dims 128` `nq/dpr-c-pruned` *dryrope*|13|ok
 31 dec|pca base `dpr-c-pruned` rescaled, `--norm` *silentheadpohnes_1*|13|bad code, ok
 31 dec|pca base `dpr-c-pruned` rescaled, `--center` *silentheadpohnes_2*|12|bad code, ok
 31 dec|pca base `dpr-c-pruned` rescaled, `--center --norm` *silentheadpohnes_3*|14|bad code, ok

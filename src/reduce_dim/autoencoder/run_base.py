@@ -26,27 +26,10 @@ args = parser.parse_args()
 torch.manual_seed(args.seed)
 data = read_pickle(args.data)
 
-# see pca/run_base.py for new preprocessing scheme
-if args.center:
-    scaler_center = CenterScaler()
-    data = scaler_center.transform(data)
-else:
-    scaler_center = IdentityScaler()
-
-if args.norm:
-    scaler_norm = NormScaler()
-    data = scaler_norm.transform(data)
-else:
-    scaler_norm = IdentityScaler()
-
-print("Because args.data_small is not provided, I'm copying the whole structure")
-
 data_train = copy.deepcopy(data)
-
 data = sub_data(data, train=False, in_place=True)
 data_train = sub_data(data_train, train=True, in_place=True)
 data_orig = copy.deepcopy(data)
-
 
 # see pca/run_base.py for new preprocessing scheme
 if args.center:
@@ -62,8 +45,6 @@ if args.norm:
     data_train = NormScaler().transform(data_train)
 else:
     scaler_norm = IdentityScaler()
-
-
 
 DIMS = process_dims(args.dims)
 
