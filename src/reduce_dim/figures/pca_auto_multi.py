@@ -22,12 +22,24 @@ for logfile in args.logfile:
 DIMS = sorted(list(set([x["dim"] for x in data_all[0]])), key=lambda x: int(x))
 DISPLAY_DIMS = [32, 256, 512, 768]
 
-fig = plt.figure(figsize=(10, 3))
+
+fig = plt.figure(figsize=(10, 2.45))
+
+if args.legend:
+    grid_top = 0.1
+    grid_bottom = -1
+else:
+    if args.auto:
+        grid_top = 0.98
+        grid_bottom = 0.085
+    else:
+        grid_top = 0.91
+        grid_bottom = 0.015
 
 gs = gridspec.GridSpec(
     1, 4, width_ratios=[1, 1, 1, 1],
     wspace=0.05, hspace=0.0,
-    top=0.9 if not args.legend else 0.1, bottom=0.15 if not args.legend else -1,
+    top=grid_top, bottom=grid_bottom,
     left=0.06, right=0.94
 )
 
@@ -71,8 +83,7 @@ for (key, data) in zip(range(4), data_all):
     ax1.set_xticks(DISPLAY_DIMS)
     ax1.set_xticklabels(DISPLAY_DIMS)
     ax1.set_ylabel("R-Precision " + ("(Autoencoder)" if args.auto else "(PCA)"))
-    # ax1.set_xlabel("Dimension")
-    ax1.set_ylim(0.015, 0.66)
+    ax1.set_ylim(0.010, 0.67)
 
     ax2 = ax1.twinx()
     legend_loss_doc = ax2.plot(
@@ -84,7 +95,7 @@ for (key, data) in zip(range(4), data_all):
     legend_loss_both = ax2.plot(
         DIMS,
         [(x["loss_d"] + x["loss_q"]) / 2 for x in data if x["type"] == "dq"], label="Loss Both", color="tab:purple", alpha=0.2)
-    ax2.set_ylim(-0.001, 0.065)
+    ax2.set_ylim(-0.002, 0.110)
     ax2.set_ylabel("Reconstruction loss")
 
     # uncompressed
@@ -100,6 +111,7 @@ for (key, data) in zip(range(4), data_all):
             y=uncompressed_ip, xmin=32, xmax=768, alpha=0.5,
             linestyle="--", color="black", label="Original")
 
+    ax1.get_xaxis().set_visible(args.auto)
     ax1.get_yaxis().set_visible(key == 0)
     ax2.get_yaxis().set_visible(key == 3)
 
@@ -122,9 +134,12 @@ if args.legend:
         ncol=5,
     )
 
-if args.auto:
-    plt.savefig("figures/auto_main.pdf")
+if args.legend:
+    plt.savefig("figures/pca_auto_legend.pdf")
 else:
-    plt.savefig("figures/pca_main.pdf")
+    if args.auto:
+        plt.savefig("figures/auto_main.pdf")
+    else:
+        plt.savefig("figures/pca_main.pdf")
 
 plt.show()
