@@ -2,10 +2,17 @@
 -|-|-|-
 ||||running
 ||||
-02 jan|splitting & embedding ELI5, TriviaQA `fixed100` (pruned), `dpr-c`|15|running
+02 jan|splitting & embedding ELI5, TriviaQA, Trex `fixed100` (pruned), `dpr-c`|15|running
+02 jan|rproj dimsingle `nq/dpr-c` *dryrope*|13|running
+02 jan|pca scaled nocn `nq/dpr-c` *dryrope*|14|running
+03 jan|uncompressed `sent0{1,2,3,5}` `dpr-c-pruned` *cluelessmoon*|12-15|running
 ||||
 ||||finished
 ||||
+02 jan|pca scaled `nq/dpr-c` *dryrope*|14|ok
+02 jan|pca base `nq/dpr-c` *dryrope*|14|ok
+02 jan|rproj nocn `nq/dpr-c` *dryrope*|14|ok
+02 jan|rproj `nq/dpr-c` *dryrope*|13|ok
 01 jan|auto base `dpr-c-pruned` rescaled, *silentheadpohnes_0*|12|bad code, ok
 01 jan|auto base `dpr-c-pruned` rescaled, `--norm` *silentheadpohnes_1*|13|bad code, ok
 01 jan|auto base `dpr-c-pruned` rescaled, `--center` *silentheadpohnes_2*|14|bad code, ok
