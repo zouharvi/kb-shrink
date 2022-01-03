@@ -65,32 +65,41 @@ def bit_performance_8(data):
     }
     return summary_performance(dataReduced)
 
-def bit_performance_1(data):
+
+def bit_performance_1(data, offset=0):
     dataReduced = {
-        "queries": transform_to_1(data["queries"], offset=0),
-        "docs": transform_to_1(data["docs"], offset=0)
+        "queries": transform_to_1(data["queries"], offset),
+        "docs": transform_to_1(data["docs"], offset)
     }
     return summary_performance(dataReduced)
 
 
 data = sub_data(data, train=False, in_place=True)
 
+data["queries"] = np.array(data["queries"], dtype=np.float64)
+data["docs"] = np.array(data["docs"], dtype=np.float64)
+
 logdata = []
-val_ip, val_l2 = bit_performance_1(data)
+val_ip, val_l2 = bit_performance_8(data)
 logdata.append({
     "val_ip": val_ip, "val_l2": val_l2,
-    "type": "bit",
+    "type": "float8",
 })
-# val_ip, val_l2 = bit_performance_8(data)
-# logdata.append({
-#     "val_ip": val_ip, "val_l2": val_l2,
-#     "type": "float8",
-# })
-# val_ip, val_l2 = bit_performance_16(data)
-# logdata.append({
-#     "val_ip": val_ip, "val_l2": val_l2,
-#     "type": "float16",
-# })
+val_ip, val_l2 = bit_performance_16(data)
+logdata.append({
+    "val_ip": val_ip, "val_l2": val_l2,
+    "type": "float16",
+})
+val_ip, val_l2 = bit_performance_1(data, offset=-0.5)
+logdata.append({
+    "val_ip": val_ip, "val_l2": val_l2,
+    "type": "bit_05",
+})
+val_ip, val_l2 = bit_performance_1(data, offset=0)
+logdata.append({
+    "val_ip": val_ip, "val_l2": val_l2,
+    "type": "bit_00",
+})
 
 # continuously override the file
 with open(args.logfile, "w") as f:

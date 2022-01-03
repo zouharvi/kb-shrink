@@ -6,7 +6,7 @@ def _transform_to_16(x):
 
 
 def _transform_to_8(x):
-    arr16 = transform_to_16(x)
+    arr16 = np.array(x, dtype=np.float16)
     arr8 = arr16.tobytes()[1::2]
     # back to float 16
     return np.frombuffer(
