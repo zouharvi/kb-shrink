@@ -1,15 +1,11 @@
 import numpy as np
-from scipy.spatial.distance import minkowski
 import torch
+from .retrieval_metric_utils import *
 
 if torch.cuda.is_available():
     DEVICE = torch.device("cuda:0")
 else:
     DEVICE = torch.device("cpu")
-
-
-def l2_sim(x, y):
-    return -minkowski(x, y)
 
 
 def order_l2_kdtree(data_queries, data_docs, fast):
@@ -104,50 +100,47 @@ def order_ip(data_queries, data_docs, retrieve_counts, fast):
 
 
 def acc_l2(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=True, report=False
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, n=20, fast=True
 ):
-    n_new_gen = order_l2(data_queries, data_docs, [
-                         n] * len(data_queries), fast)
-    return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
+    n_new_gen = order_l2(
+        data_queries, data_docs, [n] * len(data_queries), fast
+    )
+    return acc_from_relevancy(data_relevancy, n_new_gen, n)
 
 
 def acc_ip(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=True, report=False
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, n=20, fast=True
 ):
-    n_new_gen = order_ip(data_queries, data_docs, [
-                         n] * len(data_queries), fast)
-    return acc_from_relevancy(data_relevancy, n_new_gen, n, report)
+    n_new_gen = order_ip(
+        data_queries, data_docs, [n] * len(data_queries), fast
+    )
+    return acc_from_relevancy(data_relevancy, n_new_gen, n)
 
 
 def rprec_l2(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=True, report=False
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, fast=True
 ):
     n_new_gen = order_l2(
         data_queries, data_docs,
         [len(x) for x in data_relevancy],
         fast
     )
-    return rprec_from_relevancy(data_relevancy, n_new_gen, report)
+    return rprec_from_relevancy(data_relevancy, n_new_gen)
 
 
 def rprec_ip(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=True, report=False
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, fast=True
 ):
     n_new_gen = order_ip(
         data_queries, data_docs,
         [len(x) for x in data_relevancy],
         fast
     )
-    return rprec_from_relevancy(data_relevancy, n_new_gen, report)
+    return rprec_from_relevancy(data_relevancy, n_new_gen)
 
 
 def rprec_a_ip(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=True, report=False
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, fast=True
 ):
     n_new_gen = order_ip(
         data_queries, data_docs,
@@ -155,13 +148,12 @@ def rprec_a_ip(
         fast
     )
     return rprec_a_from_relevancy(
-        data_relevancy, n_new_gen, data_relevancy_articles, data_docs_articles, report
+        data_relevancy, n_new_gen, data_relevancy_articles, data_docs_articles
     )
 
 
 def rprec_a_l2(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=True, report=False
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, fast=True
 ):
     n_new_gen = order_l2(
         data_queries, data_docs,
@@ -169,93 +161,12 @@ def rprec_a_l2(
         fast
     )
     return rprec_a_from_relevancy(
-        data_relevancy, n_new_gen, data_relevancy_articles, data_docs_articles, report
+        data_relevancy, n_new_gen, data_relevancy_articles, data_docs_articles
     )
 
 
-def acc_from_relevancy(relevancy, n_new, n, report=False):
-    def acc_local(doc_true, doc_hyp):
-        """
-        Accuracy for one query
-        """
-        if len(set(doc_true) & set(doc_hyp[:n])) != 0:
-            return 1
-        else:
-            return 0
-
-    acc_val = np.average([acc_local(x, y) for x, y in zip(relevancy, n_new)])
-    if report:
-        print(f"ACC (top {n}) is {acc_val:.3f} (best is 1, worst is 0)")
-
-    return acc_val
-
-
-def rprec_from_relevancy(relevancy, n_new, report=False):
-    def rprec_local(doc_true, doc_hyp):
-        """
-        R-Precision for one query
-        """
-        return len(set(doc_hyp[:len(doc_true)]) & set(doc_true)) / len(doc_true)
-
-    rprec_val = np.average([
-        rprec_local(x, y)
-        for x, y in zip(relevancy, n_new)
-    ])
-    if report:
-        print(f"RPrec is {rprec_val:.3f} (best is 1, worst is 0)")
-
-    return rprec_val
-
-
-def rprec_a_from_relevancy(relevancy, n_new, relevancy_articles, docs_articles, report=False):
-    def rprec_local(doc_true, articles_true, doc_hyp):
-        """
-        R-Precision for one query
-        """
-
-        articles_hyp = {
-            docs_articles[doc]
-            if doc < len(docs_articles)
-            else -1  # hotfix for irrelevant effects (adding new docs)
-            for doc in doc_hyp[:len(doc_true)]
-        }
-        return len(articles_hyp & articles_true) / len(articles_true)
-
-    rprec_val = np.average([
-        rprec_local(*x)
-        for x in zip(relevancy, relevancy_articles, n_new)
-    ])
-    if report:
-        print(f"RPrec is {rprec_val:.3f} (best is 1, worst is 0)")
-
-    return rprec_val
-
-
-def hits_a_from_relevancy(relevancy, n_new, relevancy_articles, docs_articles):
-    def rprec_local(doc_true, articles_true, doc_hyp):
-        """
-        R-Precision for one query
-        """
-
-        articles_hyp = {
-            docs_articles[doc]
-            if doc < len(docs_articles)
-            else -1  # hotfix for irrelevant effects (adding new docs)
-            for doc in doc_hyp[:len(doc_true)]
-        }
-        return len(articles_hyp & articles_true)
-
-    rprec_val = [
-        rprec_local(*x)
-        for x in zip(relevancy, relevancy_articles, n_new)
-    ]
-
-    return rprec_val
-
-
 def hits_a_ip(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=True
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, fast=True
 ):
     n_new_gen = order_ip(
         data_queries, data_docs,
@@ -268,8 +179,7 @@ def hits_a_ip(
 
 
 def hits_a_l2(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles,
-    n=20, fast=True
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, fast=True
 ):
     n_new_gen = order_l2(
         data_queries, data_docs,
@@ -278,4 +188,28 @@ def hits_a_l2(
     )
     return hits_a_from_relevancy(
         data_relevancy, n_new_gen, data_relevancy_articles, data_docs_articles
+    )
+
+
+def intersection_ip(
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, fast=True
+):
+    n_new_gen = order_ip(
+        data_queries, data_docs,
+        [20] * len(data_queries), fast
+    )
+    return intersection_from_relevancy(
+        data_relevancy, n_new_gen
+    )
+
+
+def intersection_l2(
+    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, fast=True
+):
+    n_new_gen = order_l2(
+        data_queries, data_docs
+        [20] * len(data_queries), fast
+    )
+    return intersection_from_relevancy(
+        data_relevancy, n_new_gen
     )
