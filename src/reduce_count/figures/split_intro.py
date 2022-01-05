@@ -2,21 +2,71 @@
 
 import sys
 sys.path.append("src")
-import misc.plot_utils
+# import misc.plot_utils
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import colors as mcolors
 
-plt.figure(figsize=(4.4, 4))
+DATA = {
+    "fixed040_cn": {"pcount": 3814169, "val_ip": 0.7533928571428572},
+    "fixed060_cn": {"pcount": 2858954, "val_ip": 0.7573214285714286},
+    "fixed080_cn": {"pcount": 2385695, "val_ip": 0.7567857142857143},
+    "fixed080_over.20_cn": {"pcount": 2385695, "val_ip": 0.75625},
+    "fixed100_cn": {"pcount": 2114151, "val_ip": 0.7560714285714286},
+    "fixed120_cn": {"pcount": 1947229, "val_ip": 0.75625},
+    "sent01_cn": {"pcount": 5665645, "val_ip": 0.7432142857142857},
+    "sent02_cn": {"pcount": 3311972, "val_ip": 0.7625},
+    "sent03_cn": {"pcount": 2542124, "val_ip": 0.7605357142857143},
+    "sent04_cn": {"pcount": 2171949, "val_ip": 0.7623214285714286},
+    "sent05_cn": {"pcount": 1965217, "val_ip": 0.7580357142857143},
+    "sent06_cn": {"pcount": 1842948, "val_ip": 0.7582142857142857},
+}
+
+plt.figure(figsize=(5, 4))
 ax = plt.gca()
-ax.scatter(
-    0, 1,
-    label="IP",
-    color="tab:red", hatch="",
-    edgecolor="black",
-)
-ax.set_ylabel("R-Precision")
+
+COLOR_FIXED = list(mcolors.TABLEAU_COLORS)
+COLOR_SENT = list(mcolors.TABLEAU_COLORS)
+
+
+def get_style(name):
+    style = {}
+    if "fixed" in name:
+        style["marker"] = "."
+        style["color"] = COLOR_FIXED.pop(0)
+    elif "sent" in name:
+        style["marker"] = "^"
+        style["color"] = COLOR_SENT.pop(0)
+    return style
+
+
+def mangle_name(name):
+    name = name.replace("_cn", "")
+    name = name.replace("fixed", "Fixed ")
+    name = name.replace("_over.", ", over. ")
+    name = name.replace("sent", "Sent ")
+    name = name.replace(" 0", " ")
+    return name
+
+
+for name, vals in DATA.items():
+    ax.scatter(
+        vals["pcount"], vals["val_ip"],
+        label=mangle_name(name), **get_style(name)
+    )
+
+ax.set_ylabel("Acc-20")
 ax.set_xlabel("Passage count")
-plt.legend()
+xpoints = np.arange(2*10**6, 6 * 10**6 + 1, 10**6)
+
+plt.xticks(xpoints, [f"{x/(10**6):.0f}m" for x in xpoints])
+plt.legend(
+    ncol=2,
+    loc="lower left",
+    columnspacing=0.5, 
+    handlelength=0.5,
+    handletextpad=0.5,
+)
 plt.tight_layout()
 plt.savefig("figures/split_intro.pdf")
 plt.show()
