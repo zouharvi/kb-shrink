@@ -100,7 +100,7 @@ def order_ip(data_queries, data_docs, retrieve_counts, fast):
 
 
 def acc_l2(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, n=20, fast=True
+    data_queries, data_docs, data_relevancy, data_relevancy_articles=None, data_docs_articles=None, n=20, fast=True
 ):
     n_new_gen = order_l2(
         data_queries, data_docs, [n] * len(data_queries), fast
@@ -109,7 +109,7 @@ def acc_l2(
 
 
 def acc_ip(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, n=20, fast=True
+    data_queries, data_docs, data_relevancy, data_relevancy_articles=None, data_docs_articles=None, n=20, fast=True
 ):
     n_new_gen = order_ip(
         data_queries, data_docs, [n] * len(data_queries), fast
@@ -118,7 +118,7 @@ def acc_ip(
 
 
 def rprec_l2(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, fast=True
+    data_queries, data_docs, data_relevancy, data_relevancy_articles=None, data_docs_articles=None, fast=True
 ):
     n_new_gen = order_l2(
         data_queries, data_docs,
@@ -129,7 +129,7 @@ def rprec_l2(
 
 
 def rprec_ip(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, fast=True
+    data_queries, data_docs, data_relevancy, data_relevancy_articles=None, data_docs_articles=None, fast=True
 ):
     n_new_gen = order_ip(
         data_queries, data_docs,
@@ -192,11 +192,11 @@ def hits_a_l2(
 
 
 def intersection_ip(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, fast=True
+    data_queries, data_docs, data_relevancy, n=20, fast=True
 ):
     n_new_gen = order_ip(
         data_queries, data_docs,
-        [20] * len(data_queries), fast
+        [n] * len(data_queries), fast
     )
     return intersection_from_relevancy(
         data_relevancy, n_new_gen
@@ -204,11 +204,11 @@ def intersection_ip(
 
 
 def intersection_l2(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles, data_docs_articles, fast=True
+    data_queries, data_docs, data_relevancy, n=20, fast=True
 ):
     n_new_gen = order_l2(
         data_queries, data_docs
-        [20] * len(data_queries), fast
+        [n] * len(data_queries), fast
     )
     return intersection_from_relevancy(
         data_relevancy, n_new_gen
