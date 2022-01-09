@@ -26,6 +26,7 @@ data["docs"] = np.array(data["docs"])
 
 with open(args.logfile_single, "r") as f:
     DATA_SINGLE = eval(f.read())
+
 DATA_BASE = [x for x in DATA_SINGLE if x["dim"] == False][0]
 IMPR_L2 = [
     x["dim"]
@@ -46,16 +47,12 @@ class DropRandomProjection():
 data_log = []
 
 
-def safe_transform(model, array, dim, impr_array):
-    return [model.transform([x], dim, impr_array)[0] for x in array]
-
-
 def random_projection_performance(dim):
     model = DropRandomProjection()
 
     dataReduced = {
-        "queries": safe_transform(model, data["queries"], dim, IMPR_L2),
-        "docs": safe_transform(model, data["docs"], dim, IMPR_L2)
+        "queries": model.transform(data["queries"], dim, IMPR_L2),
+        "docs": model.transform(data["docs"], dim, IMPR_L2)
     }
     if args.post_cn:
         dataReduced = center_data(dataReduced)
@@ -63,22 +60,20 @@ def random_projection_performance(dim):
 
     # copy to make it C-continuous
     val_l2 = rprec_a_l2(
-        dataReduced["queries"],
-        dataReduced["docs"],
+        dataReduced["queries"].copy(),
+        dataReduced["docs"].copy(),
         data["relevancy"],
         data["relevancy_articles"],
         data["docs_articles"],
-        report=False,
         fast=True,
     )
     if not args.post_cn:
         val_ip = rprec_a_ip(
-            dataReduced["queries"],
-            dataReduced["docs"],
+            dataReduced["queries"].copy(),
+            dataReduced["docs"].copy(),
             data["relevancy"],
             data["relevancy_articles"],
             data["docs_articles"],
-            report=False,
             fast=True,
         )
     else:

@@ -2,16 +2,19 @@
 -|-|-|-
 ||||running/staged
 ||||
-02 jan|splitting & embedding ELI5, TriviaQA, Trex, WoW `fixed100` (pruned), `dpr-c`|15|running
-02 jan|rproj dimsingle `nq/dpr-c` *dryrope*|13|running
-03 jan|embd `{sent0{4,6},fixed040}` dpr-c`|14|running
 ||||
 ||||finished
 ||||
+08 jan|rproj greedy `nq/dpr-c` `--post-cn` *dryrope*|13|ok
+08 jan|rproj greedy `nq/dpr-c` *dryrope*|14|ok
+07 jan|pca_prec `dpr-c` `--post-cn` *clearwindow*|14|ok
+02 jan|rproj dimsingle `nq/dpr-c` *dryrope*|13|ok
+03 jan|embd `{sent0{4,6},fixed040}` dpr-c`|14|ok
+02 jan|splitting & embedding ELI5, TriviaQA, Trex, WoW `fixed100` (pruned), `dpr-c`|15|ok
 04 jan|uncompressed `wow/dpr-c-pruned`|13|ok
 03 jan|split `{sent0{4,6},fixed040}` dpr-c`|15|ok
 03 jan|prec base `nq/dpr-c` `{,--post-cn}` *dryrope*|15|ok
-03 jan|pca_prec base `nq/dpr-c` `{,--post-cn}` *dryrope*|12|ok
+03 jan|pca_prec `nq/dpr-c` `{,--post-cn}` *dryrope*|12|ok
 03 jan|auto base `--model {1,2,3}` `{,--post-cn}` `{,--regularize}` *cluelessmoon* (should have been called dryrope)|12-14|ok
 03 jan|uncompressed `sent0{1,2,3,5}` `dpr-c-pruned` *cluelessmoon*|12-15|ok
 02 jan|pca scaled nocn `nq/dpr-c` *dryrope*|14|ok
