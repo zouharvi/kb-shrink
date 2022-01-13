@@ -20,7 +20,7 @@ DATA = [x for x in DATA if x["model"] != "greedy"]
 DIMS = sorted(list(set([x["dim"] for x in DATA])), key=lambda x: int(x))
 DISPLAY_DIMS = [32, 256, 512, 768]
 
-plt.figure(figsize=(4.4, 3.6))
+plt.figure(figsize=(4.4, 3))
 plt.rcParams["lines.linewidth"] = 2.2
 ax = plt.gca()
 

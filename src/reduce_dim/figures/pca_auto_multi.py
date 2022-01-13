@@ -23,18 +23,18 @@ DIMS = sorted(list(set([x["dim"] for x in data_all[0]])), key=lambda x: int(x))
 DISPLAY_DIMS = [32, 256, 512, 768]
 
 
-fig = plt.figure(figsize=(10, 2.45))
+fig = plt.figure(figsize=(10, 2.1))
 
 if args.legend:
     grid_top = 0.1
     grid_bottom = -1
 else:
     if args.auto:
-        grid_top = 0.98
-        grid_bottom = 0.085
+        grid_top = 0.97
+        grid_bottom = 0.095
     else:
-        grid_top = 0.91
-        grid_bottom = 0.015
+        grid_top = 0.895
+        grid_bottom = 0.02
 
 gs = gridspec.GridSpec(
     1, 4, width_ratios=[1, 1, 1, 1],

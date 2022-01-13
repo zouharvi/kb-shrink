@@ -90,7 +90,7 @@ POS = np.arange(len(DATA_RPREC))
 BARHEIGHT = 0.2
 YERRMOCK = np.random.rand(len(DATA_RPREC))/10000
 
-plt.figure(figsize=(4.4, 4))
+plt.figure(figsize=(4.4, 3.4))
 ax = plt.gca()
 ax.bar(
     POS + 0.2 * 0,
