@@ -9,7 +9,7 @@ import numpy as np
 from collections import Counter, defaultdict
 parser = argparse.ArgumentParser()
 parser.add_argument('--logfile', default="computed/hits_pca_redcritter.log")
-parser.add_argument('--hide-y', action="store_true")
+parser.add_argument('--bit', action="store_true")
 args = parser.parse_args()
 
 with open(args.logfile, "r") as f:
@@ -22,7 +22,7 @@ img = np.zeros((
     max(x for x, y in counts.keys()) + 1,
     max(y for x, y in counts.keys()) + 1
 ))
-fig = plt.figure(figsize=(1.9 if args.hide_y else 2.5, 2.5))
+fig = plt.figure(figsize=(2.3, 2.5))
 ax = fig.get_axes()
 
 total = sum(counts.values())
@@ -45,18 +45,18 @@ plt.imshow(
     img,
     # aspect=0.9,
 )
-if not args.hide_y: 
-    plt.ylabel("Original retrieved")
+if not args.bit: 
+    # plt.ylabel("Original retrieved")
     plt.xlabel("PCA retrieved")
 else:
-    plt.gca().get_yaxis().set_visible(False)
+    # plt.gca().get_yaxis().set_visible(False)
     plt.xlabel("1bit retrieved")
     
 plt.xticks(range(3))
 plt.yticks(range(3))
 plt.gca().invert_yaxis()
 plt.tight_layout()
-if args.hide_y:
+if args.bit:
     plt.savefig("figures/hits_1bit.pdf")
 else:
     plt.savefig("figures/hits_pca.pdf")
