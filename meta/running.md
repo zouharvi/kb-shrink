@@ -2,6 +2,9 @@
 -|-|-|-
 ||||running/staged
 ||||
+13 jan|irrelevant *oilynoodles_a* (redirect to nohup)|14|running
+13 jan|irrelevant *oilynoodles_b*|15|running
+13 jan|irrelevant *oilynoodles_c*|13|running
 ||||
 ||||finished
 ||||

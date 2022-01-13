@@ -18,6 +18,8 @@ print()
 print(f"Number of queries:   {len(data['queries']):>7}")
 print(f"Number of docs:      {len(data['docs']):>7}")
 print()
+print("Boundaries:", data["boundaries"])
+print()
 print(
     f'Average number of spans per question: {np.average([len(x) for x in data["relevancy"]]):.2f}'
 )
