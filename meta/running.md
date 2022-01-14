@@ -2,12 +2,14 @@
 -|-|-|-
 ||||running/staged
 ||||
-13 jan|irrelevant *oilynoodles_a* (redirect to nohup)|14|running
-13 jan|irrelevant *oilynoodles_b*|15|running
-13 jan|irrelevant *oilynoodles_c*|13|running
 ||||
 ||||finished
 ||||
+14 jan|pca 8bit `{,--post-cn}` *blacklid*|15|ok
+14 jan|pca 16bit `{,--post-cn}` *blacklid*|14|ok
+13 jan|irrelevant *oilynoodles_a* (redirect to nohup)|14|ok
+13 jan|irrelevant *oilynoodles_b*|15|ok
+13 jan|irrelevant *oilynoodles_c*|13|ok
 08 jan|rproj greedy `nq/dpr-c` `--post-cn` *dryrope*|13|ok
 08 jan|rproj greedy `nq/dpr-c` *dryrope*|14|ok
 07 jan|pca_prec `dpr-c` `--post-cn` *clearwindow*|14|ok
