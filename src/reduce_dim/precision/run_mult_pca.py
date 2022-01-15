@@ -25,7 +25,7 @@ COMB_PREC = [
 ]
 
 COMB_PCA = [
-    128, 256, 384, 512, 768
+    128, 256, 384, 512, 640, 768
 ]
 
 def summary_performance(dataReduced):
@@ -84,7 +84,7 @@ for (prec_bit, prec_f), pca_dim in product(COMB_PREC, COMB_PCA):
     logdata.append({
         "val_ip": val_ip, "val_l2": val_l2,
         "dim": pca_dim, "bit": prec_bit,
-        "compression": 32/prec_bit * 768/pca_dim,
+        "compression": 32 / prec_bit * 768 / pca_dim,
     })
 
     # continuously override the file
