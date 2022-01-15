@@ -45,7 +45,8 @@ def summary_performance(dataReduced):
 
 
 def performance_1(data):
-    model = PCA(n_components=256)
+    # 240 works better slightly
+    model = PCA(n_components=245)
     model.fit(data["docs"])
     dataReduced = {
         "docs": model.transform(data["docs"]),
@@ -53,7 +54,7 @@ def performance_1(data):
     }
 
     # center data in between
-    # actually worsesns the performance slightly
+    # actually worsens the performance slightly
     # dataReduced = center_data(dataReduced)
     # dataReduced = norm_data(dataReduced)
 

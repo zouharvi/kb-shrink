@@ -26,3 +26,6 @@ def transform_to_8(array):
 
 def transform_to_1(array, offset=-0.5):
     return [_transform_to_1(x, offset) for x in array]
+
+def transform_to_32(array):
+    return np.array(array, dtype=np.float32)
