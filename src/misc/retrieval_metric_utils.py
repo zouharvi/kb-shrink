@@ -88,3 +88,18 @@ def intersection_from_relevancy(relevancy, n_new):
     ]
 
     return rprec_val
+
+
+def retrieved_from_relevancy(relevancy, n_new):
+    def rprec_local(doc_true, doc_hyp):
+        """
+        Useful spans for one query
+        """
+        return set(doc_hyp[:len(doc_true)])
+
+    rprec_val = [
+        rprec_local(x, y)
+        for x, y in zip(relevancy, n_new)
+    ]
+
+    return rprec_val

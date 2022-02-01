@@ -213,3 +213,28 @@ def intersection_l2(
     return intersection_from_relevancy(
         data_relevancy, n_new_gen
     )
+
+
+
+def retrieved_ip(
+    data_queries, data_docs, data_relevancy, n=20, fast=True
+):
+    n_new_gen = order_ip(
+        data_queries, data_docs,
+        [n] * len(data_queries), fast
+    )
+    return retrieved_from_relevancy(
+        data_relevancy, n_new_gen
+    )
+
+
+def retrieved_l2(
+    data_queries, data_docs, data_relevancy, n=20, fast=True
+):
+    n_new_gen = order_l2(
+        data_queries, data_docs
+        [n] * len(data_queries), fast
+    )
+    return retrieved_from_relevancy(
+        data_relevancy, n_new_gen
+    )

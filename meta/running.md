@@ -2,10 +2,13 @@
 -|-|-|-
 ||||running/staged
 ||||
-15 jan|pca mult `{,--post-cn}` *orangeball*|15|running
 ||||
 ||||finished
 ||||
+1 feb|intersection multipass *distantball*|12,13,14|ok
+1 feb|intersection all *distantball*|13|ok
+31 jan|intersection small 1000 queries *distantball*|13|ok, ok
+15 jan|pca mult `{,--post-cn}` *orangeball*|15|ok
 15 jan|pca 1bit (245) `{,--post-cn}` *orangeball*|15|ok
 15 jan|pca 1bit (245) `nq` `{,--post-cn}` *orangeball*|13|ok
 14 jan|pca 8bit `{,--post-cn}` *blacklid*|15|ok
