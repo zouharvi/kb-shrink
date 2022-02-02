@@ -1,23 +1,44 @@
 from misc.retrieval_utils import retrieved_ip
-import multiprocessing
 
-# global state
-# TODO: may not work as expected
-offset_relevancy = None
+def prune_docs(data, to_prune):
+    offset = 0
+    for doc in to_prune:
+        doc -= offset
+        data["docs"].pop(doc)
+        offset += 1
+    print("E", flush=True)
 
-def _update_doc_offset(doc):
-    global offset_relevancy
-    for doc_offset, offset_val in offset_relevancy:
-        if doc_offset <= doc:
-            return doc - offset_val
-    return doc
+    prev_offset = -1
+    offset_relevancy = {-1: 0}
+    for doc in to_prune:
+        offset_relevancy[doc] = offset_relevancy[prev_offset] + 1
+        prev_offset = doc
+    print("F", flush=True)
 
-def _update_relevancy(relevancy):
-    return [_update_doc_offset(x) for x in relevancy]
+    # remove phony target
+    offset_relevancy.pop(-1)
+    # sort from highest to lowest doc
+    offset_relevancy = sorted(
+        offset_relevancy.items(),
+        key=lambda x: x[0], reverse=True
+    )
+    print("G", flush=True)
 
-def neg_pos_step(data):
-    global offset_relevancy
+    def _update_doc_offset(doc):
+        for doc_offset, offset_val in offset_relevancy:
+            if doc_offset <= doc:
+                return doc - offset_val
+        return doc
+        
+    data["relevancy"] = list(
+        map(
+            lambda relevancy: [_update_doc_offset(x) for x in relevancy],
+            data["relevancy"]
+        )
+    )
+    print("H", flush=True)
 
+def filter_step(data):
     print("A", flush=True)
     logdata = {}
     traindata = {"negative": [], "positive": [], "neutral": []}
@@ -52,40 +73,7 @@ def neg_pos_step(data):
 
     print("D", flush=True)
 
-    offset = 0
-    for doc in to_prune:
-        doc -= offset
-        data["docs"].pop(doc)
-        offset += 1
-    print("D", flush=True)
-
+    prune_docs(data, to_prune)
     logdata["docs"] = len(data["docs"])
-
-    prev_offset = -1
-    offset_relevancy = {-1: 0}
-    for doc in to_prune:
-        offset_relevancy[doc] = offset_relevancy[prev_offset] + 1
-        prev_offset = doc
-    print("E", flush=True)
-
-    # remove phony target
-    offset_relevancy.pop(-1)
-    # sort from highest to lowest doc
-    offset_relevancy = sorted(
-        offset_relevancy.items(),
-        key=lambda x: x[0], reverse=True
-    )
-    print("F", flush=True)
-
-
-    pool = multiprocessing.Pool()
-
-    data["relevancy"] = list(
-        pool.map(
-            _update_relevancy,
-            data["relevancy"]
-        )
-    )
-    print("G", flush=True)
 
     return traindata, logdata
