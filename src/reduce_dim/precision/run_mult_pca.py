@@ -56,12 +56,15 @@ def summary_performance(dataReduced):
 
 
 def performance_mult(data, prec_f, pca_dim):
-    model = PCA(n_components=pca_dim)
-    model.fit(data["docs"])
-    dataReduced = {
-        "docs": model.transform(data["docs"]),
-        "queries": model.transform(data["queries"]),
-    }
+    if pca_dim is None:
+        dataReduced = data
+    else:
+        model = PCA(n_components=pca_dim)
+        model.fit(data["docs"])
+        dataReduced = {
+            "docs": model.transform(data["docs"]),
+            "queries": model.transform(data["queries"]),
+        }
 
     # center data in between
     # actually worsesns the performance slightly
