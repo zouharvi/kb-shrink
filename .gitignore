@@ -9,6 +9,7 @@ tmp*
 patches_local
 computed/*.out
 computed/*.log
+computed/*.pkl
 nohup*.out
 .empty
 runs/

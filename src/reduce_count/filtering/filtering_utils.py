@@ -1,39 +1,72 @@
 from misc.retrieval_utils import retrieved_ip
+import multiprocessing
 
-def harmful_useful_pass(data):
-    print(f"Running retrieval on {len(data['docs'])} docs")
+# global state
+# TODO: may not work as expected
+offset_relevancy = None
+
+def _update_doc_offset(doc):
+    global offset_relevancy
+    for doc_offset, offset_val in offset_relevancy:
+        if doc_offset <= doc:
+            return doc - offset_val
+    return doc
+
+def _update_relevancy(relevancy):
+    return [_update_doc_offset(x) for x in relevancy]
+
+def neg_pos_step(data):
+    global offset_relevancy
+
+    print("A", flush=True)
+    logdata = {}
+    traindata = {"negative": [], "positive": [], "neutral": []}
+
+    logdata["docs_old"] = len(data["docs"])
     all_retrieved = retrieved_ip(
         data["queries"], data["docs"], data["relevancy"], n=10
     )
+    print("B", flush=True)
 
-    print("Computing which documents to prune")
-    to_prune_harmful = set()
-    to_prune_useful = set()
+    to_prune_negative = set()
+    to_prune_positive = set()
     for docs_retrieved, docs_relevant in zip(all_retrieved, data["relevancy"]):
         # add docs which were previously relevant but did not help in retrieval
-        to_prune_harmful |= docs_retrieved - set(docs_relevant)
-        to_prune_useful |= docs_retrieved & set(docs_relevant)
-    to_prune = list(to_prune_harmful - to_prune_useful)
+        to_prune_negative |= docs_retrieved - set(docs_relevant)
+        to_prune_positive |= docs_retrieved & set(docs_relevant)
+    to_prune = list(to_prune_negative - to_prune_positive)
     to_prune.sort()
 
-    print("Harmful:", len(to_prune_harmful))
-    print("Useful:", len(to_prune_useful))
-    print("To-prune:", len(to_prune))
+    print("C", flush=True)
+    logdata["to_prune"] = len(to_prune)
+    logdata["positive"] = len(to_prune_positive)
+    logdata["negative"] = len(to_prune_negative)
 
-    print("Pruning documents")
+    # save training data
+    for i in to_prune_negative:
+        traindata["negative"].append(data["docs"][i])
+    for i in to_prune_positive:
+        traindata["positive"].append(data["docs"][i])
+    for i in (set(range(len(data["docs"]))) - set(to_prune_negative)) - set(to_prune_positive):
+        traindata["neutral"].append(data["docs"][i])
+
+    print("D", flush=True)
+
     offset = 0
     for doc in to_prune:
         doc -= offset
         data["docs"].pop(doc)
         offset += 1
-    print("Docs:", len(data["docs"]))
+    print("D", flush=True)
 
-    print("Offseting relevancy")
+    logdata["docs"] = len(data["docs"])
+
     prev_offset = -1
     offset_relevancy = {-1: 0}
     for doc in to_prune:
         offset_relevancy[doc] = offset_relevancy[prev_offset] + 1
         prev_offset = doc
+    print("E", flush=True)
 
     # remove phony target
     offset_relevancy.pop(-1)
@@ -42,24 +75,17 @@ def harmful_useful_pass(data):
         offset_relevancy.items(),
         key=lambda x: x[0], reverse=True
     )
-
-    def update_doc_offset(doc):
-        for doc_offset, offset_val in offset_relevancy:
-            if doc_offset <= doc:
-                return doc - offset_val
-        return doc
+    print("F", flush=True)
 
 
-    data["relevancy"] = [
-        [update_doc_offset(x) for x in relevancy] for relevancy in data["relevancy"]
-    ]
+    pool = multiprocessing.Pool()
 
-    # # TODO: there's a faster way to do this with just a single pass
-    # for offset in to_prune:
-    #     data["relevancy"] = [
-    #         [x - 1 if x > offset else x for x in relevancy]
-    #         for relevancy in data["relevancy"]
-    #     ]
-    # print("Relevancy", data["relevancy"])
+    data["relevancy"] = list(
+        pool.map(
+            _update_relevancy,
+            data["relevancy"]
+        )
+    )
+    print("G", flush=True)
 
-    return data
+    return traindata, logdata

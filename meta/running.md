@@ -2,9 +2,11 @@
 -|-|-|-
 ||||running/staged
 ||||
+1 feb|intersection 10, logging, *whitesocket*|14|running
 ||||
 ||||finished
 ||||
+1 feb|kilt splitting `--query-n 5000`|15|ok
 1 feb|intersection multipass *distantball*|12,13,14|ok
 1 feb|intersection all *distantball*|13|ok
 31 jan|intersection small 1000 queries *distantball*|13|ok, ok
