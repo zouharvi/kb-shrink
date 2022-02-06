@@ -7,8 +7,10 @@ data/kilt_knowledgesource.json
 personal_notes.md
 tmp*
 patches_local
-computed/*.out
-computed/*.log
+computed/**/*.out
+computed/**/*.log
+computed/**/*.json
+computed/**/*.pkl
 nohup*.out
 .empty
 runs/

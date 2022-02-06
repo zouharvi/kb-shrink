@@ -8,7 +8,7 @@ import random
 import argparse
 
 parser = argparse.ArgumentParser(description='Normalize embeddings')
-parser.add_argument('--data-in', default="/data/kilt-hp/dpr-c-5000.embd")
+parser.add_argument('--data-in', default="/data/hp/dpr-c-pruned.embd_cn")
 parser.add_argument('--data-out')
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
@@ -27,12 +27,16 @@ print(
 
 if args.small:
     print(f"Downsizing to {args.small} queries")
+    print(f"Originally {len(data['docs'])} docs")
     data = small_data(data, args.small)
+    print(f"Updated {len(data['docs'])} docs")
 
 if args.docs_small_random:
     print(f"Downsizing to {args.docs_small_random} docs")
-    data = {"docs": random.sample(
-        data["docs"], args.docs_small_random), "queries": []}
+    data = {
+        "docs": random.sample(data["docs"], args.docs_small_random),
+        "queries": []
+    }
 
 if args.center:
     print("Centering")

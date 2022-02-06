@@ -44,13 +44,26 @@ def small_data(data, n_queries):
     """
     Warning: The data is only being cropped from the top and may not lead to significant reduction
     """
-    docs_crop = max([max(l) for l in data["relevancy"][:n_queries]])
+    docs_crop_max = max([max(l) for l in data["relevancy"][:n_queries]])
+    docs_crop_min = min([min(l) for l in data["relevancy"][:n_queries]])
     return {
+        # query embeddings
         "queries": data["queries"][:n_queries],
-        "docs": data["docs"][:docs_crop],
-        "relevancy": data["relevancy"][:n_queries],
-        "relevancy_articles": data["relevancy_articles"][:n_queries],
-        "docs_articles": data["docs_articles"][:docs_crop],
+        # doc embeddings
+        "docs": data["docs"][docs_crop_min:docs_crop_max],
+        # set of relevant spans (docs) ids for every query
+        "relevancy": [
+            {x - docs_crop_min for x in l}
+            for l in data["relevancy"][:n_queries]
+        ],
+        # set of relevant spans (docs) ids for every article
+        "relevancy_articles": [
+            {x - docs_crop_min for x in l}
+            for l in data["relevancy_articles"][:n_queries]
+        ],
+        # map from spans (docs) to articles
+        "docs_articles": data["docs_articles"][docs_crop_min:docs_crop_max],
+        "boundaries": data["boundaries"],
     }
 
 
@@ -64,16 +77,13 @@ def sub_data(data, train=False, in_place=True):
     else:
         # dev queries
         data["queries"] = data["queries"][
-            data["boundaries"]
-            ["train"]:data["boundaries"]["dev"]
+            data["boundaries"]["train"]:data["boundaries"]["dev"]
         ]
         data["relevancy"] = data["relevancy"][
-            data["boundaries"]
-            ["train"]:data["boundaries"]["dev"]
+            data["boundaries"]["train"]:data["boundaries"]["dev"]
         ]
         data["relevancy_articles"] = data["relevancy_articles"][
-            data["boundaries"]
-            ["train"]:data["boundaries"]["dev"]
+            data["boundaries"]["train"]:data["boundaries"]["dev"]
         ]
     return data
 
@@ -142,7 +152,7 @@ class NormScaler:
         self.scale_queries = np.linalg.norm(
             data["queries"], axis=1
         )[:, np.newaxis]
-        
+
         data["docs"] /= self.scale_docs
         data["queries"] /= self.scale_queries
         return data
