@@ -1,22 +1,19 @@
 from misc.retrieval_utils import retrieved_ip
 from multiprocessing import Pool
 import time
-
-# TODO: maybe it's faster to build a direct index->offset mapping?
-def _update_doc_offset(doc, offset_relevancy):
-    for doc_offset, offset_val in offset_relevancy:
-        if doc_offset <= doc:
-            return doc - offset_val
-    return doc
+import numpy as np
 
 def _update_relevancy(args):
     relevancy, offset_relevancy = args
-    return [_update_doc_offset(x, offset_relevancy) for x in relevancy]
+    return [
+        doc-offset_relevancy[doc]
+        for doc in relevancy
+    ]
 
-def recomp_relevancy(offset_relevancy, relevancy, cur_time=time.time()):
-    print("G", f"{time.time()-cur_time:.0f}s", flush=True)
-    cur_time = time.time()
-
+def recomp_relevancy(offset_relevancy, relevancy, cur_time=time.time(), verbose=True):
+    if verbose:
+        print("G", f"{time.time()-cur_time:.0f}s", flush=True)
+        cur_time = time.time()
 
     pool = Pool()
     relevancy = list(
@@ -27,8 +24,10 @@ def recomp_relevancy(offset_relevancy, relevancy, cur_time=time.time()):
     )
     return relevancy
 
-def prune_docs(data, data_dev, to_prune):
+def prune_docs(data, data_dev, to_prune, verbose=True):
     cur_time = time.time()
+    # +10 because there's a leak in relevancy
+    original_data_len = len(data["docs"])+10
 
     offset = 0
     for doc in to_prune:
@@ -36,39 +35,33 @@ def prune_docs(data, data_dev, to_prune):
         data["docs"].pop(doc)
         offset += 1
 
-    print("E", f"{time.time()-cur_time:.0f}s", flush=True)
-    cur_time = time.time()
+    if verbose:
+        print("E", f"{time.time()-cur_time:.0f}s", flush=True)
+        cur_time = time.time()
 
+    to_prune_local = list(to_prune)
+    offset = 0
+    offset_relevancy = np.zeros(original_data_len, dtype=np.int32)
+    for i, _ in enumerate(offset_relevancy):
+        # this may be a off-by-one error but shouldn't matter because the specific document is pruned
+        if len(to_prune_local) != 0 and i == to_prune_local[0]:
+            offset += 1
+            to_prune_local.pop(0)
+        offset_relevancy[i] = offset
 
-    prev_offset = -1
-    offset_relevancy = {-1: 0}
-    for doc in to_prune:
-        offset_relevancy[doc] = offset_relevancy[prev_offset] + 1
-        prev_offset = doc
-    
-    print("F", f"{time.time()-cur_time:.0f}s", flush=True)
-    cur_time = time.time()
+    if verbose:
+        print("F", f"{time.time()-cur_time:.0f}s", flush=True)
+        cur_time = time.time()
 
-    # remove phony target
-    offset_relevancy.pop(-1)
-    # sort from highest to lowest doc
-    offset_relevancy = sorted(
-        offset_relevancy.items(),
-        key=lambda x: x[0], reverse=True
-    )
-    
-    # offset_relevancy_index = [0]*len(data["docs"])
-    # for i, _ in enumerate(offset_relevancy_index):
-    # # this can be further sped up because the offset_relevancy is sorted 
-    #     for doc_offset, offset_val in offset_relevancy:
-    #         if doc_offset <= doc:
-    #             offset_relevancy_index[i] = offset_val
+    data["relevancy"] = recomp_relevancy(offset_relevancy, data["relevancy"], cur_time, verbose=verbose)
+    if data_dev is not None:
+        data_dev["relevancy"] = recomp_relevancy(offset_relevancy, data_dev["relevancy"], cur_time, verbose=verbose)
 
-    data["relevancy"] = recomp_relevancy(offset_relevancy, data["relevancy"], cur_time)
-    data_dev["relevancy"] = recomp_relevancy(offset_relevancy, data_dev["relevancy"], cur_time)
+    if verbose:
+        print("H", f"{time.time()-cur_time:.0f}s", flush=True)
+        cur_time = time.time()
 
-    print("H", f"{time.time()-cur_time:.0f}s", flush=True)
-    cur_time = time.time()
+    return data
 
 
 def filter_step(data, data_dev, cur_time=time.time()):
@@ -79,7 +72,7 @@ def filter_step(data, data_dev, cur_time=time.time()):
 
     logdata["docs_old"] = len(data["docs"])
     all_retrieved = retrieved_ip(
-        data["queries"], data["docs"], data["relevancy"], n=10
+        data["queries"], data["docs"], data["relevancy"], n=20
     )
     
     print("B", f"{time.time()-cur_time:.0f}s", flush=True)
@@ -102,11 +95,11 @@ def filter_step(data, data_dev, cur_time=time.time()):
     logdata["negative"] = len(to_prune_negative)
 
     # save training data
-    for i in to_prune_negative:
+    for i in to_prune_negative - to_prune_positive:
         traindata["negative"].append(data["docs"][i])
     for i in to_prune_positive:
         traindata["positive"].append(data["docs"][i])
-    for i in (set(range(len(data["docs"]))) - set(to_prune_negative)) - set(to_prune_positive):
+    for i in (set(range(len(data["docs"]))) - to_prune_negative) - to_prune_positive:
         traindata["neutral"].append(data["docs"][i])
 
     print("D", f"{time.time()-cur_time:.0f}s", flush=True)

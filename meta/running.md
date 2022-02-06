@@ -2,10 +2,15 @@
 -|-|-|-
 ||||running/staged
 ||||
-2 feb|autofilter top 10, trainqueries, *sleepyeyes*|14,16|5 restart, running
+6 feb|autofilter top 10, devqueries, restart because training data diff, *olivewall*|16,12|running
+6 feb|autofilter top 20, devqueries, restart because training data diff, *closepumpkin*|16,13|running
 ||||
 ||||finished
 ||||
+6 feb|autofilter top 10, classifier on *graypark*, *wettiles*|12|ok
+6 feb|autofilter top 10, trainqueries, restart because training data diff, *graypark*|16|ok
+2 feb|autofilter top 10, trainqueries, *sleepyeyes*|14,16|5 restart, ok
+2 feb|autofilter top 10, devqueries, direct index mapping, *silverstand* (same as *whitesocket*)|12|ok
 2 feb|autofilter top 20, devqueries, *closepumpkin*|12|ok
 2 feb|autofilter top 10, devqueries, paralelized relevancy update, *olivewall* (same as *whitesocket*)|16|ok
 1 feb|autofilter 10, logging, *whitesocket*|14|ok

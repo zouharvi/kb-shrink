@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("src")
-from misc.load_utils import read_pickle, small_data, sub_data
+from misc.load_utils import read_pickle, save_json, save_pickle, small_data, sub_data
 from misc.retrieval_utils import retrieved_ip, acc_ip
 from filtering_utils import filter_step
 import argparse, json, pickle
@@ -15,20 +15,23 @@ parser.add_argument('--traindata', default="computed/autofilter_traindata.pkl")
 args = parser.parse_args()
 
 data = read_pickle(args.data)
-data = sub_data(data, train=True, in_place=True)
+data = sub_data(data, train=False, in_place=True)
 data_dev = read_pickle(args.data)
 data_dev = sub_data(data_dev, train=False, in_place=True)
 
+print(len(data["queries"]), "train queries")
+print(len(data_dev["queries"]), "dev queries")
+print(len(data["docs"]), "docs")
+print(max([max(x) for x in data["relevancy"]]), "max train relevancy")
+print(max([max(x) for x in data_dev["relevancy"]]), "max dev relevancy")
+print("", flush=True)
+
 del data["relevancy_articles"]
 del data["docs_articles"]
-# data["queries"] = data["queries"][:24000]
-# data["relevancy"] = data["relevancy"][:24000]
 del data_dev["docs_articles"]
 del data_dev["relevancy_articles"]
 del data_dev["docs"]
 
-print(len(data["queries"]), "train queries")
-print(len(data_dev["queries"]), "dev queries")
 
 def comp_acc(data, data_dev):
     val_acc = acc_ip(
@@ -45,7 +48,7 @@ logdata_all.append({"acc": val_acc})
 traindata_all = []
 
 for i in range(10):
-    print(f"Pass #### {i+1}", flush=True)
+    print(f"#### Pass {i+1}", flush=True)
     traindata, logitem = filter_step(data, data_dev, cur_time=cur_time)
     
     cur_time = time.time()
@@ -57,8 +60,5 @@ for i in range(10):
     traindata_all.append(traindata)
 
     # continuously overwrite logfile
-    with open(args.logfile, "w") as f:
-        json.dump(logdata_all, f, indent=4)
-
-    with open(args.traindata, "wb") as f:
-        pickle.dump(traindata_all, f)
+    save_json(args.logfile, logdata_all)
+    save_pickle(args.traindata, traindata_all)
