@@ -49,6 +49,14 @@ axA2.scatter(
     alpha=0.8,
     edgecolors="black",
 )
+axA2.scatter(
+    xpoints[1:],
+    [x["to_prune"] for x in dataA[1:]],
+    color="tab:gray",
+    label="Pruned docs",
+    alpha=0.8,
+    edgecolors="black",
+)
 
 axA1.set_ylim(0.5, 0.88)
 axA1.set_ylabel("Acc-10 (cutoff axis)")
@@ -87,6 +95,14 @@ axB2.scatter(
     alpha=0.8,
     edgecolors="black",
 )
+axB2.scatter(
+    xpoints[1:],
+    [x["to_prune"] for x in dataB[1:]],
+    color="tab:gray",
+    label="Pruned docs",
+    alpha=0.8,
+    edgecolors="black",
+)
 
 axB1.set_ylim(0.5, 0.88)
 axB1.get_yaxis().set_visible(False)
@@ -105,8 +121,8 @@ plt.tight_layout(rect=(0,0,1,0.95))
 plt.legend(
     leg1h + leg2h,
     leg1l + leg2l,
-    ncol=3,
-    bbox_to_anchor=(-0.7, 1, 1, 0),
+    ncol=4,
+    bbox_to_anchor=(-0.95, 1, 1, 0),
     loc="lower left",
     columnspacing=0.5,
 )

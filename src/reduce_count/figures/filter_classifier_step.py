@@ -36,7 +36,7 @@ ax1.plot(
     [x["mccc_total"] for x in data],
     label="MCCC (total)",
     color="silver",
-    marker=".",
+    marker="x",
 )
 
 ax1.plot(
@@ -51,7 +51,7 @@ ax1.plot(
     [x["lr_total"] for x in data],
     label="LR (total)",
     color="lightsteelblue",
-    marker=".",
+    marker="x",
 )
 
 ax2.scatter(
@@ -60,19 +60,22 @@ ax2.scatter(
     color="tab:green",
     label="Positive docs",
     s=15,
+    edgecolors="black",
 )
 ax2.scatter(
     xpoints,
     [x["negative"] for x in data],
-    color="tab:red",
-    label="Negative docs",
+    color="tab:gray",
+    label="Pruned docs",
     s=15,
+    edgecolors="black",
 )
 
-ax2.set_ylim(None, 5 * 10e3)
-ax1.set_ylabel("Acc (cutoff axis)")
-ax1.set_xlabel("Step")
+ax1.set_ylabel("Classifier acc (cutoff axis)")
+ax1.set_xlabel("Step (top-10)")
 ax2.set_ylabel("Number of docs")
+ax2.set_ylim(10e3, 350e3)
+# ax1.set_ylim(0.5, 0.88)
 
 ax1.set_xticks(
     xpoints,
@@ -85,9 +88,10 @@ plt.legend(
     leg1h + leg2h,
     leg1l + leg2l,
     ncol=3,
-    bbox_to_anchor=(-0.1, 1, 1, 0),
+    bbox_to_anchor=(-0.1, 1.02, 1, 0),
     loc="lower left",
     columnspacing=0.5,
 )
 plt.tight_layout()
+plt.savefig(f"figures/autofilter_classifier.pdf")
 plt.show()

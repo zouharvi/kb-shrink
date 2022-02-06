@@ -45,6 +45,14 @@ ax2.scatter(
     alpha=0.8,
     edgecolors="black",
 )
+ax2.scatter(
+    xpoints[1:],
+    [x["to_prune"] for x in data[1:]],
+    color="tab:gray",
+    label="Pruned docs",
+    alpha=0.8,
+    edgecolors="black",
+)
 # ax2.scatter(
 #     xpoints[1:],
 #     [x["docs_old"] for x in data[1:]],
@@ -54,7 +62,7 @@ ax2.scatter(
 ax1.set_ylim(0.5, 0.88)
 ax1.set_ylabel("Acc-10 (cutoff axis)")
 ax1.set_xlabel("Step (top-10)")
-ax2.set_ylim(100e3, 350e3)
+ax2.set_ylim(10e3, 355e3)
 ax2.set_ylabel("Number of docs")
 
 ax1.set_xticks(
@@ -64,14 +72,14 @@ ax1.set_xticks(
 
 leg1h, leg1l = ax1.get_legend_handles_labels()
 leg2h, leg2l = ax2.get_legend_handles_labels()
+plt.tight_layout(rect=(0,0,1,0.95))
 plt.legend(
     leg1h + leg2h,
     leg1l + leg2l,
-    ncol=3,
-    bbox_to_anchor=(-0.05, 1, 1, 0),
-    loc="lower left",
+    ncol=4,
+    bbox_to_anchor=(0.03, 1.01, 1, 0),
+    loc="lower center",
     columnspacing=0.5,
 )
-plt.tight_layout()
 plt.savefig(f"figures/autofilter_train_dev.pdf")
 plt.show()
