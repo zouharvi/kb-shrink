@@ -17,6 +17,7 @@ parser.add_argument('--all', action="store_true")
 parser.add_argument('--metric', default="rprec_a")
 parser.add_argument('--train', action="store_true")
 parser.add_argument('--without-faiss', action="store_true")
+parser.add_argument('--skip-l2', action="store_true")
 parser.add_argument('--queries-n', type=int, default=None)
 args = parser.parse_args()
 data = read_pickle(args.data)
@@ -91,10 +92,12 @@ else:
         print(f"{args.metric}_ip", metric_ip(
             data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=False,
         ))
-    print(f"{args.metric}_l2 (fast)", metric_l2(
-        data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=True,
-    ))
-    if args.without_faiss:
-        print(f"{args.metric}_l2", metric_l2(
-            data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=False,
+
+    if not args.skip_l2:
+        print(f"{args.metric}_l2 (fast)", metric_l2(
+            data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=True,
         ))
+        if args.without_faiss:
+            print(f"{args.metric}_l2", metric_l2(
+                data["queries"], data["docs"], data["relevancy"], data["relevancy_articles"], data["docs_articles"], fast=False,
+            ))

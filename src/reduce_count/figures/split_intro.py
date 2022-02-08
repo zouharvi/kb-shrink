@@ -21,6 +21,20 @@ DATA = {
     "sent05_cn": {"pcount": 1965217, "val_ip": 0.7580357142857143},
     "sent06_cn": {"pcount": 1842948, "val_ip": 0.7582142857142857},
 }
+DATA_ACC20 = {
+    "fixed040_cn": {"pcount": 3814169, "val_ip": 0.7533928571428572},
+    "fixed060_cn": {"pcount": 2858954, "val_ip": 0.7573214285714286},
+    "fixed080_cn": {"pcount": 2385695, "val_ip": 0.7567857142857143},
+    "fixed080_over.20_cn": {"pcount": 2385695, "val_ip": 0.75625},
+    "fixed100_cn": {"pcount": 2114151, "val_ip": 0.7560714285714286},
+    "fixed120_cn": {"pcount": 1947229, "val_ip": 0.75625},
+    "sent01_cn": {"pcount": 5665645, "val_ip": 0.7432142857142857},
+    "sent02_cn": {"pcount": 3311972, "val_ip": 0.7625},
+    "sent03_cn": {"pcount": 2542124, "val_ip": 0.7605357142857143},
+    "sent04_cn": {"pcount": 2171949, "val_ip": 0.7623214285714286},
+    "sent05_cn": {"pcount": 1965217, "val_ip": 0.7580357142857143},
+    "sent06_cn": {"pcount": 1842948, "val_ip": 0.7582142857142857},
+}
 
 plt.figure(figsize=(5, 4))
 ax = plt.gca()
