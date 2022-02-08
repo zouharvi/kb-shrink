@@ -100,7 +100,7 @@ def order_ip(data_queries, data_docs, retrieve_counts, fast):
 
 
 def acc_l2(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles=None, data_docs_articles=None, n=20, fast=True
+    data_queries, data_docs, data_relevancy, data_relevancy_articles=None, data_docs_articles=None, n=10, fast=True
 ):
     n_new_gen = order_l2(
         data_queries, data_docs, [n] * len(data_queries), fast
@@ -109,7 +109,7 @@ def acc_l2(
 
 
 def acc_ip(
-    data_queries, data_docs, data_relevancy, data_relevancy_articles=None, data_docs_articles=None, n=20, fast=True
+    data_queries, data_docs, data_relevancy, data_relevancy_articles=None, data_docs_articles=None, n=10, fast=True
 ):
     n_new_gen = order_ip(
         data_queries, data_docs, [n] * len(data_queries), fast

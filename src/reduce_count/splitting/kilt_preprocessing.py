@@ -2,7 +2,8 @@
 
 import sys
 sys.path.append("src")
-from reduce_count.splitting.splitter_models import get_splitter, split_paragraph_list
+from filter_models import get_filter
+from splitter_models import get_splitter, split_paragraph_list
 from misc.load_utils import save_pickle
 from kilt.knowledge_source import KnowledgeSource
 from datasets import load_dataset
@@ -17,13 +18,16 @@ if __name__ == "__main__":
     parser.add_argument('--data-out', default="/data/hp/full.pkl")
     parser.add_argument('--wiki-n', type=int, default=None)
     parser.add_argument('--splitter', default="fixed")
+    parser.add_argument('--filter', default="none")
     parser.add_argument('--query-dataset', default="hotpotqa")
     parser.add_argument('--query-n', type=int, default=None)
     parser.add_argument('--no-prune-unused', action="store_true")
     parser.add_argument('--splitter-width', type=int, default=100)
     parser.add_argument('--splitter-overlap', type=int, default=0)
+    parser.add_argument('--filter-count', type=int, default=50)
     args = parser.parse_args()
     splitter = get_splitter(args.splitter, args)
+    filter = get_filter(args.filter, args)
 
     # get the knowledge source
     ks = KnowledgeSource(collection="knowledgesource", database="kilt")
@@ -39,7 +43,8 @@ if __name__ == "__main__":
     for cur_page in tqdm(cursor[:args.wiki_n], total=ks.get_num_pages()):
         data[cur_page["wikipedia_id"]]["spans"] = split_paragraph_list(
             cur_page["text"],
-            splitter
+            splitter,
+            filter,
         )
 
     print(
