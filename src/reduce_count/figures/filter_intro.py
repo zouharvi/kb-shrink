@@ -8,17 +8,17 @@ import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 
 DATA = {
-    "word2": {"pcount": None, "val_ip": None},
+    "word2": {"pcount": 2083586, "val_ip": 0.6910714285714286},
     "word10": {"pcount": 1863866, "val_ip": 0.5153571428571428},
     "word20": {"pcount": 1683733, "val_ip": 0.5026785714285714},
     "word50": {"pcount": 1141334, "val_ip": 0.4305357142857143},
     "word100": {"pcount": 473530, "val_ip": 0.2741071428571429},
     "No filter": {"pcount": 2114151, "val_ip": 0.7008928571428571},
-    "char10": {"pcount": None, "val_ip": None},
+    "char10": {"pcount": 2082723, "val_ip": 0.6930357142857143},
     "char50": {"pcount": 1885526, "val_ip": 0.5166071428571428},
     "char200": {"pcount": 1435703, "val_ip": 0.4780357142857143},
     "char400": {"pcount": 882702, "val_ip": 0.3775},
-    "char500": {"pcount": None, "val_ip": None},
+    "char500": {"pcount": 659231, "val_ip": 0.32821428571428574},
 }
 
 plt.figure(figsize=(5, 4))
@@ -51,6 +51,7 @@ def mangle_name(name):
 for name, vals in DATA.items():
     ax.scatter(
         vals["pcount"], vals["val_ip"],
+        alpha=0.8,
         label=mangle_name(name), **get_style(name)
     )
 
