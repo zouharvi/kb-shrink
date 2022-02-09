@@ -5,6 +5,7 @@
 ||||
 ||||finished
 ||||
+9 feb|filtering word2, char10, *stuckorange*|12|ok
 8 feb|splitting rerun acc-10, *redeye*|12,13,14,16|ok
 7 feb|heuristics filtering, embedding, *stuckorange*|12,16|ok
 6 feb|autofilter top 10, devqueries, restart because training data diff, *olivewall*|16,12|ok
