@@ -12,11 +12,11 @@ args = parser.parse_args()
 
 data = read_pickle(args.data)
 
+print(f"Number of queries:   {len(data['queries']):>7}")
+print(f"Number of docs:      {len(data['docs']):>7}")
 print(f"Query shape:         {data['queries'][0].shape}")
 print(f"Query element type:  {str(data['queries'][0].dtype)}")
 print()
-print(f"Number of queries:   {len(data['queries']):>7}")
-print(f"Number of docs:      {len(data['docs']):>7}")
 print()
 print("Boundaries:", data["boundaries"])
 print()

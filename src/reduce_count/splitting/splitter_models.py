@@ -52,12 +52,12 @@ def get_splitter(name, args):
         raise Exception(f"Unknown splitter {name}")
 
 
-def split_paragraph_list(text_list, splitter):
+def split_paragraph_list(text_list, splitter, filter):
     return [
-        span for span_list
-        in [
+        span for span_list in [
             splitter.split(text) for text in text_list
             if not text.startswith("BULLET::::") and not text.startswith("Section::::")
         ]
         for span in span_list
+        if filter.filter(span)
     ]
