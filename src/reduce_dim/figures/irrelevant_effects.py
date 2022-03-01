@@ -34,7 +34,7 @@ DIMS_NEXT = [
 DISPLAY_DIMS = [128, 10**3, (10**4), 10**5, 10**6, 10**7, (10**7) * 3]
 THRESHOLD = 2114151
 
-plt.figure(figsize=(4.6, 3.9))
+plt.figure(figsize=(7, 4))
 ax = plt.gca()
 
 ax.plot(
@@ -109,10 +109,10 @@ h1, l1 = ax.get_legend_handles_labels()
 # plt.title(["No pre-processing", "Normalized", "Centered", "Centered, Normalized"][args.key])
 plt.legend(
     h1, l1,
-    loc="lower center",
-    bbox_to_anchor=(0, 1, 1, 0),
-    ncol=2
+    loc="upper left",
+    bbox_to_anchor=(1, 1),
+    ncol=1,
 )
-plt.tight_layout(rect=(0, 0, 1, 1.02))
+plt.tight_layout()
 plt.savefig("figures/model_data.pdf")
 plt.show()

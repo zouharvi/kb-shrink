@@ -28,7 +28,7 @@ with open(args.logfile_auto, "r") as f:
 DIMS = sorted(list(set([x["dim"] for x in data_pca_scikit])), key=lambda x: int(x))
 DISPLAY_DIMS = [32, 256, 512, 768]
 
-plt.figure(figsize=(4.6, 4.7))
+plt.figure(figsize=(7, 4))
 ax = plt.gca()
 
 plt.rcParams["lines.linewidth"] = 2.2
@@ -58,11 +58,12 @@ h1, l1 = ax.get_legend_handles_labels()
 # plt.title(["No pre-processing", "Normalized", "Centered", "Centered, Normalized"][args.key])
 plt.legend(
     h1, l1,
-    loc="center",
-    bbox_to_anchor=(-0.05, 1.12, 1, 0.2),
-    ncol=2,
+    loc="upper left",
+    
+    bbox_to_anchor=(1, 1),
+    ncol=1,
     columnspacing=1.4,
 )
-plt.tight_layout(rect=(0, 0, 1, 1.05))
+plt.tight_layout()
 plt.savefig("figures/model_speed.pdf")
 plt.show()

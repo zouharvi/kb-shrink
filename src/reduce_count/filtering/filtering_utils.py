@@ -4,6 +4,7 @@ import time
 import numpy as np
 
 def _update_relevancy(args):
+    # TODO: pop old docs
     relevancy, offset_relevancy = args
     return [
         doc-offset_relevancy[doc]

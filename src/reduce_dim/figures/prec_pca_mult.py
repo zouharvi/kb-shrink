@@ -20,7 +20,7 @@ DATA = [x for x in DATA]
 DIMS = sorted(list(set([x["dim"] for x in DATA if x["dim"] != None])), key=lambda x: int(x))
 DISPLAY_DIMS = [128, 256, 384, 512, 640, 768]
 
-plt.figure(figsize=(4.4, 4))
+plt.figure(figsize=(7, 4))
 ax = plt.gca()
 
 HANDLES = {}
@@ -123,10 +123,9 @@ plt.legend(
         "PCA + 16-bit",
         "PCA + 32-bit",
     ],
-    ncol=2,
-    loc="lower center",
-    mode="expand",
-    bbox_to_anchor=(0, 1, 1, 0),
+    ncol=1,
+    loc="upper left",
+    bbox_to_anchor=(1, 1),
 )
 
 plt.xlim(100)
@@ -136,6 +135,6 @@ ax.set_xticklabels(DISPLAY_DIMS)
 ax.set_ylabel("R-Precision")
 ax.set_xlabel("Dimensions")
 
-plt.tight_layout(rect=(0, 0, 1, 1.02))
+plt.tight_layout()
 plt.savefig("figures/prec_pca_mult.pdf")
 plt.show()
