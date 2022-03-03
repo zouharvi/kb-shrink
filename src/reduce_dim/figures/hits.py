@@ -8,16 +8,28 @@ import argparse
 import numpy as np
 from collections import Counter, defaultdict
 parser = argparse.ArgumentParser()
-parser.add_argument('--logfile', default="computed/hits_pca_redcritter.log")
+parser.add_argument('--logfile', default="computed/v1/hits_pca_redcritter.log")
+parser.add_argument('--logfile2', default="computed/v1/hits_1bit_redcritter.log")
 parser.add_argument('--bit', action="store_true")
 args = parser.parse_args()
 
 with open(args.logfile, "r") as f:
     data = eval(f.read())
 
+if args.logfile2:
+    with open(args.logfile2, "r") as f:
+        data2 = eval(f.read())
+
+# correlation
+print("pca, 1bit", np.corrcoef(data["hits_new"], data2["hits_new"])[0,1])
+print("unc, 1bit", np.corrcoef(data["hits_old"], data2["hits_new"])[0,1])
+print("unc, pca", np.corrcoef(data["hits_old"], data["hits_new"])[0,1])
+exit()
+
 counts = Counter(zip(data["hits_new"], data["hits_old"]))
 print(counts)
 
+# plotting
 img = np.zeros((
     max(x for x, y in counts.keys()) + 1,
     max(y for x, y in counts.keys()) + 1

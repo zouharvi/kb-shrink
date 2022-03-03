@@ -23,7 +23,8 @@ DIMS = sorted(list(set([x["dim"] for x in data_all[0]])), key=lambda x: int(x))
 DISPLAY_DIMS = [32, 256, 512, 768]
 
 
-fig = plt.figure(figsize=(10, 2.1))
+# fig = plt.figure(figsize=(10, 2.1))
+fig = plt.figure(figsize=(10, 3.1))
 
 if args.legend:
     grid_top = 0.1
@@ -38,9 +39,9 @@ else:
 
 gs = gridspec.GridSpec(
     1, 4, width_ratios=[1, 1, 1, 1],
-    wspace=0.05, hspace=0.0,
+    wspace=0.00, hspace=0.0,
     top=grid_top, bottom=grid_bottom,
-    left=0.06, right=0.94
+    left=0.05, right=0.947
 )
 
 for (key, data) in zip(range(4), data_all):
