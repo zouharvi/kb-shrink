@@ -35,7 +35,7 @@ if args.docs_small_random:
     print(f"Downsizing to {args.docs_small_random} docs")
     data = {
         "docs": random.sample(data["docs"], args.docs_small_random),
-        "queries": []
+        "queries": data["queries"],
     }
 
 if args.center:
