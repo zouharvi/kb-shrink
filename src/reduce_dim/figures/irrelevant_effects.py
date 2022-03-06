@@ -5,12 +5,13 @@ sys.path.append("src")
 import misc.plot_utils
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.stats as st
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument(
     '--logfile-pca', default="computed/pca_irrelevant_uneasiness.log")
 parser.add_argument(
-    '--logfile-auto', default="computed/auto_irrelevant_uneasiness.log")
+    '--logfile-auto', default=["computed/auto_irrelevant_uneasiness.log"], nargs="+")
 parser.add_argument(
     '--logfile-uncompressed', default="computed/uncompressed_irrelevant_oilynoodles.log")
 parser.add_argument('--key', default=0, type=int)
@@ -18,8 +19,27 @@ args = parser.parse_args()
 
 with open(args.logfile_pca, "r") as f:
     data_pca = eval(f.read())
-with open(args.logfile_auto, "r") as f:
-    data_auto = eval(f.read())
+data_auto = None
+for file in args.logfile_auto:
+    with open(file, "r") as f:
+        if data_auto is None:
+            data_auto = [{k: [v] for k, v in x.items()}
+                         for x in eval(f.read())]
+        else:
+            # a complicated deep merge
+            for x in eval(f.read()):
+                data_auto = [
+                    # deep merge
+                    {
+                        k: v + [x[k]]
+                        for k, v
+                        in xo.items()
+                    }
+                    # find the correct line
+                    if x["type"] == xo["type"][0] and x["num_samples"] == xo["num_samples"][0]
+                    else xo
+                    for xo in data_auto
+                ]
 with open(args.logfile_uncompressed, "r") as f:
     data_uncompressed = eval(f.read())
 
@@ -41,10 +61,33 @@ ax.plot(
     DIMS,
     [x["val_ip"] for x in data_pca if x["type"] == "train_data"],
     label="PCA (training docs)", color="tab:blue", linestyle="-")
+
+conf_intervals = [
+    st.t.interval(
+        alpha=0.95, df=len(x["val_ip"]) - 1,
+        loc=np.average(x["val_ip"]), scale=st.sem(x["val_ip"])
+    )
+    for x in data_auto
+    if x["type"][0] == "train_data"
+]
+conf_intervals = [(x[1] - x[0]) / 2 for x in conf_intervals]
+ax.errorbar(
+    DIMS,
+    [np.average(x["val_ip"])
+     for x in data_auto if x["type"][0] == "train_data"],
+    yerr=conf_intervals,
+    fmt="none",
+    ecolor="tab:grey", elinewidth=1.5,
+    capsize=4
+)
 ax.plot(
     DIMS,
-    [x["val_ip"] for x in data_auto if x["type"] == "train_data"],
-    label="Auto. (training docs)", color="tab:red", linestyle="-")
+    [np.average(x["val_ip"])
+     for x in data_auto if x["type"][0] == "train_data"],
+    label="Auto. (training docs)", color="tab:red", linestyle="-"
+)
+
+
 ax.hlines(
     0.619,
     xmin=np.log10(128), xmax=np.log10(DISPLAY_DIMS[-1]),
@@ -57,7 +100,7 @@ ax.plot(
     label="PCA (eval docs)", color="tab:blue", linestyle=":")
 ax.plot(
     DIMS_NEXT,
-    [x["val_ip"] for x in data_auto if x["type"] == "eval_data"],
+    [x["val_ip"][0] for x in data_auto if x["type"][0] == "eval_data"],
     label="Auto. (eval docs)", color="tab:red", linestyle=":")
 
 ax.plot(
@@ -96,9 +139,9 @@ plt.scatter(
 plt.scatter(
     np.log10(THRESHOLD),
     [
-        x["val_ip"]
+        x["val_ip"][0]
         for x in data_auto
-        if x["type"] == "train_data" and x["num_samples"] == THRESHOLD
+        if x["type"][0] == "train_data" and x["num_samples"][0] == THRESHOLD
     ],
     marker="x", color="black", zorder=10, s=17
 )
