@@ -8,11 +8,11 @@ import argparse
 import numpy as np
 import sys
 sys.path.append("src")
-from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
+from misc.load_utils import process_dims, save_json, read_pickle, center_data, norm_data, sub_data
 
 parser = argparse.ArgumentParser(description='PCA performance summary')
-parser.add_argument('--data')
-parser.add_argument('--logfile', default="computed/tmp.log")
+parser.add_argument('--data', default="/data/hp/dpr-c-pruned.embd_cn")
+parser.add_argument('--logfile', default="computed/tmp.json")
 parser.add_argument('--pca-model', default="scikit")
 parser.add_argument('--center', action="store_true")
 parser.add_argument('--norm', action="store_true")
@@ -82,5 +82,4 @@ for dim in DIMS:
     )
 
     # continuously override the file
-    with open(args.logfile, "w") as f:
-        f.write(str(logdata))
+    save_json(args.logfile, logdata)
