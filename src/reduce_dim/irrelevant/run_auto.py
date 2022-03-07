@@ -4,11 +4,11 @@ import copy
 import random
 import sys
 sys.path.append("src")
-from misc.load_utils import read_pickle, sub_data
+from misc.load_utils import read_pickle, save_json, sub_data
 import argparse
 from reduce_dim.autoencoder.model import AutoencoderModel
 
-parser = argparse.ArgumentParser(description='PCA performance summary')
+parser = argparse.ArgumentParser(description='Irrelevant effects of autoencoder')
 parser.add_argument('--data')
 parser.add_argument('--data-big')
 parser.add_argument('--post-cn', action="store_true")
@@ -19,14 +19,11 @@ args = parser.parse_args()
 data = read_pickle(args.data)
 data_big = read_pickle(args.data_big)
 
+print("seed", args.seed)
 
 data_train = copy.deepcopy(data)
 data_train = sub_data(data_train, train=True, in_place=True)
 data = sub_data(data, train=False, in_place=True)
-
-# print({k:len(v) for k,v in data.items()})
-# print({k:len(v) for k,v in data_train.items()})
-# print(data["queries"][0][:5], data_train["queries"][0][:5])
 
 logdata = []
 for num_samples in [
@@ -61,6 +58,9 @@ for num_samples in [
             "type": "eval_data",
         })
 
+    # continuously override the file
+    save_json(args.logfile, logdata)
+
     # increase train size
     new_data = copy.deepcopy(data_train)
     if num_samples < len(new_data["docs"]):
@@ -71,7 +71,7 @@ for num_samples in [
             num_samples - len(new_data["docs"])
         )
 
-    model = AutoencoderModel(model=1, bottleneck_width=args.dim)
+    model = AutoencoderModel(model=1, bottleneck_width=args.dim, seed=args.seed)
     model.train_routine(
         data, new_data,
         epochs=1,
@@ -81,7 +81,7 @@ for num_samples in [
         train_key="d",
         skip_eval=True,
     )
-    val_ip, val_l2, queries_loss, docs_loss = model.eval_routine_no_loss(
+    val_ip, val_l2 = model.eval_routine_no_loss(
         data, post_cn=args.post_cn)
 
     logdata.append({
@@ -91,5 +91,4 @@ for num_samples in [
     })
 
     # continuously override the file
-    with open(args.logfile, "w") as f:
-        f.write(str(logdata))
+    save_json(args.logfile, logdata)

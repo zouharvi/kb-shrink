@@ -19,7 +19,7 @@ def summary_performance(prefix, data_reduced, data, post_cn):
         data["relevancy"],
         data["relevancy_articles"],
         data["docs_articles"],
-        fast=True, report=False
+        fast=True
     )
     if post_cn:
         val_ip = val_l2
@@ -30,7 +30,7 @@ def summary_performance(prefix, data_reduced, data, post_cn):
             data["relevancy"],
             data["relevancy_articles"],
             data["docs_articles"],
-            fast=True, report=False
+            fast=True
         )
     print(f'{prefix} rprec_ip: {val_ip:.3f}, rprec_l2: {val_l2:.3f}')
     return val_ip, val_l2
@@ -49,8 +49,10 @@ def get_train_data(data, train_key, train_crop_n):
 
 class AutoencoderModel(nn.Module):
     # prev learningRate 0.001
-    def __init__(self, model, bottleneck_width, batchSize=128, learningRate=0.001):
+    def __init__(self, model, bottleneck_width, batchSize=128, learningRate=0.001, seed=0):
         super().__init__()
+
+        torch.manual_seed(seed)
 
         if model == 0:
             # learned PCA
@@ -153,6 +155,17 @@ class AutoencoderModel(nn.Module):
 
     def encode(self, x):
         return self.encoder(x)
+
+    def encode_safe_native(self, data):
+        dataLoader = torch.utils.data.DataLoader(
+            dataset=data, batch_size=1024 * 128, shuffle=False
+        )
+
+        out = []
+        for sample in dataLoader:
+            out.append(self.encoder(sample.to(DEVICE)))
+
+        return out
 
     def encode_safe(self, data):
         dataLoader = torch.utils.data.DataLoader(
