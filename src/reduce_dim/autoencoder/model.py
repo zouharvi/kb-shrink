@@ -156,6 +156,17 @@ class AutoencoderModel(nn.Module):
     def encode(self, x):
         return self.encoder(x)
 
+    def encode_safe_native(self, data):
+        dataLoader = torch.utils.data.DataLoader(
+            dataset=data, batch_size=1024 * 128, shuffle=False
+        )
+
+        out = []
+        for sample in dataLoader:
+            out.append(self.encoder(sample.to(DEVICE)))
+
+        return out
+
     def encode_safe(self, data):
         dataLoader = torch.utils.data.DataLoader(
             dataset=data, batch_size=1024 * 128, shuffle=False

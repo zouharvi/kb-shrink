@@ -3,7 +3,7 @@
 import sys
 sys.path.append("src")
 from misc.retrieval_utils import DEVICE
-from misc.load_utils import process_dims, read_pickle, center_data, norm_data, sub_data
+from misc.load_utils import process_dims, read_pickle, save_json, center_data, norm_data, sub_data
 from model import AutoencoderModel
 import copy
 import time
@@ -11,7 +11,7 @@ import argparse
 import torch
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data', default="/data/hp/dpr-c.embd_cn")
+parser.add_argument('--data', default="/data/hp/dpr-c-pruned.embd_cn")
 parser.add_argument('--model', default=1, type=int)
 parser.add_argument('--dims', default="custom")
 parser.add_argument('--post-cn', action="store_true")
@@ -40,7 +40,6 @@ data_train = sub_data(data_train, train=True, in_place=True)
 DIMS = process_dims(args.dims)
 
 logdata = []
-# fail first
 for dim in DIMS:
     for train_key in ["dq"]:
         dim = int(dim)
@@ -62,8 +61,8 @@ for dim in DIMS:
         encode_time = time.time()
         model.train(False)
         with torch.no_grad():
-            model.encode_safe_without_loss(data["queries"])
-            model.encode_safe_without_loss(data["docs"])
+            model.encode_safe_native(data["queries"])
+            model.encode_safe_native(data["docs"])
         encode_time = time.time() - encode_time
 
         logdata.append({
@@ -72,5 +71,4 @@ for dim in DIMS:
         })
 
         # continuously override the file
-        with open(args.logfile, "w") as f:
-            f.write(str(logdata))
+        save_json(args.logfile, logdata)

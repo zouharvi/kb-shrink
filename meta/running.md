@@ -6,11 +6,11 @@ CUDA_VISIBLE_DEVICES=2 nohup ./src/reduce_dim/irrelevant/run_auto.py --seed 5 --
 -|-|-|-
 ||||running/staged
 ||||
-6 mar|pca speed, seed 1 *reddrapes*|14|running
 ||||
 ||||finished
 ||||
-4 mar|irrelevant effects, seed 1,2,3,4,5 *frozenhand*|13,14,16|2 bad code, running
+6 mar|pca speed, seed 1 *reddrapes*|16|2 bad code, ok
+4 mar|irrelevant effects, seed 1,2,3,4,5 *frozenhand*|13,14,16|2 bad code, ok
 9 feb|filtering word2, char10, *stuckorange*|12|ok
 8 feb|splitting rerun acc-10, *redeye*|12,13,14,16|ok
 7 feb|heuristics filtering, embedding, *stuckorange*|12,16|ok
