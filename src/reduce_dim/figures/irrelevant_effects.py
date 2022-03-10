@@ -11,20 +11,28 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     '--logfile-pca', default="computed/pca_irrelevant_uneasiness.log")
 parser.add_argument(
-    '--logfile-auto', default=["computed/auto_irrelevant_uneasiness.log"], nargs="+")
+    '--logfile-auto', default=["computed/auto_irrelevant_uneasiness.log"],
+    nargs="+"
+)
 parser.add_argument(
-    '--logfile-uncompressed', default="computed/uncompressed_irrelevant_oilynoodles.log")
+    '--logfile-uncompressed',
+    default="computed/uncompressed_irrelevant_oilynoodles.log"
+)
 parser.add_argument('--key', default=0, type=int)
+parser.add_argument('--vert', action="store_true")
 args = parser.parse_args()
 
 with open(args.logfile_pca, "r") as f:
     data_pca = eval(f.read())
+
 data_auto = None
 for file in args.logfile_auto:
     with open(file, "r") as f:
         if data_auto is None:
-            data_auto = [{k: [v] for k, v in x.items()}
-                         for x in eval(f.read())]
+            data_auto = [
+                {k: [v] for k, v in x.items()}
+                for x in eval(f.read())
+            ]
         else:
             # a complicated deep merge
             for x in eval(f.read()):
@@ -54,7 +62,7 @@ DIMS_NEXT = [
 DISPLAY_DIMS = [128, 10**3, (10**4), 10**5, 10**6, 10**7, (10**7) * 3]
 THRESHOLD = 2114151
 
-plt.figure(figsize=(7, 4))
+plt.figure(figsize=(4, 4) if args.vert else (7, 4))
 ax = plt.gca()
 
 ax.plot(
@@ -106,7 +114,7 @@ ax.plot(
 ax.plot(
     DIMS_NEXT,
     [x["val_ip"] for x in data_uncompressed if x["type"] == "eval_data"],
-    label="Uncompressed (eval docs)", color="gray", linestyle=":")
+    label="Uncomp. (eval docs)", color="gray", linestyle=":")
 
 ax.set_xticks([np.log10(x) for x in DISPLAY_DIMS])
 ax.set_xticklabels([
@@ -149,13 +157,23 @@ plt.scatter(
 h1, l1 = ax.get_legend_handles_labels()
 
 
-# plt.title(["No pre-processing", "Normalized", "Centered", "Centered, Normalized"][args.key])
-plt.legend(
-    h1, l1,
-    loc="upper left",
-    bbox_to_anchor=(1, 1),
-    ncol=1,
-)
-plt.tight_layout()
+if args.vert:
+    plt.legend(
+        h1, l1,
+        loc="upper left",
+        bbox_to_anchor=(-0.15, 1.3),
+        columnspacing=1.3,
+        ncol=2,
+    )
+    plt.tight_layout(rect=(0, 0, 1, 1.05))
+else:
+    plt.legend(
+        h1, l1,
+        loc="upper left",
+        bbox_to_anchor=(1, 1),
+        ncol=1,
+    )
+    plt.tight_layout()
+
 plt.savefig("figures/model_data.pdf")
 plt.show()

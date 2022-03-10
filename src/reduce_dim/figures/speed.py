@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-./src/reduce_dim/figures/speed.py \
+./src/reduce_dim/figures/speed.py --vert \
     --logfile-pca-scikit computed/speed/speed_pca_scikit_reddrapes_* \
     --logfile-pca-torch computed/speed/speed_pca_torch_cpu_reddrapes_* \
     --logfile-pca-torch-gpu computed/speed/speed_pca_torch_gpu_reddrapes_* \
@@ -24,6 +24,7 @@ parser.add_argument('--logfile-pca-torch-gpu', default=["computed/pca_speed_puff
 parser.add_argument('--logfile-auto-gpu', default=["computed/auto_speed_puffyemery_gpu.log"], nargs="+")
 parser.add_argument('--logfile-auto', default=["computed/auto_speed_puffyemery.log"], nargs="+")
 parser.add_argument('--key', default=0, type=int)
+parser.add_argument('--vert', action="store_true")
 args = parser.parse_args()
 
 def deep_merge(data_orig, data_new):
@@ -74,7 +75,7 @@ for file in args.logfile_auto:
 DIMS = sorted(list(set([x["dim"][0] for x in data_pca_scikit])), key=lambda x: int(x))
 DISPLAY_DIMS = [32, 256, 512, 768]
 
-plt.figure(figsize=(7, 5))
+plt.figure(figsize=(4,4) if args.vert else (7, 5))
 ax1 = plt.gca()
 extra = Rectangle(
     (0, 0), 1, 1, fc="w",
@@ -109,31 +110,34 @@ plot_line_with_errorbars("encode_time", data_pca_torch_gpu, label="PCA (Torch, G
 plot_line_with_errorbars("encode_time", data_pca_torch, label="PCA (Torch, CPU)", color="tab:cyan", ax=ax1)
 plot_line_with_errorbars("encode_time", data_auto_gpu, label="Auto. (GPU)", color="tab:red", ax=ax1)
 plot_line_with_errorbars("encode_time", data_auto, label="Auto. (CPU)", color="tab:pink", ax=ax1)
-ax1.set_ylabel("Time (s)")
-# ax1.xaxis.set_visible(False)
+ax1.set_ylabel("Encode time (s)")
 ax1.set_xlabel("Dimension")
 ax1.set_xticks(DISPLAY_DIMS)
 ax1.set_xticklabels(DISPLAY_DIMS)
-ax1.set_title("Encode Time")
+if not args.vert:
+    ax1.set_title("Encode Time")
 
-# ax1 = plt.subplot(2, 1, 1)
-# ax2 = plt.subplot(2, 1, 2)
-
-plt.tight_layout(h_pad=0, rect=(0,0,0.76,1))
-h1, l1 = ax1.get_legend_handles_labels()
-plt.legend(
-    # [extra]+list(h1),
-    # ["$\\textbf{Encode}$"]+list(l1),
-    loc="upper left",
-    bbox_to_anchor=(1, 1),
-    ncol=1,
-    columnspacing=1.4,
-)
+if args.vert:
+    plt.tight_layout(h_pad=0, rect=(0, 0, 1, 0.85))
+    plt.legend(
+        loc="upper left",
+        bbox_to_anchor=(0, 1.3),
+        ncol=2,
+        columnspacing=1.4,
+    )
+else:
+    plt.tight_layout(h_pad=0, rect=(0,0,0.76,1))
+    plt.legend(
+        loc="upper left",
+        bbox_to_anchor=(1, 1),
+        ncol=1,
+        columnspacing=1.4,
+    )
 
 plt.savefig("figures/model_speed_encode.pdf")
 plt.show()
 
-plt.figure(figsize=(7, 5))
+plt.figure(figsize=(4,4) if args.vert else (7, 5))
 ax2 = plt.gca()
 
 plot_line_with_errorbars("train_time", data_pca_scikit, label="PCA (scikit)", color="tab:green", ax=ax2, linestyle="--")
@@ -142,26 +146,31 @@ plot_line_with_errorbars("train_time", data_pca_torch, label="PCA (Torch, CPU)",
 plot_line_with_errorbars("train_time", data_auto_gpu, label="Auto. (GPU)", color="tab:red", ax=ax2, linestyle="--")
 plot_line_with_errorbars("train_time", data_auto, label="Auto. (CPU)", color="tab:pink", ax=ax2, linestyle="--")
 
-ax2.set_ylabel("Time (s)")
+ax2.set_ylabel("Train time (s)")
 ax2.set_xlabel("Dimension")
 ax2.set_xticks(DISPLAY_DIMS)
 ax2.set_xticklabels(DISPLAY_DIMS)
-ax2.set_title("Train Time")
+if not args.vert:
+    ax2.set_title("Train Time")
 
 h2, l2 = ax2.get_legend_handles_labels()
 
-plt.tight_layout(h_pad=0, rect=(0,0,0.76,1))
-
-
-# plt.title(["No pre-processing", "Normalized", "Centered", "Centered, Normalized"][args.key])
-plt.legend(
-    # [extra]+list(h2),
-    # ["$\\textbf{Train}$"]+list(l2),
-    loc="upper left",
-    bbox_to_anchor=(1, 1),
-    ncol=1,
-    columnspacing=1.4,
-)
+if args.vert:
+    plt.tight_layout(h_pad=0, rect=(0, 0, 1, 0.85))
+    plt.legend(
+        loc="upper left",
+        bbox_to_anchor=(0, 1.3),
+        ncol=2,
+        columnspacing=1.4,
+    )
+else:
+    plt.tight_layout(h_pad=0, rect=(0,0,0.76,1))
+    plt.legend(
+        loc="upper left",
+        bbox_to_anchor=(1, 1),
+        ncol=1,
+        columnspacing=1.4,
+    )
 # ax.set_ylim(0.015, 0.66)
 
 plt.savefig("figures/model_speed_train.pdf")
