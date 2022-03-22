@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--legend', action="store_true")
 parser.add_argument('--auto', action="store_true")
 parser.add_argument('--logfile', nargs="+")
+parser.add_argument('--vert', action="store_true")
 args = parser.parse_args()
 
 data_all = []
@@ -22,9 +23,7 @@ for logfile in args.logfile:
 DIMS = sorted(list(set([x["dim"] for x in data_all[0]])), key=lambda x: int(x))
 DISPLAY_DIMS = [32, 256, 512, 768]
 
-
-# fig = plt.figure(figsize=(10, 2.1))
-fig = plt.figure(figsize=(10, 3.1))
+fig = plt.figure(figsize=(10, 2.1) if args.vert else (10, 3.1))
 
 if args.legend:
     grid_top = 0.1
