@@ -4,13 +4,13 @@ The 768-dimensional embedding of 2019 Wikipedia dump (split to 100 token segment
 This poses practical issues for both research and applications.
 We aim to reduce the size through two methods:
 
-Dimensionality reduction of the embedding (article in writing):
+Dimensionality reduction of the embedding:
 - PCA, autoencoder, random projections
 - Effect on IP vs L2
 - Pre-processing
 - Training/evaluation data size dependency
 
-Document splitting & filtering (thesis in writing): 
+Document splitting & filtering: 
 - Split on segments respecting semantic boundaries
 - Get retrievability annotations and train a filtering system
 - Decrease knowledge base size by clustering (join neighbours pointing to the same doc)
@@ -18,6 +18,24 @@ Document splitting & filtering (thesis in writing):
   - Cluster aggregation
   - Pre-train vs. post-train reduction effects
 
+# Recommendations
+
+- Always use pre- and post-processing (centering & normalization).
+- PCA is a good enough solution that requires very little data (1k vectors) to fit and is stable. The autoencoder provides a slight improvement but is less stable.
+
+# Citation
+
+```
+@article{zouhar2022knowledge,
+  title={Knowledge Base Index Compression via Dimensionality and Precision Reduction},
+  author={Zouhar, Vil{\'e}m and Mosbach, Marius and Zhang, Miaoran and Klakow, Dietrich},
+  journal={arXiv preprint arXiv:2204.02906},
+  year={2022}
+}
+
+```
+
+<!--
 ## Pipeline
 
 Dimensionality reduction:
@@ -34,6 +52,8 @@ Dimensionality reduction:
 4. Use PCA and Autoencoder for comparison.
 
 Run all scripts from the top directory of the repository.
+
+-->
 
 ## Acknowledgement
 
