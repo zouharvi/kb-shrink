@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     '--logfile-pca', default="computed/pca_irrelevant_uneasiness.log")
 parser.add_argument(
-    '--logfile-auto', default=["computed/auto_irrelevant_uneasiness.log"],
+    '--logfile-auto', default=["computed/irrelevant_auto_frozenhand_1.log"],
     nargs="+"
 )
 parser.add_argument(
