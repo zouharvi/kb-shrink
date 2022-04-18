@@ -32,7 +32,6 @@ Document splitting & filtering:
   journal={arXiv preprint arXiv:2204.02906},
   year={2022}
 }
-
 ```
 
 <!--
