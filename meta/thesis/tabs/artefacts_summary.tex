@@ -1,0 +1,35 @@
+\begin{table*}[ht]
+    \center
+    \resizebox{\linewidth}{!}{%
+    \setlength{\tabcolsep}{0.35em} % horizontal padding
+    \renewcommand{\arraystretch}{1.5} % vertical padding
+    \begin{tabular}{p{3.2cm}p{2.3cm}p{2.1cm}p{2.7cm}p{1.7cm}p{2.2cm}}
+        \toprule
+        \textbf{Model} & \textbf{Fusion} & \textbf{KB Source} & \textbf{Keys} & \textbf{Values} & \textbf{Aggregation} \\
+        \midrule 
+            % the minipage is a hack to prevent wrapping
+            k-NN LM \cite{khandelwal2019generalization}
+            & Very late \newline Static convex combination & Train-time & Prefix embd., \newline $L^2$ & Target word & Softmax \\
+            Continuous Cache LM \cite{grave2016improving}
+            & Very late \newline Static convex combination & Dynamic & Prefix embd., \newline inner product & Target word & Softmax \\
+            Dynamic Gating \newline LM \cite{yogatama2021adaptive}
+            & Late \newline Dyn. convex \newline combination & Train-time & Prefix encoding, \newline inner product & Target word & Softmax sum \\
+            Knowledge Graph\newline LM \cite{logan2019baracks} & Intermediate \newline Constraints & External & Entity+relation \newline Discrete struct. & Matching \newline entity & None \\
+        \cmidrule{1-1}
+            Dense Passage \newline Retrieval \citep{karpukhin2020dense} & Early\newline Input & External & Passage embd.,\newline inner product & Passages & None \\
+            Nearest Neighbour QA \citep{lewis2021question} & No model & Train-time & Passage embd.,\newline inner product & Answers & None \\
+            CBR-KBQA \citep{das2021case} & Query\newline creation & Train-time\newline External & Query embd.,\newline inner product & Logical \newline forms & New query \\
+            PullNet \citep{sun2019pullnet} & Subgraph\newline creation & Multiple\newline External & Entities & Docs and\newline Facts & Iterative \newline join \\
+            Universal Schema\newline  QA \citep{das2017question} & Intermediate \newline Retrieval & Multiple \newline External & Query embd. \newline Attention & Facts & Iterative \newline projection \\
+        % \cmidrule{1-1}
+        %     Slot filling ... \\
+        \cmidrule{1-1}
+            FAKTA \citep{nadeem2019fakta} & Early \newline Input & External \newline Online & Condensed\newline query & Docs & Re-ranking,\newline Filtering\\
+        \cmidrule{1-1}
+            Wizards of \newline Wikipedia \citep{dinan2018wizard} & Intermediate \newline Addition & External & Context+topic,\newline inverted index & Passages & Attention \newline (topic) \\
+        \bottomrule
+    \end{tabular}
+    }
+    \caption{Categorization of described NLP systems in terms of the artefact retrieval typology. \textit{Fusion} describe both where it occurs and what mechanism it employs, \textit{Keys} describes not only the key type but also the retrieval mechanism (e.g. metric).}
+    \label{tab:artefacts_summary}
+    \end{table*}

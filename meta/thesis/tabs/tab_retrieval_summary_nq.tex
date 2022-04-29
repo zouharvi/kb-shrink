@@ -1,0 +1,43 @@
+\begin{table*}
+\center
+\renewcommand{\arraystretch}{1.3} % should affect only this table
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+\multirow{2}{*}{\textbf{Method}} & \multirow{2}{*}{\textbf{Compression}} & \multicolumn{2}{c}{\textbf{Original}} & \textbf{Center + Norm.} \\ \cmidrule{3-5}
+ &  & IP & $L^2$ & \{IP, $L^2$\} (\% original) \\
+\midrule
+Original & 1$\times$ & $0.934$ & $0.758$ & $0.920\,{\scriptstyle (100\%)}$ \\
+\cmidrule{1-5}
+Gaussian Projection & 6$\times$ & $0.825$ & $0.848$ & $0.855\,{\scriptstyle (93\%)}$ \\
+Sparse Projection & 6$\times$ & $0.826$ & $0.848$& $0.856\,{\scriptstyle (93\%)}$ \\
+Dimension Dropping & 6$\times$ & $0.840$ & $0.863$ & $0.867\,{\scriptstyle (94\%)}$ \\
+Greedy Dimension Dropping & 6$\times$ & $0.845$ & $0.873$ & ${0.873}\,{\scriptstyle (95\%)}$  \\
+\cmidrule{1-5}
+PCA & 6$\times$ & $0.908$ & $0.907$ & $0.910\,{\scriptstyle (99\%)}$ \\
+PCA (scaled top 5) & 6$\times$ & $0.916$ & $0.910$ & ${0.920}\,{\scriptstyle (100\%)}$ \\ % pca/scaled.py
+\cmidrule{1-5}
+Autoencoder (single layer) & 6$\times$ & $0.915$ & $0.910$ & $0.914\,{\scriptstyle (99\%)}$ \\ % --model 1
+Autoencoder (full) & 6$\times$ & $0.903$ & $0.907$ & $0.910\,{\scriptstyle (99\%)}$ \\ % --model 2
+Autoencoder (shallow decoder) & 6$\times$ & $0.916$ & $0.918$ & $0.919\,{\scriptstyle (100\%)}$ \\ % --model 3
+Autoencoder + $L_1$ (single layer) & 6$\times$ & $0.918$ & $0.918$ & ${0.921}\,{\scriptstyle (100\%)}$ \\ % --model 1 --regularize
+Autoencoder + $L_1$ (full) & 6$\times$ & $0.909$ & $0.910$ & $0.913\,{\scriptstyle (99\%)}$ \\ % --model 2 --regularize
+Autoencoder + $L_1$ (shallow decoder) & 6$\times$ & $0.918$ & $0.917$ & ${0.919}\,{\scriptstyle (100\%)}$ \\ % --model 3 --regularize
+\cmidrule{1-5}
+Precision 16-bit & 2$\times$ & $0.921$ & $0.917$ & $0.920\,{\scriptstyle (100\%)}$ \\
+Precision 8-bit & 4$\times$ & $0.920$ & $0.921$ & $0.922\,{\scriptstyle (100\%)}$ \\
+Precision 1-bit (offset $0.5$) & 32$\times$ & $0.902$ & $0.902$ & $0.904\,{\scriptstyle (98\%)}$ \\
+Precision 1-bit (offset $0$) & 32$\times$ & $0.892$ & $0.902$ & $0.904\,{\scriptstyle (98\%)}$ \\
+\cmidrule{1-5}
+PCA (245) + Precision 1-bit (offset $0.5$)  & 100$\times$ & $0.854$ & $0.862$ & ${0.858}\,{\scriptstyle (93\%)}$ \\
+PCA (128) + Precision 8-bit & 24$\times$ & $0.906$ & $0.904$ & ${0.909}\,{\scriptstyle (99\%)}$ \\
+\bottomrule
+
+% Similarity Distillation $L^2$ & $0.233$  & $0.294$ & $0.285$ \\ % model 4, lr 0.0005
+% Similarity Distillation IP & $0.279$  & $0.284$ & $0.XXX$ \\ % model 4, lr 0.0005
+% Similarity Distillation $L^2$ + Autoencoder & $0.XXX$ & $0.XXX$ & $0.XXX$ 
+\end{tabular}
+}
+\caption{Overview of compression method performance (from 768) using either $L^2$ or inner product for retrieval. Inputs are based on (1) original and (2) centered and normalized output of DPR-CLS. Performance is measured by R-Precision on NaturalQuestions.}
+\label{tab:retrieval_summary_nq}
+\end{table*}

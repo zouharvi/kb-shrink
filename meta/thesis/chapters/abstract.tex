@@ -1,0 +1,14 @@
+Recently neural network based approaches to knowledge-intensive NLP tasks, such as question answering, started to rely heavily on the combination of neural retrievers and readers.
+Retrieval is typically performed over a large textual knowledge base which requires significant memory and compute resources, especially when scaled up.
+On HotpotQA we explore various filtering \& splitting criteria.
+Primarily, we systematically investigate reducing the size of the KB index by means of dimensionality (sparse random projections, PCA, autoencoders) and numerical precision reduction.
+
+Our results show that PCA is an easy solution that requires very little data and is only slightly worse than autoencoders, which are less stable.
+All methods are sensitive to pre- and post-processing and data should always be centered and normalized both before and after dimension reduction.
+Finally, we show that it is possible to combine PCA with using 1bit per dimension.
+Overall we achieve (1) 100$\times$ compression with 75\%, and (2) 24$\times$ compression with 92\% original retrieval performance.
+
+% Particularly, we focus on knowledge bases that consist out of dense document embeddings obtained from transformer-based encoders.
+% This can be potentially used for any downstream task relying on retrieval using continuous vector representation.
+% On HotpotQA and NaturalQuestions we systematically investigate three simple unsupervised approaches for dimensionality reduction: sparse random projections, PCA and, non-linear autoencoders.
+% and investigate their interaction with different metrics used for retrieval.

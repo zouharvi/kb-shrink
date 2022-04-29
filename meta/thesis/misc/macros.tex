@@ -1,0 +1,44 @@
+\newcommand\TODO[1]{\textcolor{red}{TODO: #1}}
+\newcommand\WIP{This part has not yet been written/is work in progress.}
+
+%% for comments
+\newcommand{\mm}[1]{{\textcolor{orange}{[MM: #1]}}}
+\newcommand{\vz}[1]{{\textcolor{Fuchsia}{[VZ: #1]}}}
+
+%% math
+\DeclareMathOperator*{\argk}{arg\,top-k}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+% increase default tab line spacing
+\renewcommand{\arraystretch}{1.2}
+
+% add space between floats and text
+% http://www-h.eng.cam.ac.uk/help/tpl/textprocessing/squeeze.html
+\addtolength{\intextsep}{5mm}
+\addtolength{\belowcaptionskip}{2mm}
+\addtolength{\abovecaptionskip}{2mm}
+
+% increase paragraph spaces
+\addtolength{\parskip}{0.2mm}
+
+% draw splitting examples
+\def\splitExampleOverlap{
+    \hspace{-0.6em}
+    \begin{tikzpicture}[x=5em, y=0.9em]
+    \draw [use as bounding box] (0,0) rectangle (1,1);
+    \fill [fill=red]   (0.01, 0.01) rectangle (0.3, 0.34);
+    \fill [fill=green] (0.2,  0.34) rectangle (0.5, 0.67);
+    \fill [fill=blue]  (0.3,  0.67) rectangle (0.9, 0.99);
+    \end{tikzpicture}
+    \hspace{-0.6em}
+}
+\def\splitExampleNoncontinuous{
+    \hspace{-0.6em}
+    \begin{tikzpicture}[x=5em, y=0.9em]
+    \draw [use as bounding box] (0,0) rectangle (1,1);
+    \fill [fill=red]   (0.01, 0.01) rectangle (0.3,  0.4);
+    \fill [fill=green] (0.4,  0.01) rectangle (0.5,  0.4);
+    \fill [fill=blue]  (0.7,  0.01) rectangle (0.99, 0.4);
+    \end{tikzpicture}
+    \hspace{-0.6em}
+}

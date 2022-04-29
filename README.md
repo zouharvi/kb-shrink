@@ -34,6 +34,8 @@ Document splitting & filtering:
 }
 ```
 
+Furthermore, this project is also [a Master thesis](https://raw.githubusercontent.com/zouharvi/kb-shrink/main/meta/thesis/zouhar_thesis_lct.pdf).
+
 <!--
 ## Pipeline
 
