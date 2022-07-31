@@ -1,5 +1,7 @@
 # Knowledge Base Shrink
 
+Read the [ACL paper](https://aclanthology.org/2022.spanlp-1.5/) or watch the [presentation](https://youtu.be/qczabc2oyMA).
+
 The 768-dimensional embedding of 2019 Wikipedia dump (split to 100 token segment) takes almost 150GB.
 This poses practical issues for both research and applications.
 We aim to reduce the size through two methods:
