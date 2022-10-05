@@ -1,6 +1,6 @@
 # Knowledge Base Shrink
 
-Read the [ACL paper](https://aclanthology.org/2022.spanlp-1.5/) or watch the [presentation](https://youtu.be/qczabc2oyMA).
+Read the [ACL paper](https://aclanthology.org/2022.spanlp-1.5/), the [master thesis](meta/thesis/zouhar_thesis_lct.pdf) or watch the [presentation](https://youtu.be/qczabc2oyMA).
 
 The 768-dimensional embedding of 2019 Wikipedia dump (split to 100 token segment) takes almost 150GB.
 This poses practical issues for both research and applications.
@@ -24,14 +24,16 @@ Document splitting & filtering:
 
 - Always use pre- and post-processing (centering & normalization).
 - PCA is a good enough solution that requires very little data (1k vectors) to fit and is stable. The autoencoder provides a slight improvement but is less stable.
+- 8-bit floats are supported and offer very little performance drop. Combine PCA and this precision reduction for the best trade-off.
 
 # Citation
 
 ```
-@article{zouhar2022knowledge,
+@inproceedings{zouhar2022knowledge,
   title={Knowledge Base Index Compression via Dimensionality and Precision Reduction},
   author={Zouhar, Vil{\'e}m and Mosbach, Marius and Zhang, Miaoran and Klakow, Dietrich},
-  journal={arXiv preprint arXiv:2204.02906},
+  booktitle={Proceedings of the 1st Workshop on Semiparametric Methods in NLP: Decoupling Logic from Knowledge},
+  pages={41--53},
   year={2022}
 }
 ```
@@ -60,5 +62,5 @@ Run all scripts from the top directory of the repository.
 
 ## Acknowledgement
 
-- Based on KILT [research](https://arxiv.org/abs/2009.02252) & [dataset](https://github.com/facebookresearch/KILT):
+- Based on KILT [research](https://arxiv.org/abs/2009.02252) & [dataset](https://github.com/facebookresearch/KILT).
 - This work was funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) – Project-ID 232722074 – SFB 1102.
