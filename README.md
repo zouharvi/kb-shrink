@@ -39,7 +39,7 @@ Document splitting & filtering:
 }
 ```
 
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/qczabc2oyMA?si=Ae6kdER8egRUU46b" title="Paper video presentation" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+[![Paper video presentation](https://img.youtube.com/vi/qczabc2oyMA/0.jpg)](https://www.youtube.com/watch?v=qczabc2oyMA)
 
 Furthermore, this project is also [a Master thesis](https://raw.githubusercontent.com/zouharvi/kb-shrink/main/meta/thesis/zouhar_thesis_lct.pdf).
 
