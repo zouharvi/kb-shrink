@@ -34,9 +34,12 @@ Document splitting & filtering:
   author={Zouhar, Vil{\'e}m and Mosbach, Marius and Zhang, Miaoran and Klakow, Dietrich},
   booktitle={Proceedings of the 1st Workshop on Semiparametric Methods in NLP: Decoupling Logic from Knowledge},
   pages={41--53},
-  year={2022}
+  year={2022},
+  url={https://aclanthology.org/2022.spanlp-1.5/},
 }
 ```
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/qczabc2oyMA?si=Ae6kdER8egRUU46b" title="Paper video presentation" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 Furthermore, this project is also [a Master thesis](https://raw.githubusercontent.com/zouharvi/kb-shrink/main/meta/thesis/zouhar_thesis_lct.pdf).
 
