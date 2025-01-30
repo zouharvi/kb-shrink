@@ -1,6 +1,10 @@
 # Knowledge Base Shrink
 
-Read the [ACL paper](https://aclanthology.org/2022.spanlp-1.5/), the [master thesis](meta/thesis/zouhar_thesis_lct.pdf) or watch the [presentation](https://youtu.be/qczabc2oyMA).
+[![Paper](https://img.shields.io/badge/📜%20paper-481.svg)](https://aclanthology.org/2022.spanlp-1.5/)
+&nbsp;
+[![Master thesis](https://img.shields.io/badge/📔%20master%20thesis-481.svg)](meta/thesis/zouhar_thesis_lct.pdf)
+&nbsp;
+[![YouTube video](https://img.shields.io/badge/🎥%20YouTube%20video-F00.svg)](https://youtu.be/qczabc2oyMA)
 
 The 768-dimensional embedding of 2019 Wikipedia dump (split to 100 token segment) takes almost 150GB.
 This poses practical issues for both research and applications.
@@ -39,8 +43,6 @@ Document splitting & filtering:
 }
 ```
 
-[![Paper video presentation](https://img.youtube.com/vi/qczabc2oyMA/0.jpg)](https://www.youtube.com/watch?v=qczabc2oyMA)
-
 Furthermore, this project is also [a Master thesis](https://raw.githubusercontent.com/zouharvi/kb-shrink/main/meta/thesis/zouhar_thesis_lct.pdf).
 
 <!--
@@ -60,7 +62,6 @@ Dimensionality reduction:
 4. Use PCA and Autoencoder for comparison.
 
 Run all scripts from the top directory of the repository.
-
 -->
 
 ## Acknowledgement
